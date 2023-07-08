@@ -8,39 +8,39 @@ export const AppRoot = () => {
       </div>
       <div className="bg-slate-300 bg-gradient-to-b from-blue-900 flex flex-col">
         <div className="w-full flex justify-left">
-          <div className="bg-yellow-300 bg-gradient-to-t from-slate-300 w-64 h-64"></div>
+          <div className="bg-yellow-300 bg-gradient-to-t from-slate-300 w-64 h-64 hover:animate-bounce"></div>
         </div>
 
         <div className="w-full flex justify-center">
-          <div className="bg-yellow-300 bg-gradient-to-t from-slate-300 w-64 h-64"></div>
+          <div className="bg-yellow-300 bg-gradient-to-t from-slate-300 w-64 h-64 hover:animate-bounce"></div>
         </div>
 
         <div className="w-full flex justify-end">
-          <div className="bg-yellow-300 bg-gradient-to-t from-slate-300 w-64 h-64"></div>
+          <div className="bg-yellow-300 bg-gradient-to-t from-slate-300 w-64 h-64 hover:animate-bounce"></div>
         </div>
 
         <div className="w-full flex justify-left">
-          <div className="bg-yellow-300 bg-gradient-to-t from-slate-300 w-64 h-64"></div>
+          <div className="bg-yellow-300 bg-gradient-to-t from-slate-300 w-64 h-64 hover:animate-bounce"></div>
         </div>
 
         <div className="w-full flex justify-center">
-          <div className="bg-yellow-300 bg-gradient-to-t from-slate-300 w-64 h-64"></div>
+          <div className="bg-yellow-300 bg-gradient-to-t from-slate-300 w-64 h-64 hover:animate-bounce"></div>
         </div>
 
         <div className="w-full flex justify-end">
-          <div className="bg-yellow-300 bg-gradient-to-t from-slate-300 w-64 h-64"></div>
+          <div className="bg-yellow-300 bg-gradient-to-t from-slate-300 w-64 h-64 hover:animate-bounce"></div>
         </div>
 
         <div className="w-full flex justify-left">
-          <div className="bg-yellow-300 bg-gradient-to-t from-slate-300 w-64 h-64"></div>
+          <div className="bg-yellow-300 bg-gradient-to-t from-slate-300 w-64 h-64 hover:animate-bounce"></div>
         </div>
 
         <div className="w-full flex justify-center">
-          <div className="bg-yellow-300 bg-gradient-to-t from-slate-300 w-64 h-64"></div>
+          <div className="bg-yellow-300 bg-gradient-to-t from-slate-300 w-64 h-64 hover:animate-bounce"></div>
         </div>
 
         <div className="w-full flex justify-end">
-          <div className="bg-yellow-300 bg-gradient-to-t from-slate-300 w-64 h-64"></div>
+          <div className="bg-yellow-300 bg-gradient-to-t from-slate-300 w-64 h-64 hover:animate-bounce"></div>
         </div>
       </div>
     </>
