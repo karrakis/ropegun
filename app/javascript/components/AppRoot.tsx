@@ -37,7 +37,9 @@ export const AppRoot = () => {
       </div>
       <div
         className="flex flex-col min-h-screen w-full bg-no-repeat bg-center bg-top"
-        style={{ backgroundImage: `url(dreamcatcher.jpg)` }}
+        style={{
+          backgroundImage: `linear-gradient(to top, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0)), url(dreamcatcher.jpg)`,
+        }}
       >
         <Bouncer />
         <Bouncer />
