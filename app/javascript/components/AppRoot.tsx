@@ -1,6 +1,7 @@
 import React from "react";
 
 export const Bouncer = () => {
+  console.log("bouncer?");
   return (
     <>
       <div className="w-full flex justify-start">
@@ -19,9 +20,13 @@ export const Bouncer = () => {
 };
 
 export const AppRoot = () => {
+  console.log("the fuck?");
   return (
     <>
-      <div className="bg-blue-900 text-white h-8 w-full flex items-center sticky top-0 z-50">
+      <div
+        className="text-white h-8 w-full flex items-center sticky top-0 z-50 bg-center bg-no-repeat bg-top -mb-8 border border-bot border-black"
+        style={{ backgroundImage: "url(dreamcatcher.jpg)" }}
+      >
         <div id="header-left" className="justify-start flex w-full">
           <span>Kitsunesays</span>
         </div>
@@ -30,7 +35,10 @@ export const AppRoot = () => {
           <span className="mr-4">Log In</span>
         </div>
       </div>
-      <div className="bg-slate-300 bg-gradient-to-b from-blue-900 flex flex-col min-h-screen">
+      <div
+        className="flex flex-col min-h-screen w-full bg-no-repeat bg-center bg-top"
+        style={{ backgroundImage: `url(dreamcatcher.jpg)` }}
+      >
         <Bouncer />
         <Bouncer />
         <Bouncer />
