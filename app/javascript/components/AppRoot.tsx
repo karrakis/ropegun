@@ -1,26 +1,86 @@
 import React from "react";
 
-export const Bouncer = () => {
-  console.log("bouncer?");
+export const SectionHeader = ({ children }: any) => {
   return (
-    <>
-      <div className="w-full flex justify-start">
-        <div className="bg-yellow-300 bg-gradient-to-t from-slate-300 w-64 h-64 hover:animate-bounce"></div>
-      </div>
+    <div className="w-full flex justify-center my-4">
+      <h1 className="text-xl font-bold bg-white border border-green-500 px-4 py-2 h-auto">
+        {children}
+      </h1>
+    </div>
+  );
+};
 
-      <div className="w-full flex justify-center">
-        <div className="bg-yellow-300 bg-gradient-to-t from-slate-300 w-64 h-64 hover:animate-bounce"></div>
-      </div>
+export const LinkTitle = ({ children }: any) => {
+  return (
+    <div className="w-full flex justify-center p-2">
+      <h2 className="text-xl font-bold bg-white border border-green-500 px-2 py-1 h-auto">
+        {children}
+      </h2>
+    </div>
+  );
+};
 
-      <div className="w-full flex justify-end">
-        <div className="bg-yellow-300 bg-gradient-to-t from-slate-300 w-64 h-64 hover:animate-bounce"></div>
+interface LinkBoxProps {
+  background: string;
+  title: string;
+  onClick: Function;
+}
+
+export const LinkBox = ({ background, title, onClick }: LinkBoxProps) => {
+  return (
+    <div
+      style={{
+        backgroundImage: `url(${background})`,
+      }}
+      onClick={onClick}
+      className="p-2 flex-none w-fit m-2"
+    >
+      <LinkTitle>{title}</LinkTitle>
+    </div>
+  );
+};
+
+export const Climbers = () => {
+  return (
+    <div className="flex w-full justify-center my-8 h-96">
+      <div className="w-2/3 h-full flex flex-col justify-start bg-green-300 drop-shadow-2xl border border-green-500">
+        <SectionHeader>Climbers</SectionHeader>
+        <LinkBox
+          background="dreamcatcher.jpg"
+          title="Find Opportunities"
+          onClick={() => {}}
+        />
+        <LinkBox
+          background="dreamcatcher.jpg"
+          title="Advertise Skills"
+          onClick={() => {}}
+        />
       </div>
-    </>
+    </div>
+  );
+};
+
+export const Organizers = () => {
+  return (
+    <div className="flex w-full justify-center my-8 h-96">
+      <div className="w-2/3 h-full flex flex-col justify-start bg-orange-300 drop-shadow-2xl border border-orange-500">
+        <SectionHeader>Organizers</SectionHeader>
+        <LinkBox
+          background="dreamcatcher.jpg"
+          title="Create Opportunities"
+          onClick={() => {}}
+        />
+        <LinkBox
+          background="dreamcatcher.jpg"
+          title="Manage Opportunities"
+          onClick={() => {}}
+        />
+      </div>
+    </div>
   );
 };
 
 export const AppRoot = () => {
-  console.log("the fuck?");
   return (
     <>
       <div
@@ -41,9 +101,8 @@ export const AppRoot = () => {
           backgroundImage: `linear-gradient(to top, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0)), url(dreamcatcher.jpg)`,
         }}
       >
-        <Bouncer />
-        <Bouncer />
-        <Bouncer />
+        <Climbers />
+        <Organizers />
       </div>
     </>
   );
