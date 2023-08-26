@@ -3,7 +3,7 @@ import React from "react";
 export const SectionHeader = ({ children }: any) => {
   return (
     <div className="w-full flex justify-center my-4">
-      <h1 className="text-xl font-bold bg-white border border-green-500 px-4 py-2 h-auto">
+      <h1 className="text-xl font-bold bg-white border border-green-500 px-4 py-2 h-auto bg-auburn">
         {children}
       </h1>
     </div>
@@ -13,7 +13,7 @@ export const SectionHeader = ({ children }: any) => {
 export const LinkTitle = ({ children }: any) => {
   return (
     <div className="w-full flex justify-center p-2">
-      <h2 className="text-xl font-bold bg-white border border-green-500 px-2 py-1 h-auto">
+      <h2 className="text-xl font-bold bg-white px-2 py-1 h-auto">
         {children}
       </h2>
     </div>
@@ -29,11 +29,8 @@ interface LinkBoxProps {
 export const LinkBox = ({ background, title, onClick }: LinkBoxProps) => {
   return (
     <div
-      style={{
-        backgroundImage: `url(${background})`,
-      }}
       onClick={onClick}
-      className="p-2 flex-none w-fit m-2"
+      className="p-2 mt-2 w-full text-cream bg-khaki border"
     >
       <LinkTitle>{title}</LinkTitle>
     </div>
@@ -42,8 +39,8 @@ export const LinkBox = ({ background, title, onClick }: LinkBoxProps) => {
 
 export const Climbers = () => {
   return (
-    <div className="flex w-full justify-center my-8 h-96">
-      <div className="w-2/3 h-full flex flex-col justify-start bg-green-300 drop-shadow-2xl border border-green-500">
+    <div className="flex h-full justify-center m-8">
+      <div className="w-full h-full flex flex-col justify-start bg-green-300 drop-shadow-2xl border border-green-500 bg-ashgray p-1">
         <SectionHeader>Climbers</SectionHeader>
         <LinkBox
           background="dreamcatcher.jpg"
@@ -62,8 +59,8 @@ export const Climbers = () => {
 
 export const Organizers = () => {
   return (
-    <div className="flex w-full justify-center my-8 h-96">
-      <div className="w-2/3 h-full flex flex-col justify-start bg-orange-300 drop-shadow-2xl border border-orange-500">
+    <div className="flex h-full justify-center m-8">
+      <div className="w-full h-full flex flex-col justify-start bg-orange-300 drop-shadow-2xl border border-orange-500 bg-ashgray p-1">
         <SectionHeader>Organizers</SectionHeader>
         <LinkBox
           background="dreamcatcher.jpg"
@@ -83,10 +80,7 @@ export const Organizers = () => {
 export const AppRoot = () => {
   return (
     <>
-      <div
-        className="text-white h-8 w-full flex items-center sticky top-0 z-50 bg-center bg-no-repeat bg-top -mb-8 border border-bot border-black"
-        style={{ backgroundImage: "url(dreamcatcher.jpg)" }}
-      >
+      <div className="text-white h-8 w-full flex items-center sticky top-0 z-50 -mb-8 bg-night text-cream">
         <div id="header-left" className="justify-start flex w-full">
           <span>Kitsunesays</span>
         </div>
@@ -95,12 +89,7 @@ export const AppRoot = () => {
           <span className="mr-4">Log In</span>
         </div>
       </div>
-      <div
-        className="flex flex-col min-h-screen w-full bg-no-repeat bg-center bg-top"
-        style={{
-          backgroundImage: `linear-gradient(to top, rgba(255, 255, 255, 1), rgba(255, 255, 255, 0)), url(dreamcatcher.jpg)`,
-        }}
-      >
+      <div className="flex justify-around min-h-screen w-full bg-auburn text-cream">
         <Climbers />
         <Organizers />
       </div>
