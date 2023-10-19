@@ -93,6 +93,17 @@ export const AppRoot = ({ routes }: AppRootProps) => {
         </div>
         <div id="header-right" className="justify-end flex w-full">
           <span className="mr-4">Profile</span>
+          <form class="button_to" method="get" action="/auth/logout">
+            <button data-turbo="false" type="submit">
+              Log Out
+            </button>
+            <input
+              type="hidden"
+              name="authenticity_token"
+              value={csrf}
+              autocomplete="off"
+            ></input>
+          </form>
           <form class="button_to" method="post" action="/auth/auth0">
             <button data-turbo="false" type="submit">
               Login
