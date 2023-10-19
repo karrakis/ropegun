@@ -73,3 +73,7 @@ group :test do
   gem "selenium-webdriver"
   gem "webdrivers"
 end
+
+gem 'omniauth-auth0'
+gem 'omniauth-rails_csrf_protection'
+gem 'dotenv-rails'

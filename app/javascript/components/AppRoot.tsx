@@ -26,6 +26,10 @@ interface LinkBoxProps {
   onClick: Function;
 }
 
+interface AppRootProps {
+  routes: string;
+}
+
 export const LinkBox = ({ background, title, onClick }: LinkBoxProps) => {
   return (
     <div
@@ -77,7 +81,10 @@ export const Organizers = () => {
   );
 };
 
-export const AppRoot = () => {
+export const AppRoot = ({ routes }: AppRootProps) => {
+  const csrf = document
+    .querySelector("meta[name='csrf-token']")
+    .getAttribute("content");
   return (
     <>
       <div className="text-white h-8 w-full flex items-center sticky top-0 z-50 -mb-8 bg-night text-cream">
@@ -86,7 +93,17 @@ export const AppRoot = () => {
         </div>
         <div id="header-right" className="justify-end flex w-full">
           <span className="mr-4">Profile</span>
-          <span className="mr-4">Log In</span>
+          <form class="button_to" method="post" action="/auth/auth0">
+            <button data-turbo="false" type="submit">
+              Login
+            </button>
+            <input
+              type="hidden"
+              name="authenticity_token"
+              value={csrf}
+              autocomplete="off"
+            ></input>
+          </form>
         </div>
       </div>
       <div className="flex justify-around min-h-screen w-full bg-auburn text-cream">
