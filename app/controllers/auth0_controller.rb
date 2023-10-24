@@ -5,6 +5,17 @@ class Auth0Controller < ApplicationController
       # Refer to https://github.com/auth0/omniauth-auth0/blob/master/EXAMPLES.md#example-of-the-resulting-authentication-hash for complete information on 'omniauth.auth' contents.
       auth_info = request.env['omniauth.auth']
       session[:userinfo] = auth_info['extra']['raw_info']
+
+      user = User.find_by(auth0_sub: session[:userinfo]["sub"])
+      unless user
+        user = User.new(auth0_sub: session[:userinfo]["sub"])
+        user.name = "#{session[:userinfo]["given_name"]} #{session[:userinfo]["family_name"]}"
+        user.email = session[:userinfo]["email"]
+        user.save!
+      end
+      
+      
+
   
       # Redirect to the URL you want after successful auth
       redirect_to '/dashboard'
