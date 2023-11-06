@@ -26,8 +26,23 @@ interface LinkBoxProps {
   onClick: Function;
 }
 
+interface UserSessionObject {
+  name: string;
+  picture: string;
+}
+
+interface Route {
+  path: string;
+  name: string;
+}
+
+interface RouteList {
+  dashboard: Route;
+}
+
 interface AppRootProps {
-  routes: string;
+  routes: RouteList;
+  user: UserSessionObject;
 }
 
 export const LinkBox = ({ background, title, onClick }: LinkBoxProps) => {
@@ -81,40 +96,56 @@ export const Organizers = () => {
   );
 };
 
-export const AppRoot = ({ routes }: AppRootProps) => {
+export const AppRoot = ({ routes, user }: AppRootProps) => {
   const csrf = document
     .querySelector("meta[name='csrf-token']")
     .getAttribute("content");
+
+  console.log("user,", user);
+  console.log("dash route,", routes.dashboard.path);
+  console.log("picture path,", user.picture);
+
   return (
     <>
-      <div className="text-white h-8 w-full flex items-center sticky top-0 z-50 -mb-8 bg-night text-cream">
+      <div className="text-white h-16 w-full flex items-center sticky top-0 z-50 -mb-8 bg-night text-cream">
         <div id="header-left" className="justify-start flex w-full">
           <span>Kitsunesays</span>
         </div>
         <div id="header-right" className="justify-end flex w-full">
-          <span className="mr-4">Profile</span>
-          <form class="button_to" method="get" action="/auth/logout">
-            <button data-turbo="false" type="submit">
-              Log Out
-            </button>
-            <input
-              type="hidden"
-              name="authenticity_token"
-              value={csrf}
-              autocomplete="off"
-            ></input>
-          </form>
-          <form class="button_to" method="post" action="/auth/auth0">
-            <button data-turbo="false" type="submit">
-              Login
-            </button>
-            <input
-              type="hidden"
-              name="authenticity_token"
-              value={csrf}
-              autocomplete="off"
-            ></input>
-          </form>
+          {!!user && (
+            <form className="button_to m-2" method="get" action="/auth/logout">
+              <button data-turbo="false" type="submit">
+                Log Out
+              </button>
+              <input
+                type="hidden"
+                name="authenticity_token"
+                value={csrf}
+                autoComplete="off"
+              ></input>
+              <button
+                data-turbo="false"
+                onClick={() => {
+                  window.location.href = routes.dashboard.path;
+                }}
+              >
+                <img src={user.picture}></img>
+              </button>
+            </form>
+          )}
+          {!user && (
+            <form className="button_to m-2" method="post" action="/auth/auth0">
+              <button data-turbo="false" type="submit">
+                Login
+              </button>
+              <input
+                type="hidden"
+                name="authenticity_token"
+                value={csrf}
+                autoComplete="off"
+              ></input>
+            </form>
+          )}
         </div>
       </div>
       <div className="flex justify-around min-h-screen w-full bg-auburn text-cream">
