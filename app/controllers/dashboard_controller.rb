@@ -4,5 +4,6 @@ class DashboardController < ApplicationController
     def show
       # session[:userinfo] was saved earlier on Auth0Controller#callback
       @user = session[:userinfo]
+      @local_user = User.find_by(auth0_sub: @user["sub"]).as_json
     end
   end

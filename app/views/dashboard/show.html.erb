@@ -1,4 +1,5 @@
 <div>
   <p>Normalized User Profile:<%= JSON.pretty_generate(@user)%></p>
+  <p>Normalized User Profile (local):<%= JSON.pretty_generate(@local_user)%></p>
   <img src=<%= @user["picture"] %>>
 </div>

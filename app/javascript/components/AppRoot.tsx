@@ -142,7 +142,11 @@ export const AppRoot = ({ routes, user }: AppRootProps) => {
           )}
           {!user && (
             <form className="button_to m-2" method="post" action="/auth/auth0">
-              <button data-turbo="false" type="submit">
+              <button
+                className="bg-auburn p-2 m-2"
+                data-turbo="false"
+                type="submit"
+              >
                 Login
               </button>
               <input
