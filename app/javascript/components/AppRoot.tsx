@@ -109,12 +109,20 @@ export const AppRoot = ({ routes, user }: AppRootProps) => {
     <>
       <div className="text-white h-16 w-full flex items-center sticky top-0 z-50 -mb-8 bg-night text-cream">
         <div id="header-left" className="justify-start flex w-full">
-          <span>Kitsunesays</span>
+          <span className="px-4 py-2 bg-auburn text-xl">Approach</span>
         </div>
-        <div id="header-right" className="justify-end flex w-full">
+        <div id="header-right" className="justify-end flex w-full h-full">
           {!!user && (
-            <form className="button_to m-2" method="get" action="/auth/logout">
-              <button data-turbo="false" type="submit">
+            <form
+              className="button_to m-2 flex items-center justify-end"
+              method="get"
+              action="/auth/logout"
+            >
+              <button
+                className="m-2 p-2 bg-auburn"
+                data-turbo="false"
+                type="submit"
+              >
                 Log Out
               </button>
               <input
@@ -123,14 +131,13 @@ export const AppRoot = ({ routes, user }: AppRootProps) => {
                 value={csrf}
                 autoComplete="off"
               ></input>
-              <button
+              <a
                 data-turbo="false"
-                onClick={() => {
-                  window.location.href = routes.dashboard.path;
-                }}
+                className="h-full w-auto m-2 cursor-pointer"
+                href={routes.dashboard.path}
               >
-                <img src={user.picture}></img>
-              </button>
+                <img className="h-12 w-auto" src={user.picture}></img>
+              </a>
             </form>
           )}
           {!user && (
