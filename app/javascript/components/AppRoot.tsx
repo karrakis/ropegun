@@ -1,4 +1,5 @@
 import React from "react";
+import logo from "../assets/mountains-transparency5.png";
 
 export const SectionHeader = ({ children }: any) => {
   return (
@@ -101,15 +102,16 @@ export const AppRoot = ({ routes, user }: AppRootProps) => {
     .querySelector("meta[name='csrf-token']")
     .getAttribute("content");
 
-  console.log("user,", user);
-  console.log("dash route,", routes.dashboard.path);
-  console.log("picture path,", user.picture);
+  console.log("logo located at:", logo);
 
   return (
     <>
       <div className="text-white h-16 w-full flex items-center sticky top-0 z-50 -mb-8 bg-night text-cream">
         <div id="header-left" className="justify-start flex w-full">
-          <span className="px-4 py-2 bg-auburn text-xl">Approach</span>
+          <img className="h-12" src={logo} />
+          <span className="px-4 py-2 bg-auburn text-xl flex flex-row items-center">
+            <span>Approach</span>
+          </span>
         </div>
         <div id="header-right" className="justify-end flex w-full h-full">
           {!!user && (
