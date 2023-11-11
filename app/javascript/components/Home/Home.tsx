@@ -17,7 +17,7 @@ export const Organizers = () => {
   return (
     <NavContainerGray>
       <SectionHeader>Organizers</SectionHeader>
-      <LinkBox title="Create @userOpportunities" onClick={() => {}} />
+      <LinkBox title="Create Opportunities" onClick={() => {}} />
       <LinkBox title="Manage Opportunities" onClick={() => {}} />
     </NavContainerGray>
   );
