@@ -18,7 +18,7 @@ class Auth0Controller < ApplicationController
 
   
       # Redirect to the URL you want after successful auth
-      redirect_to '/dashboard'
+      redirect_to '/'
     end
   
     def failure

@@ -1,8 +1,7 @@
-import React from "react";
-import NavContainerGray from "./NavContainer/NavContainerGray";
-import SectionHeader from "./NavContainer/SectionHeader";
-import LinkBox from "./NavContainer/LinkBox";
+import React, { useState, useEffect } from "react";
 import Header from "./Header/Header";
+import Home from "./Home/Home";
+import Dashboard from "./Dashboard/Dashboard";
 
 interface UserSessionObject {
   name: string;
@@ -21,30 +20,32 @@ interface RouteList {
 interface AppRootProps {
   routes: RouteList;
   user: UserSessionObject;
+  local_user: JSON;
   csrf: string;
 }
 
-export const Climbers = () => {
-  return (
-    <NavContainerGray>
-      <SectionHeader>Climbers</SectionHeader>
-      <LinkBox title="Find Opportunities" onClick={() => {}} />
-      <LinkBox title="Advertise Skills" onClick={() => {}} />
-    </NavContainerGray>
-  );
-};
+export const AppRoot = ({ routes, user, local_user, csrf }: AppRootProps) => {
+  const [currentPage, setPage] = useState(window.location.pathname);
 
-export const Organizers = () => {
-  return (
-    <NavContainerGray>
-      <SectionHeader>Organizers</SectionHeader>
-      <LinkBox title="Create Opportunities" onClick={() => {}} />
-      <LinkBox title="Manage Opportunities" onClick={() => {}} />
-    </NavContainerGray>
-  );
-};
+  const setDisplayPage = () => {
+    switch (currentPage) {
+      case "/":
+        window.history.pushState({}, "Home", "/");
+        return <Home />;
+      case "/home":
+        window.history.pushState({}, "Home", "/");
+        return <Home />;
+      case "/dashboard":
+        window.history.pushState({}, "Dashboard", "/dashboard");
+        return <Dashboard user={user} local_user={local_user} />;
+    }
+  };
 
-export const AppRoot = ({ routes, user, csrf }: AppRootProps) => {
+  useEffect(() => {
+    console.log(currentPage);
+    setDisplayPage();
+  }, [currentPage]);
+
   return (
     <div className="relative">
       <a
@@ -59,13 +60,8 @@ export const AppRoot = ({ routes, user, csrf }: AppRootProps) => {
           src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Boulder_Flatirons.jpg/512px-Boulder_Flatirons.jpg"
         />
       </a>
-      <Header user={user} csrf={csrf} dashboard_path={routes.dashboard.path} />
-      <div className="w-full flex flex-row justify-center">
-        <div className="flex flex-col md:flex-row justify-start md:justify-center min-h-screen w-full bg-auburn text-cream  max-w-3xl">
-          <Climbers />
-          <Organizers />
-        </div>
-      </div>
+      <Header user={user} csrf={csrf} setPage={setPage} />
+      {setDisplayPage()}
     </div>
   );
 };

@@ -1,19 +1,16 @@
 import React from "react";
-import Logo from "./Logo";
+import HeaderLeft from "./HeaderLeft";
 import HeaderRightLoggedIn from "./HeaderRightLoggedIn";
 import HeaderRightLoggedOut from "./HeaderRightLoggedOut";
 
-export const Header = ({ user, csrf, dashboard_path }) => {
+export const Header = ({ user, csrf, setPage }) => {
+  console.log("rendering header");
   return (
     <div className="text-white h-16 w-full flex items-center sticky top-0 z-50 bg-night text-cream">
-      <Logo />
+      <HeaderLeft setPage={setPage} />
       <div id="header-right" className="justify-end flex w-full h-full">
         {!!user && (
-          <HeaderRightLoggedIn
-            user={user}
-            csrf={csrf}
-            dashboard_path={dashboard_path}
-          />
+          <HeaderRightLoggedIn user={user} csrf={csrf} setPage={setPage} />
         )}
         {!user && <HeaderRightLoggedOut csrf={csrf} />}
       </div>
