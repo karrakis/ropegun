@@ -1,31 +1,8 @@
 import React from "react";
 import logo from "../assets/mountains-transparency5.png";
-
-export const SectionHeader = ({ children }: any) => {
-  return (
-    <div className="w-full flex justify-center my-4">
-      <h1 className="text-xl font-bold bg-white border border-green-500 px-4 py-2 h-auto bg-auburn">
-        {children}
-      </h1>
-    </div>
-  );
-};
-
-export const LinkTitle = ({ children }: any) => {
-  return (
-    <div className="w-full flex justify-center p-2">
-      <h2 className="text-xl font-bold bg-white px-2 py-1 h-auto">
-        {children}
-      </h2>
-    </div>
-  );
-};
-
-interface LinkBoxProps {
-  background: string;
-  title: string;
-  onClick: Function;
-}
+import NavContainerGray from "./NavContainerGray";
+import SectionHeader from "./SectionHeader";
+import LinkBox from "./LinkBox";
 
 interface UserSessionObject {
   name: string;
@@ -46,54 +23,39 @@ interface AppRootProps {
   user: UserSessionObject;
 }
 
-export const LinkBox = ({ background, title, onClick }: LinkBoxProps) => {
-  return (
-    <div
-      onClick={onClick}
-      className="p-2 mt-2 w-full text-cream bg-khaki border"
-    >
-      <LinkTitle>{title}</LinkTitle>
-    </div>
-  );
-};
-
 export const Climbers = () => {
   return (
-    <div className="flex h-full justify-center m-8">
-      <div className="w-full h-full flex flex-col justify-start bg-green-300 drop-shadow-2xl border border-green-500 bg-ashgray p-1">
-        <SectionHeader>Climbers</SectionHeader>
-        <LinkBox
-          background="dreamcatcher.jpg"
-          title="Find Opportunities"
-          onClick={() => {}}
-        />
-        <LinkBox
-          background="dreamcatcher.jpg"
-          title="Advertise Skills"
-          onClick={() => {}}
-        />
-      </div>
-    </div>
+    <NavContainerGray>
+      <SectionHeader>Climbers</SectionHeader>
+      <LinkBox
+        background="dreamcatcher.jpg"
+        title="Find Opportunities"
+        onClick={() => {}}
+      />
+      <LinkBox
+        background="dreamcatcher.jpg"
+        title="Advertise Skills"
+        onClick={() => {}}
+      />
+    </NavContainerGray>
   );
 };
 
 export const Organizers = () => {
   return (
-    <div className="flex h-full justify-center m-8">
-      <div className="w-full h-full flex flex-col justify-start bg-orange-300 drop-shadow-2xl border border-orange-500 bg-ashgray p-1">
-        <SectionHeader>Organizers</SectionHeader>
-        <LinkBox
-          background="dreamcatcher.jpg"
-          title="Create Opportunities"
-          onClick={() => {}}
-        />
-        <LinkBox
-          background="dreamcatcher.jpg"
-          title="Manage Opportunities"
-          onClick={() => {}}
-        />
-      </div>
-    </div>
+    <NavContainerGray>
+      <SectionHeader>Organizers</SectionHeader>
+      <LinkBox
+        background="dreamcatcher.jpg"
+        title="Create Opportunities"
+        onClick={() => {}}
+      />
+      <LinkBox
+        background="dreamcatcher.jpg"
+        title="Manage Opportunities"
+        onClick={() => {}}
+      />
+    </NavContainerGray>
   );
 };
 
@@ -105,9 +67,21 @@ export const AppRoot = ({ routes, user }: AppRootProps) => {
   console.log("logo located at:", logo);
 
   return (
-    <>
-      <div className="text-white h-16 w-full flex items-center sticky top-0 z-50 -mb-8 bg-night text-cream">
-        <div id="header-left" className="justify-start flex w-full">
+    <div className="relative">
+      <a
+        className="absolute top-0 left-0 -z-10"
+        title="Paulhaberstroh, CC BY-SA 4.0 'https://creativecommons.org/licenses/by-sa/4.0', via Wikimedia Commons"
+        href="https://commons.wikimedia.org/wiki/File:Boulder_Flatirons.jpg"
+      >
+        <img
+          className="w-screen h-auto"
+          width="512"
+          alt="Boulder Flatirons"
+          src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Boulder_Flatirons.jpg/512px-Boulder_Flatirons.jpg"
+        />
+      </a>
+      <div className="text-white h-16 w-full flex items-center sticky top-0 z-50 bg-night text-cream">
+        <div id="header-left" className="justify-start flex w-full ml-2">
           <img className="h-12" src={logo} />
           <span className="px-4 py-2 bg-auburn text-xl flex flex-row items-center">
             <span>Approach</span>
@@ -121,7 +95,7 @@ export const AppRoot = ({ routes, user }: AppRootProps) => {
               action="/auth/logout"
             >
               <button
-                className="m-2 p-2 bg-auburn"
+                className="p-2 h-12 bg-auburn"
                 data-turbo="false"
                 type="submit"
               >
@@ -135,7 +109,7 @@ export const AppRoot = ({ routes, user }: AppRootProps) => {
               ></input>
               <a
                 data-turbo="false"
-                className="h-full w-auto m-2 cursor-pointer"
+                className="h-full w-auto mr-2 cursor-pointer"
                 href={routes.dashboard.path}
               >
                 <img className="h-12 w-auto" src={user.picture}></img>
@@ -161,11 +135,13 @@ export const AppRoot = ({ routes, user }: AppRootProps) => {
           )}
         </div>
       </div>
-      <div className="flex justify-around min-h-screen w-full bg-auburn text-cream">
-        <Climbers />
-        <Organizers />
+      <div className="w-full flex flex-row justify-center">
+        <div className="flex flex-col md:flex-row justify-start md:justify-center min-h-screen w-full bg-auburn text-cream  max-w-3xl">
+          <Climbers />
+          <Organizers />
+        </div>
       </div>
-    </>
+    </div>
   );
 };
 
