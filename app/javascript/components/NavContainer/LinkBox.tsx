@@ -2,12 +2,11 @@ import React from "react";
 import LinkTitle from "./LinkTitle";
 
 interface LinkBoxProps {
-  background: string;
   title: string;
-  onClick: Function;
+  onClick: VoidFunction;
 }
 
-export const LinkBox = ({ background, title, onClick }: LinkBoxProps) => {
+export const LinkBox = ({ title, onClick }: LinkBoxProps) => {
   return (
     <div
       onClick={onClick}
