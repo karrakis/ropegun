@@ -20,11 +20,11 @@ interface RouteList {
 interface AppRootProps {
   routes: RouteList;
   user: UserSessionObject;
-  local_user: JSON;
+  localUser: JSON;
   csrf: string;
 }
 
-export const AppRoot = ({ routes, user, local_user, csrf }: AppRootProps) => {
+export const AppRoot = ({ routes, user, localUser, csrf }: AppRootProps) => {
   const [currentPage, setPage] = useState(window.location.pathname);
 
   const setDisplayPage = () => {
@@ -37,7 +37,7 @@ export const AppRoot = ({ routes, user, local_user, csrf }: AppRootProps) => {
         return <Home />;
       case "/dashboard":
         window.history.pushState({}, "Dashboard", "/dashboard");
-        return <Dashboard user={user} local_user={local_user} />;
+        return <Dashboard user={user} localUser={localUser} />;
     }
   };
 

@@ -8,12 +8,19 @@ document.addEventListener("DOMContentLoaded", () => {
   const routes =
     rootEl && JSON.parse(rootEl.getAttribute("data-routes") || false);
   const user = rootEl && JSON.parse(rootEl.getAttribute("data-user") || false);
+  const local_user =
+    rootEl && JSON.parse(rootEl.getAttribute("data-local-user") || false);
   const csrf = document
     .querySelector("meta[name='csrf-token']")!
     .getAttribute("content");
 
   ReactDOM.render(
-    <AppRoot routes={routes || ""} user={user} csrf={csrf || ""} />,
+    <AppRoot
+      routes={routes || ""}
+      user={user}
+      localUser={local_user}
+      csrf={csrf || ""}
+    />,
     rootEl
   );
 });
