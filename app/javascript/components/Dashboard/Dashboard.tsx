@@ -14,9 +14,9 @@ export const Dashboard = ({ user, localUser }) => {
         <div className="w-full relative">
           <button
             className="w-16 h-8 bg-cream text-night absolute top-0 right-0 cursor-pointer"
-            onClick={() => setEditing(true)}
+            onClick={() => setEditing(!editing)}
           >
-            Edit
+            {editing ? "Save" : "Edit"}
           </button>
         </div>
         {editing ? (

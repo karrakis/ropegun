@@ -2,6 +2,17 @@ import React, { useState } from "react";
 
 export const Edit = ({ user, localUser }) => {
   const [multipitch, setMultipitch] = useState(localUser.multipitch || 0);
+  const [leadBelay, setLeadBelay] = useState(localUser.lead_belay || 0);
+  const [tradLead, setTradLead] = useState(localUser.trad_lead || 0);
+  const [topRopeBelay, setTopRopeBelay] = useState(
+    localUser.top_rope_belay || 0
+  );
+  const [tradOutdoorGrade, setTradOutdoorGrade] = useState(
+    localUser.trad_climb_outdoor_grade || "?"
+  );
+  const [leadOutdoorGrade, setLeadOutdoorGrade] = useState(
+    localUser.lead_climb_outdoor_grade || "?"
+  );
 
   console.log(multipitch);
 
@@ -30,16 +41,36 @@ export const Edit = ({ user, localUser }) => {
           </div>
         </div>
       </div>
-      <div className="w-full flex grid grid-cols-1 md:grid-cols-2 ml-16">
+      <div className="w-full flex grid grid-cols-1 md:grid-cols-2 ml-16 gap-4">
         <div className="w-full grid-cols-2 flex items-end">
-          <h4 className="text-2xl text-khaki">Top Rope Belay:</h4>
-          <span className="text-2xl ml-2">
-            {localUser.top_rope_belay || "No"}
-          </span>
+          <label className="text-2xl text-khaki" htmlFor="TopRopeBelay">
+            Top Rope Belay:
+          </label>
+          <select
+            id="leadBelay"
+            className="h-8 w-fit bg-auburn text-2xl ml-2 appearance-none border-b cursor-pointer"
+            value={topRopeBelay}
+            onChange={(e) => setTopRopeBelay(e.target.value)}
+          >
+            <option value={0}>No</option>
+            <option value={1}>Yes</option>
+            <option value={2}>Rusty</option>
+          </select>
         </div>
         <div className="w-full grid-cols-2 flex items-end">
-          <h4 className="text-2xl text-khaki">Lead Belay:</h4>
-          <span className="text-2xl ml-2">{localUser.lead_belay || "No"}</span>
+          <label className="text-2xl text-khaki" htmlFor="leadBelay">
+            Lead Belay:
+          </label>
+          <select
+            id="leadBelay"
+            className="h-8 w-fit bg-auburn text-2xl ml-2 appearance-none border-b cursor-pointer"
+            value={leadBelay}
+            onChange={(e) => setLeadBelay(e.target.value)}
+          >
+            <option value={0}>No</option>
+            <option value={1}>Yes</option>
+            <option value={2}>Rusty</option>
+          </select>
         </div>
         <div className="w-full grid-cols-2 flex items-end">
           <h4 className="text-2xl text-khaki">Top Rope Indoor Grade:</h4>
@@ -60,20 +91,43 @@ export const Edit = ({ user, localUser }) => {
           </span>
         </div>
         <div className="w-full grid-cols-2 flex items-end">
-          <h4 className="text-2xl text-khaki">Lead Outdoor Grade:</h4>
-          <span className="text-2xl ml-2">
-            {localUser.lead_climb_outdoor_grade || "?"}
-          </span>
+          <label className="text-2xl text-khaki" htmlFor="leadOutdoorGrade">
+            Lead Outdoor Grade:
+          </label>
+          <input
+            id="leadOutdoorGrade"
+            type="text"
+            className="text-2xl ml-2 w-12 bg-auburn border-b"
+            value={leadOutdoorGrade}
+            onChange={(e) => setLeadOutdoorGrade(e.target.value)}
+          />
         </div>
         <div className="w-full grid-cols-2 flex items-end">
-          <h4 className="text-2xl text-khaki">Trad Lead:</h4>
-          <span className="text-2xl ml-2">{localUser.trad_lead || "No"}</span>
+          <label className="text-2xl text-khaki" htmlFor="tradLead">
+            Trad Lead:
+          </label>
+          <select
+            id="tradLead"
+            className="h-8 w-fit bg-auburn text-2xl ml-2 appearance-none border-b cursor-pointer"
+            value={tradLead}
+            onChange={(e) => setTradLead(e.target.value)}
+          >
+            <option value={0}>No</option>
+            <option value={1}>Yes</option>
+            <option value={2}>Rusty</option>
+          </select>
         </div>
         <div className="w-full grid-cols-2 flex items-end">
-          <h4 className="text-2xl text-khaki">Trad Outdoor Grade:</h4>
-          <span className="text-2xl ml-2">
-            {localUser.trad_climb_outdoor_grade || "?"}
-          </span>
+          <label htmlFor="tradOutdoorGrade" className="text-2xl text-khaki">
+            Trad Outdoor Grade:
+          </label>
+          <input
+            id="tradOutdoorGrade"
+            type="text"
+            className="text-2xl ml-2 w-12 bg-auburn border-b"
+            value={tradOutdoorGrade}
+            onChange={(e) => setTradOutdoorGrade(e.target.value)}
+          />
         </div>
         <div className="w-full grid-cols-2 flex items-end">
           <label className="text-2xl text-khaki" htmlFor="multipitch">
@@ -81,7 +135,7 @@ export const Edit = ({ user, localUser }) => {
           </label>
           <select
             id="multipitch"
-            className="h-8 w-fit bg-auburn text-2xl ml-2 appearance-none border-b"
+            className="h-8 w-fit bg-auburn text-2xl ml-2 appearance-none border-b cursor-pointer"
             value={multipitch}
             onChange={(e) => setMultipitch(e.target.value)}
           >
