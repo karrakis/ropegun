@@ -10,8 +10,19 @@ export const Edit = ({ user, localUser }) => {
   const [tradOutdoorGrade, setTradOutdoorGrade] = useState(
     localUser.trad_climb_outdoor_grade || "?"
   );
+
+  const [leadIndoorGrade, setLeadIndoorGrade] = useState(
+    localUser.lead_climb_indoor_grade || "?"
+  );
   const [leadOutdoorGrade, setLeadOutdoorGrade] = useState(
     localUser.lead_climb_outdoor_grade || "?"
+  );
+
+  const [topRopeOutdoorGrade, setTopRopeOutdoorGrade] = useState(
+    localUser.tr_outdoor_climb_grade || "?"
+  );
+  const [topRopeIndoorGrade, setTopRopeIndoorGrade] = useState(
+    localUser.tr_indoor_climb_grade || "?"
   );
 
   console.log(multipitch);
@@ -73,22 +84,40 @@ export const Edit = ({ user, localUser }) => {
           </select>
         </div>
         <div className="w-full grid-cols-2 flex items-end">
-          <h4 className="text-2xl text-khaki">Top Rope Indoor Grade:</h4>
-          <span className="text-2xl ml-2">
-            {localUser.tr_indoor_climb_grade || "?"}
-          </span>
+          <label className="text-2xl text-khaki" htmlFor="topRopeIndoorGrade">
+            Top Rope Indoor Grade:
+          </label>
+          <input
+            id="topRopeIndoorGrade"
+            type="text"
+            className="text-2xl ml-2 w-12 bg-auburn border-b"
+            value={topRopeIndoorGrade}
+            onChange={(e) => setTopRopeIndoorGrade(e.target.value)}
+          />
         </div>
         <div className="w-full grid-cols-2 flex items-end">
-          <h4 className="text-2xl text-khaki">Lead Indoor Grade:</h4>
-          <span className="text-2xl ml-2">
-            {localUser.lead_climb_indoor_grade || "?"}
-          </span>
+          <label className="text-2xl text-khaki" htmlFor="leadIndoorGrade">
+            Lead Indoor Grade:
+          </label>
+          <input
+            id="leadIndoorGrade"
+            type="text"
+            className="text-2xl ml-2 w-12 bg-auburn border-b"
+            value={leadIndoorGrade}
+            onChange={(e) => setLeadIndoorGrade(e.target.value)}
+          />
         </div>
         <div className="w-full grid-cols-2 flex items-end">
-          <h4 className="text-2xl text-khaki">Top Rope Outdoor Grade:</h4>
-          <span className="text-2xl ml-2">
-            {localUser.tr_outdoor_climb_grade || "?"}
-          </span>
+          <label className="text-2xl text-khaki" htmlFor="topRopeOutdoorGrade">
+            Top Rope Outdoor Grade:
+          </label>
+          <input
+            id="topRopeOutdoorGrade"
+            type="text"
+            className="text-2xl ml-2 w-12 bg-auburn border-b"
+            value={topRopeOutdoorGrade}
+            onChange={(e) => setTopRopeOutdoorGrade(e.target.value)}
+          />
         </div>
         <div className="w-full grid-cols-2 flex items-end">
           <label className="text-2xl text-khaki" htmlFor="leadOutdoorGrade">
