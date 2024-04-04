@@ -9,4 +9,6 @@ Rails.application.routes.draw do
   get '/auth/failure' => 'auth0#failure'
   get '/auth/logout' => 'auth0#logout'
   get '/dashboard' => 'components#index'
+  
+  patch '/users/:id' => 'users#update'
 end

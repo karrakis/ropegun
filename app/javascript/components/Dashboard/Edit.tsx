@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-export const Edit = ({ user, localUser }) => {
+export const Edit = ({ user, localUser, setEditing, setLocalUser }) => {
   const [multipitch, setMultipitch] = useState(localUser.multipitch || 0);
   const [leadBelay, setLeadBelay] = useState(localUser.lead_belay || 0);
   const [tradLead, setTradLead] = useState(localUser.trad_lead || 0);
@@ -25,10 +25,50 @@ export const Edit = ({ user, localUser }) => {
     localUser.tr_indoor_climb_grade || "?"
   );
 
-  console.log(multipitch);
+  const updateUser = (e) => {
+    e.preventDefault();
+    const body = {
+      user: {
+        multipitch: multipitch,
+        lead_belay: leadBelay,
+        trad_lead: tradLead,
+        top_rope_belay: topRopeBelay,
+        trad_climb_outdoor_grade: tradOutdoorGrade,
+        lead_climb_indoor_grade: leadIndoorGrade,
+        lead_climb_outdoor_grade: leadOutdoorGrade,
+        tr_outdoor_climb_grade: topRopeOutdoorGrade,
+        tr_indoor_climb_grade: topRopeIndoorGrade,
+      },
+    };
+
+    fetch(`/users/${localUser.id}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        "X-CSRF-Token": document.querySelector('[name="csrf-token"]').content,
+      },
+      body: JSON.stringify(body),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setLocalUser(Object.assign({}, localUser, data));
+      });
+  };
 
   return (
-    <form>
+    <>
+      <div className="w-full relative">
+        <button
+          className="w-16 h-8 bg-cream text-night absolute top-0 right-0 cursor-pointer"
+          onClick={(e) => {
+            updateUser(e);
+            setEditing(false);
+          }}
+        >
+          Save
+        </button>
+      </div>
       <div className="flex flex-row w-full h-fit">
         <img
           className="h-32 w-auto ml-16 my-16"
@@ -174,7 +214,7 @@ export const Edit = ({ user, localUser }) => {
           </select>
         </div>
       </div>
-    </form>
+    </>
   );
 };
 

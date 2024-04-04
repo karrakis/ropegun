@@ -1,8 +1,16 @@
 import React from "react";
 
-export const Display = ({ user, localUser }) => {
+export const Display = ({ user, localUser, setEditing }) => {
   return (
     <>
+      <div className="w-full relative">
+        <button
+          className="w-16 h-8 bg-cream text-night absolute top-0 right-0 cursor-pointer"
+          onClick={() => setEditing(true)}
+        >
+          Edit
+        </button>
+      </div>
       <div className="flex flex-row w-full h-fit">
         <img
           className="h-32 w-auto ml-16 my-16"
