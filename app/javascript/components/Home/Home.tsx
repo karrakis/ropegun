@@ -25,20 +25,37 @@ export const Organizers = () => {
 
 export const Home = () => {
   console.log("rendering home");
-  const [weather, updateWeather] = useState(null);
+  const [weather, updateWeather] = useState({});
 
   useEffect(() => {
-    fetch("https://api.weather.gov/gridpoints/PAH/128,74/forecast", {
-      method: "GET",
-      headers: {
-        Accept: "application/ld+json",
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        updateWeather(data);
-      });
-  }, []);
+    if (!weather["Jackson Falls"]) {
+      fetch("https://api.weather.gov/gridpoints/PAH/128,74/forecast", {
+        method: "GET",
+        headers: {
+          Accept: "application/ld+json",
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          updateWeather(Object.assign({}, weather, { "Jackson Falls": data }));
+        });
+    }
+
+    if (!weather["Horseshoe Canyon Ranch"]) {
+      fetch("https://api.weather.gov/gridpoints/LZK/45,128/forecast", {
+        method: "GET",
+        headers: {
+          Accept: "application/ld+json",
+        },
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          updateWeather(
+            Object.assign({}, weather, { "Horseshoe Canyon Ranch": data })
+          );
+        });
+    }
+  }, [weather]);
 
   return (
     <div className="w-full flex flex-row justify-center">
@@ -47,13 +64,29 @@ export const Home = () => {
           <Climbers />
           <Organizers />
         </div>
-        <div>
-          {weather?.periods?.map((period) => (
-            <div key={period.number}>
-              <h2>{period.name}</h2>
-              <p>{period.detailedForecast}</p>
-            </div>
-          ))}
+        <div className="flex flex-col w-full">
+          <div className="flex flex-col">
+            {Object.keys(weather).map((placeName) => {
+              const forecasts = weather[placeName];
+              console.log(placeName);
+              console.log("forecasts", forecasts);
+              return (
+                <div className="bg-night w-full flex flex-col my-2 p-2">
+                  <div>{placeName}</div>
+                  <div className="flex flex-row overflow-scroll">
+                    {forecasts.periods.map((period) => {
+                      return (
+                        <div className="flex flex-col m-2 border border-cream p-2">
+                          <div>{period.name}</div>
+                          <div>{period.temperature}</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
     </div>
