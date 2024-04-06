@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import NavContainerGray from "../NavContainer/NavContainerGray";
 import SectionHeader from "../NavContainer/SectionHeader";
 import LinkBox from "../NavContainer/LinkBox";
+import Map from "../Map/Map";
 
 export const Climbers = () => {
   return (
@@ -61,9 +62,11 @@ export const Home = () => {
     <div className="w-full flex flex-row justify-center">
       <div className="flex flex-col justify-start min-h-screen w-full bg-auburn text-cream  max-w-3xl">
         <div className="flex flex-col md:flex-row  justify-start md:justify-center w-full">
-          <Climbers />
-          <Organizers />
+          {/* <Climbers />
+          <Organizers /> */}
+          <Map />
         </div>
+
         <div className="flex flex-col w-full">
           <div className="flex flex-col">
             {Object.keys(weather).map((placeName) => {
@@ -74,7 +77,7 @@ export const Home = () => {
                 <div className="bg-night w-full flex flex-col my-2 p-2">
                   <div>{placeName}</div>
                   <div className="flex flex-row overflow-scroll">
-                    {forecasts.periods.map((period) => {
+                    {forecasts?.periods.map((period) => {
                       return (
                         <div className="flex flex-col m-2 border border-cream p-2">
                           <div>{period.name}</div>
