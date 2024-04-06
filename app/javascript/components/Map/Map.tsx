@@ -44,7 +44,7 @@ export const Map = () => {
     <>
       <input
         id="pac-input"
-        className="w-64 h-8 text-night bg-cream border-2 border-night rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-night focus:border-transparent"
+        className="w-64 h-8 mt-4 text-night bg-cream border-2 border-night rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-night focus:border-transparent"
         type="text"
         placeholder="Find Climbing Areas..."
       />

@@ -68,13 +68,13 @@ export const Home = () => {
         </div>
 
         <div className="flex flex-col w-full">
-          <div className="flex flex-col">
+          <div className="flex flex-col p-2">
             {Object.keys(weather).map((placeName) => {
               const forecasts = weather[placeName];
               console.log(placeName);
               console.log("forecasts", forecasts);
               return (
-                <div className="bg-night w-full flex flex-col my-2 p-2">
+                <div className="bg-night w-full flex flex-col my-2 p-2 rounded border border-cream shadow-lg">
                   <div>{placeName}</div>
                   <div className="flex flex-row overflow-scroll">
                     {forecasts?.periods.map((period) => {
