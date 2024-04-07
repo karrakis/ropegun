@@ -107,6 +107,20 @@ export const Home = () => {
               </div>
             );
           })}
+          <button
+            className="p-2 m-2 bg-cream text-auburn rounded shadow-lg"
+            onClick={() => {
+              fetch("/api/v1/locations", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ locations: savedLocations }),
+              });
+            }}
+          >
+            Save Locations
+          </button>
         </div>
         <div className="flex flex-col w-full">
           <div className="flex flex-col p-2">
