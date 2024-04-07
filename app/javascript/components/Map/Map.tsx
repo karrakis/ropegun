@@ -9,9 +9,7 @@ import React, { useState } from "react";
 
 import SearchBox from "./SearchBox";
 
-export const GoogleMap = () => {
-  const [position, updatePosition] = useState({ lat: -25.344, lng: 131.031 });
-
+export const GoogleMap = ({ position, updatePosition }) => {
   return (
     <APIProvider
       apiKey={"AIzaSyByI8LqBihCCEq9uCD-sOjed15Y0x_wREU"}

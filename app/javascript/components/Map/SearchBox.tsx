@@ -39,11 +39,9 @@ export const AutocompletePlaces = ({ updatePosition }) => {
   ) => {
     setInputValue(place.description);
     setResults([]);
-    console.log("Selected place", place);
     const geocoder = new google.maps.Geocoder();
     geocoder.geocode({ placeId: place.place_id }, (results, status) => {
       if (status === "OK") {
-        console.log("Geocode results", results);
         updatePosition(results[0].geometry.location.toJSON());
       }
     });
