@@ -42,7 +42,10 @@ export const AutocompletePlaces = ({ updatePosition }) => {
     const geocoder = new google.maps.Geocoder();
     geocoder.geocode({ placeId: place.place_id }, (results, status) => {
       if (status === "OK") {
-        updatePosition(results[0].geometry.location.toJSON());
+        updatePosition({
+          name: place.description,
+          location: results[0].geometry.location.toJSON(),
+        });
       }
     });
   };

@@ -27,7 +27,10 @@ export const Organizers = () => {
 export const Home = () => {
   console.log("rendering home");
   const [weather, updateWeather] = useState({});
-  const [position, updatePosition] = useState({ lat: -25.344, lng: 131.031 });
+  const [position, updatePosition] = useState({
+    name: "Jackson Falls",
+    location: { lat: 37.5081391, lng: -88.6832446 },
+  });
   const [savedLocations, updateSavedLocations] = useState([]);
 
   useEffect(() => {
@@ -60,35 +63,49 @@ export const Home = () => {
     }
   }, [weather]);
 
-  console.log("current position:", position);
-  console.log("savedLocations:", savedLocations);
-
   return (
     <div className="w-full flex flex-row justify-center">
       <div className="flex flex-col justify-start min-h-screen w-full bg-auburn text-cream  max-w-3xl">
         <div className="flex flex-col md:flex-row  justify-start md:justify-center w-full">
           {/* <Climbers />
           <Organizers /> */}
-          <GoogleMap position={position} updatePosition={updatePosition} />
+          <GoogleMap
+            position={position.location}
+            updatePosition={updatePosition}
+          />
         </div>
 
         <div className="flex flex-col w-full bg-night text-cream">
           <div className="flex w-full">
             <button
+              className="p-2 m-2 bg-cream text-auburn rounded shadow-lg"
               onClick={() =>
                 updateSavedLocations(savedLocations.concat(position))
               }
             >
               Add Location
             </button>
-            <button onClick={() => updateSavedLocations([])}>
+            <button
+              className="p-2 m-2 bg-cream text-auburn rounded shadow-lg"
+              onClick={() => updateSavedLocations([])}
+            >
               Clear Locations
             </button>
-            <div>Current Location: {JSON.stringify(position)}</div>
+            <div className="p-2 m-2 w-full bg-auburn text-cream w-full">
+              Current Location: {JSON.stringify(position)}
+            </div>
           </div>
-          <div className="text-cream">Locations Logged</div>
+          <div className="text-cream mb-2">Locations Logged</div>
           {savedLocations.map((location) => {
-            return <div>{JSON.stringify(location)}</div>;
+            return (
+              <div className="my-2">
+                <span className="border border-auburn rounded mr-2 p-2">
+                  {location.name}
+                </span>
+                <span>{location.location.lat}</span>,{" "}
+                <span>{location.location.lng}</span>
+              </div>
+            );
           })}
         </div>
         <div className="flex flex-col w-full">
