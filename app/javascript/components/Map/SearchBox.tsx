@@ -1,22 +1,9 @@
 import React from "react";
 
-// const SearchBox = () => {
-//   return (
-//     <input
-//       id="pac-input"
-//       className="w-64 h-8 mt-4 text-night bg-cream border-2 border-night rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-night focus:border-transparent"
-//       type="text"
-//       placeholder="Find Climbing Areas..."
-//     />
-//   );
-// };
-
-// export default SearchBox;
-
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
 import { useMapsLibrary } from "@vis.gl/react-google-maps";
 
-export const AutocompletePlaces = () => {
+export const AutocompletePlaces = ({ updatePosition }) => {
   const placesLibrary = useMapsLibrary("places");
   const [service, setService] =
     useState<google.maps.places.AutocompleteService | null>(null);
@@ -52,6 +39,14 @@ export const AutocompletePlaces = () => {
   ) => {
     setInputValue(place.description);
     setResults([]);
+    console.log("Selected place", place);
+    const geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ placeId: place.place_id }, (results, status) => {
+      if (status === "OK") {
+        console.log("Geocode results", results);
+        updatePosition(results[0].geometry.location.toJSON());
+      }
+    });
   };
 
   if (!service) return null;

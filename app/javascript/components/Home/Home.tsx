@@ -27,6 +27,7 @@ export const Organizers = () => {
 export const Home = () => {
   console.log("rendering home");
   const [weather, updateWeather] = useState({});
+  const [savedLocations, updateSavedLocations] = useState([]);
 
   useEffect(() => {
     if (!weather["Jackson Falls"]) {
@@ -64,22 +65,14 @@ export const Home = () => {
         <div className="flex flex-col md:flex-row  justify-start md:justify-center w-full">
           {/* <Climbers />
           <Organizers /> */}
-          <GoogleMap />
+          <GoogleMap updateSavedLocations={updateSavedLocations} />
         </div>
 
         <div className="flex flex-col w-full bg-night text-cream">
           <div className="text-cream">Locations Logged</div>
-          {google.maps.markers?.map((marker) => {
-            return (
-              <div
-                key={marker.name}
-                className="bg-night w-full flex flex-col my-2 p-2 rounded border border-cream shadow-lg"
-              >
-                <div>{marker.name}</div>
-                <div>{marker.temperature}</div>
-              </div>
-            );
-          })}
+          {savedLocations.map((location) => {
+            return <div>{location}</div>;          
+          }}
         </div>
         <div className="flex flex-col w-full">
           <div className="flex flex-col p-2">
