@@ -18,7 +18,7 @@ export function initAutocomplete() {
 
   // Create the search box and link it to the UI element.
   const input = document.getElementById("pac-input") as HTMLInputElement;
-  const searchBox = new google.maps.places.SearchBox(input);
+  
 
   map.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
 
@@ -31,7 +31,8 @@ export function initAutocomplete() {
 
   // Listen for the event fired when the user selects a prediction and retrieve
   // more details for that place.
-  searchBox.addListener("places_changed", () => {
+
+  searchBox.addListener("places_changed", (updateMarkers) => {
     const places = searchBox.getPlaces();
 
     if (places.length == 0) {
@@ -87,4 +88,5 @@ declare global {
     initAutocomplete: () => void;
   }
 }
+
 window.initAutocomplete = initAutocomplete;
