@@ -5,8 +5,8 @@ class CreateLocations < ActiveRecord::Migration[7.0]
       t.string :latitude
       t.string :longitude
       t.string :office
-      t.number :office_x
-      t.number :office_y
+      t.integer :office_x
+      t.integer :office_y
     
       t.belongs_to :user, null: false, foreign_key: true
 

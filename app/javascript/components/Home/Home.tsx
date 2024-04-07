@@ -24,44 +24,115 @@ export const Organizers = () => {
   );
 };
 
-export const Home = () => {
+export const Home = ({ userSavedLocations, localUser }) => {
   console.log("rendering home");
   const [weather, updateWeather] = useState({});
+  const [weatherTargets, updateWeatherTargets] = useState(
+    userSavedLocations || []
+  );
   const [position, updatePosition] = useState({
     name: "Jackson Falls",
     location: { lat: 37.5081391, lng: -88.6832446 },
   });
+  console.log("user saved locations:", userSavedLocations);
   const [savedLocations, updateSavedLocations] = useState([]);
+  console.log("saved locations:", savedLocations);
 
   useEffect(() => {
-    if (!weather["Jackson Falls"]) {
-      fetch("https://api.weather.gov/gridpoints/PAH/128,74/forecast", {
-        method: "GET",
-        headers: {
-          Accept: "application/ld+json",
-        },
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          updateWeather(Object.assign({}, weather, { "Jackson Falls": data }));
-        });
+    weatherTargets.forEach((loc) => {
+      if (loc.office && loc.office_x && loc.office_y) {
+        if (!weather[loc.name]) {
+          fetch(
+            `https://api.weather.gov/gridpoints/${loc.office}/${loc.office_x},${loc.office_y}/forecast`,
+            {
+              method: "GET",
+              headers: {
+                Accept: "application/ld+json",
+              },
+            }
+          )
+            .then((res) => res.json())
+            .then((data) => {
+              updateWeather(Object.assign({}, weather, { [loc.name]: data }));
+            });
+        }
+      } else {
+        fetch(`https://api.weather.gov/points/${loc.lat},${loc.lng}`, {
+          method: "GET",
+          headers: {
+            Accept: "application/ld+json",
+          },
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            fetch(data.properties.forecast, {
+              method: "GET",
+              headers: {
+                Accept: "application/ld+json",
+              },
+            })
+              .then((res) => res.json())
+              .then((forecast) => {
+                updateWeather(
+                  Object.assign({}, weather, { [loc.name]: forecast })
+                );
+              });
+          });
+      }
+      if (!weather[loc.name]) {
+        fetch(
+          `https://api.weather.gov/gridpoints/${loc.office}/${loc.lat},${loc.lng}`,
+          {
+            method: "GET",
+            headers: {
+              Accept: "application/ld+json",
+            },
+          }
+        )
+          .then((res) => res.json())
+          .then((data) => {
+            updateWeather(Object.assign({}, weather, { [loc.name]: data }));
+          });
+      }
     }
+  })
 
-    if (!weather["Horseshoe Canyon Ranch"]) {
-      fetch("https://api.weather.gov/gridpoints/LZK/45,128/forecast", {
-        method: "GET",
-        headers: {
-          Accept: "application/ld+json",
-        },
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          updateWeather(
-            Object.assign({}, weather, { "Horseshoe Canyon Ranch": data })
-          );
-        });
-    }
-  }, [weather]);
+  // useEffect(() => {
+  //   if (!weather["Jackson Falls"]) {
+  //     fetch("https://api.weather.gov/gridpoints/PAH/128,74/forecast", {
+  //       method: "GET",
+  //       headers: {
+  //         Accept: "application/ld+json",
+  //       },
+  //     })
+  //       .then((res) => res.json())
+  //       .then((data) => {
+  //         updateWeather(Object.assign({}, weather, { "Jackson Falls": data }));
+  //       });
+  //   }
+
+  //   if (!weather["Horseshoe Canyon Ranch"]) {
+  //     fetch("https://api.weather.gov/gridpoints/LZK/45,128/forecast", {
+  //       method: "GET",
+  //       headers: {
+  //         Accept: "application/ld+json",
+  //       },
+  //     })
+  //       .then((res) => res.json())
+  //       .then((data) => {
+  //         updateWeather(
+  //           Object.assign({}, weather, { "Horseshoe Canyon Ranch": data })
+  //         );
+  //       });
+  //   }
+  // }, [weather]);
+
+  useEffect(() => {
+    console.log("trying 2");
+    savedLocations.forEach((loc) => {
+      console.log(loc);
+    });
+  }, [savedLocations]);
 
   return (
     <div className="w-full flex flex-row justify-center">
@@ -110,12 +181,24 @@ export const Home = () => {
           <button
             className="p-2 m-2 bg-cream text-auburn rounded shadow-lg"
             onClick={() => {
-              fetch("/api/v1/locations", {
-                method: "POST",
-                headers: {
-                  "Content-Type": "application/json",
-                },
-                body: JSON.stringify({ locations: savedLocations }),
+              savedLocations.forEach((loc) => {
+                fetch("/locations", {
+                  method: "POST",
+                  headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-Token": document.querySelector(
+                      '[name="csrf-token"]'
+                    ).content,
+                  },
+                  body: JSON.stringify({
+                    location: {
+                      latitude: loc.location.lat,
+                      longitude: loc.location.lng,
+                      name: loc.name,
+                      user_id: localUser.id,
+                    },
+                  }),
+                });
               });
             }}
           >

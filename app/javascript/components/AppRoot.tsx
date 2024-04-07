@@ -22,19 +22,30 @@ interface AppRootProps {
   user: UserSessionObject;
   localUser: JSON;
   csrf: string;
+  userSavedLocations: JSON;
 }
 
-export const AppRoot = ({ routes, user, localUser, csrf }: AppRootProps) => {
+export const AppRoot = ({
+  routes,
+  user,
+  localUser,
+  csrf,
+  userSavedLocations,
+}: AppRootProps) => {
   const [currentPage, setPage] = useState(window.location.pathname);
 
   const setDisplayPage = () => {
     switch (currentPage) {
       case "/":
         window.history.pushState({}, "Home", "/");
-        return <Home />;
+        return (
+          <Home localUser={localUser} userSavedLocations={userSavedLocations} />
+        );
       case "/home":
         window.history.pushState({}, "Home", "/");
-        return <Home />;
+        return (
+          <Home localUser={localUser} userSavedLocations={userSavedLocations} />
+        );
       case "/dashboard":
         window.history.pushState({}, "Dashboard", "/dashboard");
         return <Dashboard user={user} localUser={localUser} />;

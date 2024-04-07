@@ -11,4 +11,5 @@ Rails.application.routes.draw do
   get '/dashboard' => 'components#index'
   
   patch '/users/:id' => 'users#update'
+  post '/locations' => 'locations#create'
 end

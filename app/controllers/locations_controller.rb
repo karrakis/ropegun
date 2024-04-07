@@ -1,7 +1,7 @@
 class LocationsController < ApplicationController
     def create
         @location = Location.new(location_params)
-        @location.user = current_user
+        @location.user = User.find(location_params[:user_id])
         if @location.save
             render json: @location, status: :created
         else
@@ -12,6 +12,6 @@ class LocationsController < ApplicationController
     private
 
     def location_params
-        params.require(:location).permit(:name, :latitude, :longitude, :office, :office_x, :office_y)
+        params.require(:location).permit(:name, :latitude, :longitude, :office, :office_x, :office_y, :user_id)
     end
 end

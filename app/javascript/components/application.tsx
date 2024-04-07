@@ -10,6 +10,13 @@ document.addEventListener("DOMContentLoaded", () => {
   const user = rootEl && JSON.parse(rootEl.getAttribute("data-user") || false);
   const local_user =
     rootEl && JSON.parse(rootEl.getAttribute("data-local-user") || false);
+
+  const userSavedLocations =
+    rootEl &&
+    JSON.parse(rootEl.getAttribute("data-locations") || false);
+
+  console.log("application.tsx userSavedLocation:", userSavedLocations);
+
   const csrf = document
     .querySelector("meta[name='csrf-token']")!
     .getAttribute("content");
@@ -19,6 +26,7 @@ document.addEventListener("DOMContentLoaded", () => {
       routes={routes || ""}
       user={user}
       localUser={local_user}
+      userSavedLocations={userSavedLocations || []}
       csrf={csrf || ""}
     />,
     rootEl
