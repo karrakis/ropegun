@@ -3,6 +3,7 @@ import NavContainerGray from "../NavContainer/NavContainerGray";
 import SectionHeader from "../NavContainer/SectionHeader";
 import LinkBox from "../NavContainer/LinkBox";
 import GoogleMap from "../Map/Map";
+import MapControl from "../Map/MapControl";
 
 export const Climbers = () => {
   return (
@@ -39,32 +40,7 @@ export const Home = ({ userSavedLocations, localUser }) => {
   const [savedLocations, updateSavedLocations] = useState([]);
   console.log("saved locations:", savedLocations);
 
-  // const fetchWeather = async () => {
-  //   const weatherUpdate = await Promise.all(
-  //     weatherTargets.map((loc) => {
-  //       if (loc.office && loc.office_x && loc.office_y) {
-  //         if (!weather[loc.name]) {
-  //           return fetch(
-  //             `https://api.weather.gov/gridpoints/${loc.office}/${loc.office_x},${loc.office_y}/forecast`,
-  //             {
-  //               method: "GET",
-  //               headers: {
-  //                 Accept: "application/ld+json",
-  //               },
-  //             }
-  //           );
-  //           .then((res) => res.json())
-  //           .then((data) => {
-  //             { [loc.name]: data };
-  //           });
-  //         }
-  //       }
-  //     })
-  //   );
-  //   updateWeather(Object.assign({}, weather, weatherUpdate));
-  // };
   useEffect(() => {
-    // fetchWeather();
     const weatherUpdates = weatherTargets.map(async (loc) => {
       let response = await fetch(
         `https://api.weather.gov/gridpoints/${loc.office}/${loc.office_x},${loc.office_y}/forecast`,
@@ -95,91 +71,17 @@ export const Home = ({ userSavedLocations, localUser }) => {
   return (
     <div className="w-full flex flex-row justify-center">
       <div className="flex flex-col justify-start min-h-screen w-full bg-auburn text-cream  max-w-3xl">
-        <div className="flex flex-col md:flex-row  justify-start md:justify-center w-full">
-          {/* <Climbers />
-          <Organizers /> */}
-          <GoogleMap
-            position={position.location}
-            updatePosition={updatePosition}
-          />
-        </div>
-
-        <div className="flex flex-col w-full bg-night text-cream">
-          <div className="flex w-full">
-            <button
-              className="p-2 m-2 bg-cream text-auburn rounded shadow-lg"
-              onClick={() =>
-                updateSavedLocations(savedLocations.concat(position))
-              }
-            >
-              Add Location
-            </button>
-            <button
-              className="p-2 m-2 bg-cream text-auburn rounded shadow-lg"
-              onClick={() => updateSavedLocations([])}
-            >
-              Clear Locations
-            </button>
-            <div className="p-2 m-2 w-full bg-auburn text-cream w-full">
-              Current Location: {JSON.stringify(position)}
-            </div>
-          </div>
-          <div className="text-cream mb-2">Locations Logged</div>
-          {savedLocations.map((location) => {
-            return (
-              <div className="my-2">
-                <span className="border border-auburn rounded mr-2 p-2">
-                  {location.name}
-                </span>
-                <span>{location.location.lat}</span>,{" "}
-                <span>{location.location.lng}</span>
-              </div>
-            );
-          })}
-          <button
-            className="p-2 m-2 bg-cream text-auburn rounded shadow-lg"
-            onClick={() => {
-              savedLocations.forEach((loc) => {
-                fetch(
-                  `https://api.weather.gov/points/${loc.location.lat},${loc.location.lng}`,
-                  {
-                    method: "GET",
-                    headers: {
-                      Accept: "application/ld+json",
-                    },
-                  }
-                )
-                  .then((res) => res.json())
-                  .then((data) => {
-                    const body = {
-                      location: {
-                        latitude: loc.location.lat,
-                        longitude: loc.location.lng,
-                        name: loc.name,
-                        user_id: localUser.id,
-                        office: data.gridId,
-                        office_x: data.gridX,
-                        office_y: data.gridY,
-                      },
-                    };
-                    fetch("/locations", {
-                      method: "POST",
-                      headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-Token": document.querySelector(
-                          '[name="csrf-token"]'
-                        ).content,
-                      },
-                      body: JSON.stringify(body),
-                    });
-                    updateWeatherTargets(weatherTargets.concat(body.location));
-                  });
-              });
-            }}
-          >
-            Save Locations
-          </button>
-        </div>
+        <MapControl
+          {...{
+            position,
+            updatePosition,
+            savedLocations,
+            updateSavedLocations,
+            weatherTargets,
+            updateWeatherTargets,
+            localUser,
+          }}
+        />
         <div className="flex flex-col w-full">
           <div className="flex flex-col p-2">
             {Object.keys(weather).map((placeName) => {
