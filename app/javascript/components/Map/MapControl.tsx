@@ -35,19 +35,37 @@ export const MapControl = ({
           >
             Clear Locations
           </button>
-          <div className="p-2 m-2 w-full bg-auburn text-cream w-full">
-            Current Location: {JSON.stringify(position)}
+          <div className="p-2 m-2 w-full bg-auburn text-cream w-full flex flex-col">
+            <div>{position.name}</div>
+            <div>
+              {position.location.lat}, {position.location.lng}
+            </div>
           </div>
         </div>
-        <div className="text-cream mb-2">Locations Logged</div>
+        <div className="text-cream mb-2">Locations:</div>
         {savedLocations.map((location) => {
           return (
-            <div className="my-2">
-              <span className="border border-auburn rounded mr-2 p-2">
+            <div className="my-2 flex h-10">
+              <span className="border border-auburn rounded mr-2 p-2 flex-none">
                 {location.name}
               </span>
-              <span>{location.location.lat}</span>,{" "}
-              <span>{location.location.lng}</span>
+              <div className="flex-none p-2">
+                <span>{location.location.lat}</span>,{" "}
+                <span className="flex-none p-2">{location.location.lng}</span>
+              </div>
+              <div className="w-full">
+                <div
+                  className="text-cream bg-auburn p-2 rounded shadow-lg w-auto h-full aspect-square flex justify-center items-center"
+                  onClick={() =>
+                    updateSavedLocations(
+                      savedLocations.filter((loc) => loc !== location)
+                    )
+                  }
+                  style={{ cursor: "pointer" }}
+                >
+                  x
+                </div>
+              </div>
             </div>
           );
         })}
