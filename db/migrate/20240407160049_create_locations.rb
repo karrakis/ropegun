@@ -9,6 +9,7 @@ class CreateLocations < ActiveRecord::Migration[7.0]
       t.integer :office_y
     
       t.belongs_to :user, null: false, foreign_key: true
+      t.index [:user_id, :latitude, :longitude], unique: true
 
       t.timestamps
     end
