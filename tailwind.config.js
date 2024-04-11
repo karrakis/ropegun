@@ -12,6 +12,9 @@ module.exports = {
       cream: "#EFF2C0",
       ashgray: "#A4BAB7",
       khaki: "#BEA57D"
+    },
+    screens: {
+      xs: '375px',
     }
   }
 }

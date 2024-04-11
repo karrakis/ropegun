@@ -45,25 +45,27 @@ export const MapControl = ({
         <div className="text-cream mb-2">Locations:</div>
         {savedLocations.map((location) => {
           return (
-            <div className="my-2 flex h-10">
-              <span className="border border-auburn rounded mr-2 p-2 flex-none">
+            <div className="my-2 flex flex-col xs:flex-row xs:h-10 border border-auburn xs:rounded w-fit float-left">
+              <span className="border-b xs:border-b-0 xs:border-r border-auburn xs:rounded mr-2 p-2 flex-none w-full xs:w-fit">
                 {location.name}
               </span>
-              <div className="flex-none p-2">
-                <span>{location.location.lat}</span>,{" "}
-                <span className="flex-none p-2">{location.location.lng}</span>
-              </div>
-              <div className="w-full">
-                <div
-                  className="text-cream bg-auburn p-2 rounded shadow-lg w-auto h-full aspect-square flex justify-center items-center"
-                  onClick={() =>
-                    updateSavedLocations(
-                      savedLocations.filter((loc) => loc !== location)
-                    )
-                  }
-                  style={{ cursor: "pointer" }}
-                >
-                  x
+              <div className="flex w-full items-center">
+                <span className="flex-none pl-2">
+                  {location.location.lat},{" "}
+                </span>
+                <span className="flex-none pr-2">{location.location.lng}</span>
+                <div className="w-full">
+                  <div
+                    className="text-cream bg-auburn p-2 xs:rounded shadow-lg w-8 xs:w-auto xs:h-full aspect-square flex justify-center items-center"
+                    onClick={() =>
+                      updateSavedLocations(
+                        savedLocations.filter((loc) => loc !== location)
+                      )
+                    }
+                    style={{ cursor: "pointer" }}
+                  >
+                    x
+                  </div>
                 </div>
               </div>
             </div>
