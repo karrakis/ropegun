@@ -2,8 +2,8 @@ import React, { useState, useEffect } from "react";
 import NavContainerGray from "../NavContainer/NavContainerGray";
 import SectionHeader from "../NavContainer/SectionHeader";
 import LinkBox from "../NavContainer/LinkBox";
-import GoogleMap from "../Map/Map";
 import MapControl from "../Map/MapControl";
+import Graph from "../Weather/Graph";
 
 export const Climbers = () => {
   return (
@@ -66,6 +66,20 @@ export const Home = ({ userSavedLocations, localUser }) => {
     });
   }, [weatherTargets]);
 
+  const weatherDataFinal: Object[] = [];
+  const weatherDataRaw = Object.keys(weather).map((placeName) => {
+    return weather[placeName].periods.map((p) =>
+      Object.assign({}, { name: p.name, [placeName]: p.temperature })
+    );
+  });
+
+  weatherDataRaw.forEach((list) => {
+    list.forEach((item, i) => {
+      weatherDataFinal[i] ||= {};
+      weatherDataFinal[i] = Object.assign({}, weatherDataFinal[i], item);
+    });
+  });
+
   return (
     <div className="w-full flex flex-row justify-center">
       <div className="flex flex-col justify-start min-h-screen w-full bg-auburn text-cream  max-w-3xl">
@@ -77,6 +91,7 @@ export const Home = ({ userSavedLocations, localUser }) => {
             {openMap ? "Close Map" : "Add Weather Locations"}
           </div>
         </div>
+        {weatherDataFinal.length > 0 && <Graph data={weatherDataFinal} />}
         {openMap && (
           <MapControl
             {...{
