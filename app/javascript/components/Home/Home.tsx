@@ -26,8 +26,6 @@ export const Organizers = () => {
 };
 
 export const Home = ({ userSavedLocations, localUser }) => {
-  console.log("userSavedLocations", userSavedLocations);
-  console.log("rendering home");
   const [weather, updateWeather] = useState({});
   const [weatherTargets, updateWeatherTargets] = useState(
     userSavedLocations || []
@@ -36,9 +34,9 @@ export const Home = ({ userSavedLocations, localUser }) => {
     name: "Jackson Falls",
     location: { lat: 37.5081391, lng: -88.6832446 },
   });
-  console.log("user saved locations:", userSavedLocations);
+  const [openMap, updateOpenMap] = useState(weatherTargets.length === 0);
+
   const [savedLocations, updateSavedLocations] = useState([]);
-  console.log("saved locations:", savedLocations);
 
   useEffect(() => {
     const weatherUpdates = weatherTargets.map(async (loc) => {
@@ -71,18 +69,29 @@ export const Home = ({ userSavedLocations, localUser }) => {
   return (
     <div className="w-full flex flex-row justify-center">
       <div className="flex flex-col justify-start min-h-screen w-full bg-auburn text-cream  max-w-3xl">
-        <MapControl
-          {...{
-            position,
-            updatePosition,
-            savedLocations,
-            updateSavedLocations,
-            weatherTargets,
-            updateWeatherTargets,
-            localUser,
-          }}
-        />
+        <div className="flex flex-col items-center p-2">
+          <div
+            className="text-cream bg-auburn p-2 rounded shadow-lg cursor-pointer"
+            onClick={() => updateOpenMap(!openMap)}
+          >
+            {openMap ? "Close Map" : "Add Weather Locations"}
+          </div>
+        </div>
+        {openMap && (
+          <MapControl
+            {...{
+              position,
+              updatePosition,
+              savedLocations,
+              updateSavedLocations,
+              weatherTargets,
+              updateWeatherTargets,
+              localUser,
+            }}
+          />
+        )}
         <div className="flex flex-col w-full">
+          <div className="text-cream w-full bg-night">Weather</div>
           <div className="flex flex-col p-2">
             {Object.keys(weather).map((placeName) => {
               const forecasts = weather[placeName];
