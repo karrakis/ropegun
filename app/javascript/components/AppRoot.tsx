@@ -52,7 +52,13 @@ export const AppRoot = ({
         return <Dashboard user={user} localUser={localUser} />;
       case "/trip_plan":
         window.history.pushState({}, "Trip Planning", "/trip_plan");
-        return <TripPlan user={user} localUser={localUser} />;
+        return (
+          <TripPlan
+            user={user}
+            localUser={localUser}
+            userSavedLocations={userSavedLocations}
+          />
+        );
     }
   };
 
@@ -62,7 +68,7 @@ export const AppRoot = ({
   }, [currentPage]);
 
   return (
-    <div className="relative">
+    <div className="relative overflow-hidden">
       <a
         className="absolute top-0 left-0 -z-10"
         title="Paulhaberstroh, CC BY-SA 4.0 'https://creativecommons.org/licenses/by-sa/4.0', via Wikimedia Commons"
