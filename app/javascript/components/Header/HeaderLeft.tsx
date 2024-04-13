@@ -6,12 +6,18 @@ export const HeaderLeft = ({ setPage }) => {
     <div
       id="header-left"
       className="justify-start flex w-full ml-2 cursor-pointer"
-      onClick={() => setPage("/home")}
     >
-      <img className="h-12" src={logo} />
-      <span className="px-4 py-2 bg-auburn text-xl flex flex-row items-center">
-        <span>Approach</span>
-      </span>
+      <div onClick={() => setPage("/home")} className="flex">
+        <img className="h-12" src={logo} />
+        <span className="px-4 py-2 bg-auburn text-xl flex flex-row items-center">
+          <span>Approach</span>
+        </span>
+      </div>
+      <div onClick={() => setPage("/trip_plan")} className="flex ml-2">
+        <span className="px-4 py-2 bg-auburn text-xl flex flex-row items-center">
+          <span>Plan a Trip</span>
+        </span>
+      </div>
     </div>
   );
 };

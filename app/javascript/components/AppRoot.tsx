@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Header from "./Header/Header";
 import Home from "./Home/Home";
 import Dashboard from "./Dashboard/Dashboard";
+import TripPlan from "./TripPlan/TripPlan";
 
 interface UserSessionObject {
   name: string;
@@ -49,6 +50,9 @@ export const AppRoot = ({
       case "/dashboard":
         window.history.pushState({}, "Dashboard", "/dashboard");
         return <Dashboard user={user} localUser={localUser} />;
+      case "/trip_plan":
+        window.history.pushState({}, "Trip Planning", "/trip_plan");
+        return <TripPlan user={user} localUser={localUser} />;
     }
   };
 
