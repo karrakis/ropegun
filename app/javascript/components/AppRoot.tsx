@@ -65,7 +65,7 @@ export const AppRoot = ({
         href="https://commons.wikimedia.org/wiki/File:Boulder_Flatirons.jpg"
       >
         <img
-          className="w-screen h-auto"
+          className="min-w-screen min-h-screen"
           width="512"
           alt="Boulder Flatirons"
           src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Boulder_Flatirons.jpg/512px-Boulder_Flatirons.jpg"

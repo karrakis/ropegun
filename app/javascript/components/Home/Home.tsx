@@ -82,7 +82,7 @@ export const Home = ({ userSavedLocations, localUser }) => {
 
   return (
     <div className="w-full flex flex-row justify-center">
-      <div className="flex flex-col justify-start min-h-screen w-full bg-auburn text-cream  max-w-3xl">
+      <div className="flex flex-col justify-start h-screen overflow-scroll w-full bg-auburn text-cream  max-w-3xl">
         <div className="flex flex-col items-center p-2">
           <div
             className="text-cream bg-auburn p-2 rounded shadow-lg cursor-pointer"
@@ -91,7 +91,6 @@ export const Home = ({ userSavedLocations, localUser }) => {
             {openMap ? "Close Map" : "Add Weather Locations"}
           </div>
         </div>
-        {weatherDataFinal.length > 0 && <Graph data={weatherDataFinal} />}
         {openMap && (
           <MapControl
             {...{
@@ -105,8 +104,13 @@ export const Home = ({ userSavedLocations, localUser }) => {
             }}
           />
         )}
+        <div className="bg-night w-full text-cream text-center pt-12 border border-cream border-b-0">
+          {weatherDataFinal.length > 0 && <Graph data={weatherDataFinal} />}
+        </div>
         <div className="flex flex-col w-full">
-          <div className="text-cream w-full bg-night">Weather</div>
+          <div className="text-cream w-full bg-night border border-cream text-center">
+            Weather
+          </div>
           <div className="flex flex-col p-2">
             {Object.keys(weather).map((placeName) => {
               const forecasts = weather[placeName];
