@@ -6,6 +6,7 @@
     "@hotwired/turbo-rails": "^7.3.0",
     "@vis.gl/react-google-maps": "^0.8.3",
     "autoprefixer": "^10.4.14",
+    "classnames": "^2.5.1",
     "esbuild": "^0.18.11",
     "postcss": "^8.4.25",
     "react": "^18.2.0",

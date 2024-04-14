@@ -17,6 +17,7 @@ const generateRandomColor = () => {
 };
 
 const generateLines = (data) => {
+  console.log(data);
   return Object.keys(data[0]).map((key) => {
     if (key === "name") return;
     return (
