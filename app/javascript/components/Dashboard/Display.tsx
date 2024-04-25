@@ -19,18 +19,22 @@ export const Display = ({ user, localUser, setEditing }) => {
         ></img>
         <div id="user_info" className="w-full text-cream m-16">
           <div className="w-full h-fit flex flex-row items-end  grid grid-cols-3">
-            <h4 className="text-2xl text-khaki min-w-fit col-span-1">
-              User Name:
-            </h4>
+            <h4 className="text-2xl text-khaki min-w-fit col-span-1">Name:</h4>
             <span className="text-xl ml-4 w-fit col-span-2">
               {user.given_name} {user.family_name}
             </span>
           </div>
           <div className="w-full h-fit flex flex-row items-end mt-4  grid grid-cols-3">
-            <h4 className="text-2xl text-khaki min-w-fit col-span-1">
-              User Email:
-            </h4>
+            <h4 className="text-2xl text-khaki min-w-fit col-span-1">Email:</h4>
             <span className="text-xl ml-4 w-fit col-span-2">{user.email}</span>
+          </div>
+          <div className="w-full h-fit flex flex-row items-end mt-4  grid grid-cols-3">
+            <h4 className="text-2xl text-khaki min-w-fit col-span-1">
+              Home Address:
+            </h4>
+            <span className="text-xl ml-4 w-fit col-span-2">
+              {localUser.home_address}
+            </span>
           </div>
         </div>
       </div>

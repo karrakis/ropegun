@@ -25,6 +25,8 @@ export const Edit = ({ user, localUser, setEditing, setLocalUser }) => {
     localUser.tr_indoor_climb_grade || "?"
   );
 
+  const [homeAddress, setHomeAddress] = useState(localUser.home_address || "");
+
   const updateUser = (e) => {
     e.preventDefault();
     const body = {
@@ -38,6 +40,7 @@ export const Edit = ({ user, localUser, setEditing, setLocalUser }) => {
         lead_climb_outdoor_grade: leadOutdoorGrade,
         tr_outdoor_climb_grade: topRopeOutdoorGrade,
         tr_indoor_climb_grade: topRopeIndoorGrade,
+        home_address: homeAddress,
       },
     };
 
@@ -90,6 +93,18 @@ export const Edit = ({ user, localUser, setEditing, setLocalUser }) => {
             </h4>
             <span className="text-xl ml-4 w-fit col-span-2">{user.email}</span>
           </div>
+        </div>
+        <div className="w-full grid-cols-2 flex items-end">
+          <label className="text-2xl text-khaki" htmlFor="homeAddress">
+            Home Address:
+          </label>
+          <input
+            id="homeAddress"
+            type="text"
+            className="text-2xl ml-2 w-12 bg-auburn border-b"
+            value={homeAddress}
+            onChange={(e) => setHomeAddress(e.target.value)}
+          />
         </div>
       </div>
       <div className="w-full flex grid grid-cols-1 md:grid-cols-2 ml-16 gap-4">

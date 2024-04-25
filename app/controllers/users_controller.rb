@@ -20,6 +20,7 @@ class UsersController < ApplicationController
             :trad_lead,
             :trad_climb_outdoor_grade,
             :multipitch,
+            :home_address,
             )
     end
 end
