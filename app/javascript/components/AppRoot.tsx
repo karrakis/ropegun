@@ -3,6 +3,7 @@ import Header from "./Header/Header";
 import Home from "./Home/Home";
 import Dashboard from "./Dashboard/Dashboard";
 import TripPlan from "./TripPlan/TripPlan";
+import ComingSoon from "./Home/ComingSoon";
 
 interface UserSessionObject {
   name: string;
@@ -36,6 +37,9 @@ export const AppRoot = ({
   const [currentPage, setPage] = useState(window.location.pathname);
 
   const setDisplayPage = () => {
+    if (!localUser.id) {
+      return <ComingSoon />;
+    }
     switch (currentPage) {
       case "/":
         window.history.pushState({}, "Home", "/");
@@ -70,17 +74,19 @@ export const AppRoot = ({
   return (
     <div className="relative overflow-hidden">
       <a
-        className="absolute top-0 left-0 -z-10"
+        className="absolute top-0 left-0 -z-10 w-screen h-screen"
         title="Paulhaberstroh, CC BY-SA 4.0 'https://creativecommons.org/licenses/by-sa/4.0', via Wikimedia Commons"
         href="https://commons.wikimedia.org/wiki/File:Boulder_Flatirons.jpg"
       >
         <img
-          className="min-w-screen min-h-screen"
+          className="object-cover object-left h-screen w-auto"
           width="512"
-          alt="Boulder Flatirons"
-          src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Boulder_Flatirons.jpg/512px-Boulder_Flatirons.jpg"
+          alt="Geyikbayiri, Antalya, Turkey"
+          // src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Boulder_Flatirons.jpg/512px-Boulder_Flatirons.jpg"
+          src={require("../assets/Geyikbayiri.jpg")}
         />
       </a>
+
       <Header user={user} csrf={csrf} setPage={setPage} />
       {setDisplayPage()}
     </div>
