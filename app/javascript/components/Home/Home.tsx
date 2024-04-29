@@ -4,6 +4,7 @@ import SectionHeader from "../NavContainer/SectionHeader";
 import LinkBox from "../NavContainer/LinkBox";
 import MapControl from "../Map/MapControl";
 import Graph from "../Weather/Graph";
+import AreaGraph from "../Weather/AreaGraph";
 
 export const Climbers = () => {
   return (
@@ -66,18 +67,25 @@ export const Home = ({ userSavedLocations, localUser }) => {
     });
   }, [weatherTargets]);
 
-  const weatherDataFinal: Object[] = [];
-  const weatherDataRaw = Object.keys(weather).map((placeName) => {
-    return weather[placeName].periods.map((p) =>
-      Object.assign({}, { name: p.name, [placeName]: p.temperature })
-    );
-  });
-
-  weatherDataRaw.forEach((list) => {
-    list.forEach((item, i) => {
-      weatherDataFinal[i] ||= {};
-      weatherDataFinal[i] = Object.assign({}, weatherDataFinal[i], item);
-    });
+  const weatherDataTemperature = Object.keys(weather).map((placeName) => {
+    const days = weather[placeName].periods
+      .map((p) => p.endTime.slice(0, 10))
+      .filter((el, i, arr) => arr.indexOf(el) === i);
+    return days.map((day) => {
+      const periods = weather[placeName].periods.filter(
+        (p) =>
+          p.endTime.slice(0, 10) === day || p.startTime.slice(0, 10) === day
+      );
+      const temperatures = periods.map((p) => p.temperature).sort();
+      const temperatureOutput = [
+        temperatures[0],
+        temperatures[temperatures.length - 1],
+      ];
+      return {
+        day,
+        [placeName]: temperatureOutput,
+      };
+    });u
   });
 
   return (
@@ -105,7 +113,9 @@ export const Home = ({ userSavedLocations, localUser }) => {
           />
         )}
         <div className="bg-night w-full text-cream text-center pt-12 border border-cream border-b-0">
-          {weatherDataFinal.length > 0 && <Graph data={weatherDataFinal} />}
+          {weatherDataTemperature.length > 0 && (
+            <AreaGraph data={weatherDataTemperature} />
+          )}
         </div>
         <div className="flex flex-col w-full">
           <div className="text-cream w-full bg-night border border-cream text-center">
