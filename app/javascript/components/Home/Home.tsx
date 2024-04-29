@@ -35,6 +35,9 @@ export const Home = ({ userSavedLocations, localUser }) => {
     name: "Jackson Falls",
     location: { lat: 37.5081391, lng: -88.6832446 },
   });
+
+  const [weatherDisplay, updateWeatherDisplay] = useState("temperature");
+
   const [openMap, updateOpenMap] = useState(weatherTargets.length === 0);
 
   const [savedLocations, updateSavedLocations] = useState([]);
@@ -85,8 +88,45 @@ export const Home = ({ userSavedLocations, localUser }) => {
         day,
         [placeName]: temperatureOutput,
       };
-    });u
+    });
   });
+
+  // const weatherDataPrecipitation = Object.keys(weather)
+  //   .map((placeName) => {
+  //     return weather[placeName].periods.map((unit) => {
+  //       return {
+  //         name: unit.name,
+  //         [placeName]: unit.probabilityOfPrecipitation.value || 0,
+  //       };
+  //     });
+  //   })
+  //   .flat();
+
+  const weatherDataPrecipitation: Object[] = [];
+  const weatherDataRaw = Object.keys(weather).map((placeName) => {
+    return weather[placeName].periods.map((p) =>
+      Object.assign(
+        {},
+        { name: p.name, [placeName]: p.probabilityOfPrecipitation.value || 0 }
+      )
+    );
+  });
+
+  weatherDataRaw.forEach((list) => {
+    list.forEach((item, i) => {
+      weatherDataPrecipitation[i] ||= {};
+      weatherDataPrecipitation[i] = Object.assign(
+        {},
+        weatherDataPrecipitation[i],
+        item
+      );
+    });
+  });
+
+  debugger;
+
+  console.log(weatherDataTemperature.length);
+  console.log(weatherDataPrecipitation.length);
 
   return (
     <div className="w-full flex flex-row justify-center">
@@ -115,6 +155,9 @@ export const Home = ({ userSavedLocations, localUser }) => {
         <div className="bg-night w-full text-cream text-center pt-12 border border-cream border-b-0">
           {weatherDataTemperature.length > 0 && (
             <AreaGraph data={weatherDataTemperature} />
+          )}
+          {weatherDataPrecipitation.length > 0 && (
+            <Graph data={weatherDataPrecipitation} />
           )}
         </div>
         <div className="flex flex-col w-full">
