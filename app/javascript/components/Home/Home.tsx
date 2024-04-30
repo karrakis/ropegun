@@ -91,17 +91,6 @@ export const Home = ({ userSavedLocations, localUser }) => {
     });
   });
 
-  // const weatherDataPrecipitation = Object.keys(weather)
-  //   .map((placeName) => {
-  //     return weather[placeName].periods.map((unit) => {
-  //       return {
-  //         name: unit.name,
-  //         [placeName]: unit.probabilityOfPrecipitation.value || 0,
-  //       };
-  //     });
-  //   })
-  //   .flat();
-
   const weatherDataPrecipitation: Object[] = [];
   const weatherDataRaw = Object.keys(weather).map((placeName) => {
     return weather[placeName].periods.map((p) =>
@@ -122,8 +111,6 @@ export const Home = ({ userSavedLocations, localUser }) => {
       );
     });
   });
-
-  debugger;
 
   console.log(weatherDataTemperature.length);
   console.log(weatherDataPrecipitation.length);
@@ -153,12 +140,32 @@ export const Home = ({ userSavedLocations, localUser }) => {
           />
         )}
         <div className="bg-night w-full text-cream text-center pt-12 border border-cream border-b-0">
-          {weatherDataTemperature.length > 0 && (
-            <AreaGraph data={weatherDataTemperature} />
-          )}
-          {weatherDataPrecipitation.length > 0 && (
-            <Graph data={weatherDataPrecipitation} />
-          )}
+          {weatherDataTemperature.length > 0 &&
+            weatherDisplay == "temperature" && (
+              <AreaGraph data={weatherDataTemperature} />
+            )}
+          {weatherDataPrecipitation.length > 0 &&
+            weatherDisplay == "precipitation" && (
+              <Graph data={weatherDataPrecipitation} />
+            )}
+        </div>
+        <div className="flex flex-row justify-center w-full">
+          <div
+            className={`w-1/2 h-full flex justify-center items-center ${
+              weatherDisplay === "temperature" ? "bg-auburn" : "bg-night"
+            } text-cream`}
+            onClick={() => updateWeatherDisplay("temperature")}
+          >
+            Temperature
+          </div>
+          <div
+            className={`w-1/2 h-full flex justify-center items-center ${
+              weatherDisplay === "precipitation" ? "bg-auburn" : "bg-night"
+            } text-cream`}
+            onClick={() => updateWeatherDisplay("precipitation")}
+          >
+            Precipitation
+          </div>
         </div>
         <div className="flex flex-col w-full">
           <div className="text-cream w-full bg-night border border-cream text-center">
