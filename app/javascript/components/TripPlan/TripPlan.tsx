@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import Graph from "../Weather/Graph";
 import classNames from "classnames";
+import GraphSwitcher from "../Weather/GraphSwitcher";
 
 export const TripPlan = ({
   user,
@@ -8,8 +8,6 @@ export const TripPlan = ({
   userSavedLocations,
   tripSavedLocations = [],
 }) => {
-  //Bunny idea - for weather graphs, instead of using separate data points for night and day, use a single data point with a range.  This would allow for a single line graph with a shaded area for the range of temperatures.  This would be a more compact and visually appealing way to display the data.
-
   const [trip, updateTrip] = useState({
     name: "",
     locations: tripSavedLocations || [],
@@ -47,20 +45,6 @@ export const TripPlan = ({
       updateWeather(Object.assign({}, ...weatherToAdd));
     });
   }, [weatherTargets]);
-
-  const weatherDataFinal: Object[] = [];
-  const weatherDataRaw = Object.keys(weather).map((placeName) => {
-    return weather[placeName].periods.map((p) =>
-      Object.assign({}, { name: p.name, [placeName]: p.temperature })
-    );
-  });
-
-  weatherDataRaw.forEach((list) => {
-    list.forEach((item, i) => {
-      weatherDataFinal[i] ||= {};
-      weatherDataFinal[i] = Object.assign({}, weatherDataFinal[i], item);
-    });
-  });
 
   const handleWeatherSelection = (loc) => {
     if (trip.locations.includes(loc)) {
@@ -137,9 +121,7 @@ export const TripPlan = ({
               );
             })}
           </div>
-          <div className="bg-night w-full text-cream text-center pt-12 border border-cream border-b-0">
-            {weatherDataFinal.length > 0 && <Graph data={weatherDataFinal} />}
-          </div>
+          <GraphSwitcher weather={weather} />
           <div>
             <button
               onClick={() => {

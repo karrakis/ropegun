@@ -5,6 +5,7 @@ import LinkBox from "../NavContainer/LinkBox";
 import MapControl from "../Map/MapControl";
 import Graph from "../Weather/Graph";
 import AreaGraph from "../Weather/AreaGraph";
+import GraphSwitcher from "../Weather/GraphSwitcher";
 
 export const Climbers = () => {
   return (
@@ -35,8 +36,6 @@ export const Home = ({ userSavedLocations, localUser }) => {
     name: "Jackson Falls",
     location: { lat: 37.5081391, lng: -88.6832446 },
   });
-
-  const [weatherDisplay, updateWeatherDisplay] = useState("temperature");
 
   const [openMap, updateOpenMap] = useState(weatherTargets.length === 0);
 
@@ -70,51 +69,6 @@ export const Home = ({ userSavedLocations, localUser }) => {
     });
   }, [weatherTargets]);
 
-  const weatherDataTemperature = Object.keys(weather).map((placeName) => {
-    const days = weather[placeName].periods
-      .map((p) => p.endTime.slice(0, 10))
-      .filter((el, i, arr) => arr.indexOf(el) === i);
-    return days.map((day) => {
-      const periods = weather[placeName].periods.filter(
-        (p) =>
-          p.endTime.slice(0, 10) === day || p.startTime.slice(0, 10) === day
-      );
-      const temperatures = periods.map((p) => p.temperature).sort();
-      const temperatureOutput = [
-        temperatures[0],
-        temperatures[temperatures.length - 1],
-      ];
-      return {
-        day,
-        [placeName]: temperatureOutput,
-      };
-    });
-  });
-
-  const weatherDataPrecipitation: Object[] = [];
-  const weatherDataRaw = Object.keys(weather).map((placeName) => {
-    return weather[placeName].periods.map((p) =>
-      Object.assign(
-        {},
-        { name: p.name, [placeName]: p.probabilityOfPrecipitation.value || 0 }
-      )
-    );
-  });
-
-  weatherDataRaw.forEach((list) => {
-    list.forEach((item, i) => {
-      weatherDataPrecipitation[i] ||= {};
-      weatherDataPrecipitation[i] = Object.assign(
-        {},
-        weatherDataPrecipitation[i],
-        item
-      );
-    });
-  });
-
-  console.log(weatherDataTemperature.length);
-  console.log(weatherDataPrecipitation.length);
-
   return (
     <div className="w-full flex flex-row justify-center">
       <div className="flex flex-col justify-start h-screen overflow-scroll w-full bg-auburn text-cream  max-w-3xl">
@@ -139,34 +93,7 @@ export const Home = ({ userSavedLocations, localUser }) => {
             }}
           />
         )}
-        <div className="bg-night w-full text-cream text-center pt-12 border border-cream border-b-0">
-          {weatherDataTemperature.length > 0 &&
-            weatherDisplay == "temperature" && (
-              <AreaGraph data={weatherDataTemperature} />
-            )}
-          {weatherDataPrecipitation.length > 0 &&
-            weatherDisplay == "precipitation" && (
-              <Graph data={weatherDataPrecipitation} />
-            )}
-        </div>
-        <div className="flex flex-row justify-center w-full">
-          <div
-            className={`w-1/2 h-full flex justify-center items-center ${
-              weatherDisplay === "temperature" ? "bg-auburn" : "bg-night"
-            } text-cream`}
-            onClick={() => updateWeatherDisplay("temperature")}
-          >
-            Temperature
-          </div>
-          <div
-            className={`w-1/2 h-full flex justify-center items-center ${
-              weatherDisplay === "precipitation" ? "bg-auburn" : "bg-night"
-            } text-cream`}
-            onClick={() => updateWeatherDisplay("precipitation")}
-          >
-            Precipitation
-          </div>
-        </div>
+        <GraphSwitcher weather={weather} />
         <div className="flex flex-col w-full">
           <div className="text-cream w-full bg-night border border-cream text-center">
             Weather
