@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import classNames from "classnames";
 import GraphSwitcher from "../Weather/GraphSwitcher";
+import Distance from "../Distance/Distance";
+
 
 export const TripPlan = ({
   user,
@@ -64,7 +66,7 @@ export const TripPlan = ({
     updateWeatherTargets(trip.locations);
   }, [trip.locations.length]);
 
-  console.log("rendering");
+  console.log("rendering tripPlan");
 
   return (
     <div className="w-full flex flex-row justify-center">
@@ -122,6 +124,7 @@ export const TripPlan = ({
             })}
           </div>
           <GraphSwitcher weather={weather} />
+          <Distance locations={trip.locations} localUser={localUser} />
           <div>
             <button
               onClick={() => {

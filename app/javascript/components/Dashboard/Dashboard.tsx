@@ -6,9 +6,6 @@ export const Dashboard = ({ user, localUser }) => {
   const [editing, setEditing] = useState(false);
   const [_localUser, setLocalUser] = useState(localUser);
 
-  console.log("user", user);
-  console.log("localUser", localUser);
-
   // users should be able to define crags they want weather for to appear on home page
   // users should be able to define what weather at a given crag qualifies it as "climbable"
   // crags that should not be climbed when wet should be marked as such
