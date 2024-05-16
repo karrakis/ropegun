@@ -6,20 +6,26 @@ class Distance < ApplicationRecord
     def calculate
         # okay, so we need to make a call to the google maps API to get the distance between the two points
         # this method should be called if self.get_distance returns nil
+        # puts "GOOGLE API KEY: #{ENV['GOOGLE_MAPS_API_KEY']}"
+        # Net::HTTP.start('maps.googleapis.com') do |http|
+        #     puts "ORIGIN: #{origin}"
+        #     p "DESTINATION: #{destination}"
+        #     p "KEY: #{ENV['GOOGLE_MAPS_API_KEY']}"
+        #     p "URL: /maps/api/distancematrix/json?units=imperial&origins=#{origin}&destinations=#{destination}&key=#{ENV['GOOGLE_MAPS_API_KEY']}"
+        #     response = http.get("/maps/api/distancematrix/json?units=imperial&origins=#{origin}&destinations=#{destination}&key=#{ENV['GOOGLE_MAPS_API_KEY']}")
+        #     puts "RESPONSE: #{response.body}"
+        #     return response.body
+        # end
 
-        # this is the URL we need to hit:
-        # https://maps.googleapis.com/maps/api/distancematrix/json?origins=Seattle&destinations=San+Franc
 
-        # we need to replace Seattle and San+Francisco with the origin and destination
-
-        fetch("https://maps.googleapis.com/maps/api/distancematrix/json?origins=#{origin}&destinations=#{destination}&key=#{ENV['GOOGLE_MAPS_API_KEY']}").then(response => response.json()).then(data => {
-            Distance.find_or_create_by(origin: origin, destination: destination).update(distance: data.rows[0].elements[0].distance.text, duration: data.rows[0].elements[0].duration.text)
-        })
+        uri = URI("https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=#{origin}&destinations=#{destination}&key=#{ENV['GOOGLE_MAPS_API_KEY']}")
+        res = Net::HTTP.get_response(uri)
+        return JSON.parse(res.body) if res.is_a?(Net::HTTPSuccess)
     end
 
     def self.get_distance
         if self.find_by(origin: origin, destination: destination)
-          render json: { distance: distance, origin: origin, destination: destination, duration: duration}
+          return { distance: distance, origin: origin, destination: destination, duration: duration }
         else
             nil
         end

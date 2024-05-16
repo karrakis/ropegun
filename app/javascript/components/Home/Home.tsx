@@ -106,7 +106,7 @@ export const Home = ({ userSavedLocations, localUser }) => {
                 <div className="bg-night w-full flex flex-col my-2 p-2 rounded border border-cream shadow-lg">
                   <div>{placeName}</div>
                   <div className="flex flex-row overflow-scroll">
-                    {forecasts?.periods.map((period) => {
+                    {forecasts?.periods?.map((period) => {
                       return (
                         <div className="flex flex-col m-2 border border-cream p-2">
                           <div>{period.name}</div>
