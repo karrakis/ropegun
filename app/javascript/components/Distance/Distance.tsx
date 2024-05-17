@@ -3,47 +3,46 @@ import React, { useState, useEffect } from "react";
 export const Distance = ({ locations, localUser }) => {
   const [distances, updateDistances] = useState({});
   const [distancesReady, updateDistancesReady] = useState(false);
-  const fetchDistanceFromGoogleAPI = async (origin, destination, label) => {
+
+  useEffect(() => {
+    console.log("useEffect running");
+    console.log(locations);
     const csrfElement: HTMLElement | null = document.querySelector(
       '[name="csrf-token"]'
     );
     const csrfToken =
       csrfElement instanceof HTMLMetaElement ? csrfElement.content : "";
-    fetch("/api/v1/distance", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRF-Token": csrfToken,
-      },
-      body: JSON.stringify({
-        origin,
-        destination,
-      }),
-    })
-      .then((response) => {
-        return response.json();
-      })
-      .then((data) => {
-        updateDistances({ ...distances, [label]: data });
+    const locationUpdates = locations.map(async (loc) => {
+      const origin = localUser.home_address;
+      if (!origin) return;
+      const destination = loc.location;
+      const label = loc.name;
+
+      let response = await fetch("/api/v1/distance", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-Token": csrfToken,
+        },
+        body: JSON.stringify({
+          origin,
+          destination,
+        }),
       });
-  };
 
-  const handleDistanceSelection = async (loc) => {
-    console.log("handleDistanceSelection");
-    const origin = localUser.home_address;
-    if (!origin) return;
-    console.log("origin", origin);
-    console.log("loc", loc);
-    const destination = loc.location;
-    const label = loc.name;
-    const distance = fetchDistanceFromGoogleAPI(origin, destination, label);
-    updateDistances({ ...distances, [loc.name]: distance });
-  };
+      let data = await response.json();
+      return { name: loc.name, data: data };
+    });
 
-  useEffect(() => {
-    console.log("useEffect running");
-    locations.forEach((loc) => {
-      handleDistanceSelection(loc);
+    let locationUpdatesResolved = Promise.all(locationUpdates).then((data) => {
+      return data.map((loc) => {
+        return {
+          [loc.name]: loc.data,
+        };
+      });
+    });
+    locationUpdatesResolved.then((distancesToAdd) => {
+      updateDistances(Object.assign({}, ...distancesToAdd));
     });
   }, [locations]);
 
@@ -71,29 +70,31 @@ export const Distance = ({ locations, localUser }) => {
             </th>
           </tr>
         </thead>
-        {Object.keys(distances).map((destination) => {
-          if (distances[destination].distance) {
-            return (
-              <tr>
-                <td className="border-b border-l border-r border-auburn p-1">
-                  {destination}
-                </td>
-                <td className="border-b border-l border-r border-auburn p-1">
-                  {
-                    distances[destination].distance.rows[0].elements[0].distance
-                      .text
-                  }
-                </td>
-                <td className="border-b border-l border-r border-auburn p-1">
-                  {
-                    distances[destination].distance.rows[0].elements[0].duration
-                      .text
-                  }
-                </td>
-              </tr>
-            );
-          }
-        })}
+        <tbody>
+          {Object.keys(distances).map((destination) => {
+            if (distances[destination].distance) {
+              return (
+                <tr key={`${destination}-distance`}>
+                  <td className="border-b border-l border-r border-auburn p-1">
+                    {destination}
+                  </td>
+                  <td className="border-b border-l border-r border-auburn p-1">
+                    {
+                      distances[destination].distance.rows[0].elements[0]
+                        .distance.text
+                    }
+                  </td>
+                  <td className="border-b border-l border-r border-auburn p-1">
+                    {
+                      distances[destination].distance.rows[0].elements[0]
+                        .duration.text
+                    }
+                  </td>
+                </tr>
+              );
+            }
+          })}
+        </tbody>
       </table>
     );
   };

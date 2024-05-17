@@ -4,7 +4,6 @@ import HeaderRightLoggedIn from "./HeaderRightLoggedIn";
 import HeaderRightLoggedOut from "./HeaderRightLoggedOut";
 
 export const Header = ({ user, csrf, setPage }) => {
-  console.log("rendering header");
   return (
     <div className="text-white h-16 w-full flex items-center sticky top-0 z-50 bg-night text-cream">
       <HeaderLeft setPage={setPage} />

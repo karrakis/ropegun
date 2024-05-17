@@ -65,8 +65,6 @@ export const TripPlan = ({
     updateWeatherTargets(trip.locations);
   }, [trip.locations.length]);
 
-  console.log("rendering tripPlan");
-
   return (
     <div className="w-full flex flex-row justify-center h-full">
       <div className="flex flex-col justify-start h-full overflow-scroll w-full text-cream  max-w-3xl">
@@ -109,7 +107,7 @@ export const TripPlan = ({
             >
               {userSavedLocations.map((loc) => {
                 return (
-                  <div className="flex">
+                  <div className="flex" key={loc.id}>
                     <input
                       type="checkbox"
                       key={loc.id}

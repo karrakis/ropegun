@@ -20,6 +20,7 @@ const generateAreas = (data) => {
     const placeName = Object.keys(weather[0])[1];
     return (
       <Area
+        key={placeName}
         type="monotone"
         dataKey={placeName}
         stroke={generateRandomColor()}
@@ -33,9 +34,7 @@ const generateAreas = (data) => {
 export const AreaGraph = ({ data }) => {
   const listData = {};
   data.forEach((place) => {
-    console.log(place);
     place.forEach((day) => {
-      console.log(day);
       listData[day.day] ||= {};
       Object.entries(day).forEach(([key, value]) => {
         if (key !== "day") {
