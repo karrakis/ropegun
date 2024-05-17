@@ -71,7 +71,9 @@ export const TripPlan = ({
     <div className="w-full flex flex-row justify-center h-full">
       <div className="flex flex-col justify-start h-full overflow-scroll w-full bg-auburn text-cream  max-w-3xl">
         <div className="flex flex-col items-center p-2 bg-cream text-auburn h-full overflow-scroll">
-          <h1>Plan a Trip</h1>
+          <h1 className="text-cream text-2xl font-bold mb-2 bg-auburn p-2 w-full text-center">
+            Plan a Trip
+          </h1>
           <form className="mb-2">
             <input
               className="w-full p-2 bg-night text-cream rounded-t-md"
@@ -123,8 +125,9 @@ export const TripPlan = ({
           </form>
           <GraphSwitcher weather={weather} />
           <Distance locations={trip.locations} localUser={localUser} />
-          <div>
+          <div className="mb-16 mt-2">
             <button
+              className="bg-auburn text-cream p-2 rounded-md"
               onClick={() => {
                 console.log(trip);
               }}
