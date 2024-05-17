@@ -69,8 +69,8 @@ export const TripPlan = ({
 
   return (
     <div className="w-full flex flex-row justify-center h-full">
-      <div className="flex flex-col justify-start h-full overflow-scroll w-full bg-auburn text-cream  max-w-3xl">
-        <div className="flex flex-col items-center p-2 bg-cream text-auburn h-full overflow-scroll">
+      <div className="flex flex-col justify-start h-full overflow-scroll w-full text-cream  max-w-3xl">
+        <div className="flex flex-col items-center p-2 bg-cream bg-opacity-50 no-scrollbar text-auburn h-full overflow-scroll">
           <h1 className="text-cream text-2xl font-bold mb-2 bg-auburn p-2 w-full text-center">
             Plan a Trip
           </h1>
