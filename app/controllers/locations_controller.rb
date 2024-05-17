@@ -1,11 +1,15 @@
 class LocationsController < ApplicationController
     def create
         @location = Location.new(location_params)
-        @location.user = User.find(location_params[:user_id])
-        if @location.save
-            render json: @location, status: :created
-        else
-            render json: @location.errors, status: :unprocessable_entity
+        begin
+            @location.user = User.find(location_params[:user_id])
+            if @location.save
+                render json: @location, status: :created
+            else
+                render json: @location.errors, status: :unprocessable_entity
+            end
+        rescue ActiveRecord::RecordNotFound
+            render json: { error: 'User not found' }, status: :unprocessable_entity
         end
     end
 
