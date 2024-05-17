@@ -52,7 +52,7 @@ const GraphSwitcher = ({ weather }) => {
   console.log(weatherDataPrecipitation.length);
   return (
     <>
-      <div className="bg-night w-full text-cream text-center pt-12 border border-cream border-b-0">
+      <div className="bg-night w-full text-cream text-center pt-12">
         {weatherDataTemperature.length > 0 &&
           weatherDisplay == "temperature" && (
             <AreaGraph data={weatherDataTemperature} />

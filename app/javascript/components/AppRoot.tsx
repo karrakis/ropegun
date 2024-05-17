@@ -47,7 +47,7 @@ export const AppRoot = ({
           <Home localUser={localUser} userSavedLocations={userSavedLocations} />
         );
       case "/home":
-        window.history.pushState({}, "Home", "/");
+        window.historTripPlany.pushState({}, "Home", "/");
         return (
           <Home localUser={localUser} userSavedLocations={userSavedLocations} />
         );
@@ -72,14 +72,14 @@ export const AppRoot = ({
   }, [currentPage]);
 
   return (
-    <div className="relative overflow-hidden">
+    <div className="relative overflow-hidden h-screen">
       <a
-        className="absolute top-0 left-0 -z-10 w-screen h-screen"
+        className="absolute top-0 left-0 -z-10 w-screen h-full"
         title="Paulhaberstroh, CC BY-SA 4.0 'https://creativecommons.org/licenses/by-sa/4.0', via Wikimedia Commons"
         href="https://commons.wikimedia.org/wiki/File:Boulder_Flatirons.jpg"
       >
         <img
-          className="object-cover object-left h-screen w-auto"
+          className="object-cover object-left h-full w-auto"
           width="512"
           alt="Geyikbayiri, Antalya, Turkey"
           // src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Boulder_Flatirons.jpg/512px-Boulder_Flatirons.jpg"

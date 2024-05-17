@@ -57,7 +57,7 @@ export const Distance = ({ locations, localUser }) => {
 
   const displayDistances = () => {
     return (
-      <table>
+      <table className="mb-16">
         <thead>
           <tr>
             <th>Destination</th>
