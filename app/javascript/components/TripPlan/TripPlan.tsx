@@ -72,10 +72,19 @@ export const TripPlan = ({
       <div className="flex flex-col justify-start h-full overflow-scroll w-full bg-auburn text-cream  max-w-3xl">
         <div className="flex flex-col items-center p-2 bg-cream text-auburn h-full overflow-scroll">
           <h1>Plan a Trip</h1>
-          <form>
-            <input type="text" placeholder="Name Your Trip" />
+          <form className="mb-2">
+            <input
+              className="w-full p-2 bg-night text-cream rounded-t-md"
+              type="text"
+              placeholder="Name Your Trip"
+            />
             <div
-              className="bg-auburn text-cream"
+              className={classNames(
+                "bg-auburn text-cream cursor-pointer p-2 text-center",
+                {
+                  "rounded-b-md": !locationsSelectorsVisible,
+                }
+              )}
               onClick={() => {
                 updateLocationsSelectorsVisible(!locationsSelectorsVisible);
               }}
@@ -88,6 +97,8 @@ export const TripPlan = ({
                 "bg-night",
                 "flex",
                 "flex-col",
+                "p-2",
+                "rounded-b-md",
                 {
                   block: locationsSelectorsVisible,
                   hidden: !locationsSelectorsVisible,
@@ -110,18 +121,6 @@ export const TripPlan = ({
               })}
             </div>
           </form>
-          <div>
-            {trip.locations.map((loc) => {
-              return (
-                <div key={"loclist_" + loc.id}>
-                  <span>{loc.name}</span>
-                  <span>
-                    {loc.location.lat}, {loc.location.lng}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
           <GraphSwitcher weather={weather} />
           <Distance locations={trip.locations} localUser={localUser} />
           <div>
