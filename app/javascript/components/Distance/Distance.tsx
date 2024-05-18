@@ -1,49 +1,14 @@
 import React, { useState, useEffect } from "react";
+import { asynchronousStateUpdate } from "../../utilities/asynchronousStateUpdate";
+import { getDistances } from "../../utilities/getDistances";
 
 export const Distance = ({ locations, localUser }) => {
   const [distances, updateDistances] = useState({});
   const [distancesReady, updateDistancesReady] = useState(false);
 
   useEffect(() => {
-    console.log("useEffect running");
-    console.log(locations);
-    const csrfElement: HTMLElement | null = document.querySelector(
-      '[name="csrf-token"]'
-    );
-    const csrfToken =
-      csrfElement instanceof HTMLMetaElement ? csrfElement.content : "";
-    const locationUpdates = locations.map(async (loc) => {
-      const origin = localUser.home_address;
-      if (!origin) return;
-      const destination = loc.location;
-      const label = loc.name;
-
-      let response = await fetch("/api/v1/distance", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRF-Token": csrfToken,
-        },
-        body: JSON.stringify({
-          origin,
-          destination,
-        }),
-      });
-
-      let data = await response.json();
-      return { name: loc.name, data: data };
-    });
-
-    let locationUpdatesResolved = Promise.all(locationUpdates).then((data) => {
-      return data.map((loc) => {
-        return {
-          [loc.name]: loc.data,
-        };
-      });
-    });
-    locationUpdatesResolved.then((distancesToAdd) => {
-      updateDistances(Object.assign({}, ...distancesToAdd));
-    });
+    const locationUpdates = getDistances(locations, localUser);
+    asynchronousStateUpdate(locationUpdates, updateDistances);
   }, [locations]);
 
   useEffect(() => {

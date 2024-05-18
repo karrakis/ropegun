@@ -47,7 +47,7 @@ export const AppRoot = ({
           <Home localUser={localUser} userSavedLocations={userSavedLocations} />
         );
       case "/home":
-        window.historTripPlany.pushState({}, "Home", "/");
+        window.history.pushState({}, "Home", "/");
         return (
           <Home localUser={localUser} userSavedLocations={userSavedLocations} />
         );
