@@ -3,6 +3,8 @@ import classNames from "classnames";
 import GraphSwitcher from "../Weather/GraphSwitcher";
 import Distance from "../Distance/Distance";
 
+import LocationsSelector from "./Locations/Selector";
+
 export const TripPlan = ({
   user,
   localUser,
@@ -72,55 +74,10 @@ export const TripPlan = ({
           <h1 className="text-cream text-2xl font-bold mb-2 bg-auburn p-2 w-full text-center">
             Plan a Trip
           </h1>
-          <form className="mb-2">
-            <input
-              className="w-full p-2 bg-night text-cream rounded-t-md"
-              type="text"
-              placeholder="Name Your Trip"
-            />
-            <div
-              className={classNames(
-                "bg-auburn text-cream cursor-pointer p-2 text-center",
-                {
-                  "rounded-b-md": !locationsSelectorsVisible,
-                }
-              )}
-              onClick={() => {
-                updateLocationsSelectorsVisible(!locationsSelectorsVisible);
-              }}
-            >
-              Add Locations
-            </div>
-            <div
-              className={classNames(
-                "text-cream",
-                "bg-night",
-                "flex",
-                "flex-col",
-                "p-2",
-                "rounded-b-md",
-                {
-                  block: locationsSelectorsVisible,
-                  hidden: !locationsSelectorsVisible,
-                }
-              )}
-            >
-              {userSavedLocations.map((loc) => {
-                return (
-                  <div className="flex" key={loc.id}>
-                    <input
-                      type="checkbox"
-                      key={loc.id}
-                      id={loc.name}
-                      value={loc.id}
-                      onChange={() => handleWeatherSelection(loc)}
-                    />
-                    <label htmlFor={loc.name}>{loc.name}</label>
-                  </div>
-                );
-              })}
-            </div>
-          </form>
+          <LocationsSelector
+            locationOptions={userSavedLocations}
+            updateLocations={handleWeatherSelection}
+          />
           <GraphSwitcher weather={weather} />
           <Distance locations={trip.locations} localUser={localUser} />
           <div className="mb-16 mt-2">
