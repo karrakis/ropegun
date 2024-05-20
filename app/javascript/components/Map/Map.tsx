@@ -82,7 +82,7 @@ export const GoogleMap = ({ position, updatePosition }) => {
       libraries={["places", "marker"]}
     >
       <Map
-        center={position}
+        defaultCenter={position}
         zoom={10}
         className="w-full aspect-video"
         // disableDefaultUI={true}

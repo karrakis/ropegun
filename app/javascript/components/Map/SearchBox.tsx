@@ -1,7 +1,7 @@
 import React from "react";
 
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
-import { useMapsLibrary } from "@vis.gl/react-google-maps";
+import { useMapsLibrary, useMap } from "@vis.gl/react-google-maps";
 
 export const AutocompletePlaces = ({ updatePosition }) => {
   const placesLibrary = useMapsLibrary("places");
@@ -11,6 +11,8 @@ export const AutocompletePlaces = ({ updatePosition }) => {
     google.maps.places.QueryAutocompletePrediction[] | null
   >([]);
   const [inputValue, setInputValue] = useState<string>("");
+
+  const map = useMap();
 
   useEffect(() => {
     if (placesLibrary) setService(new placesLibrary.AutocompleteService());
@@ -42,6 +44,7 @@ export const AutocompletePlaces = ({ updatePosition }) => {
     const geocoder = new google.maps.Geocoder();
     geocoder.geocode({ placeId: place.place_id }, (results, status) => {
       if (status === "OK") {
+        map.setCenter(results[0].geometry.location.toJSON());
         updatePosition({
           name: place.description,
           location: results[0].geometry.location.toJSON(),

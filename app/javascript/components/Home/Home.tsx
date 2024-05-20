@@ -77,7 +77,7 @@ export const Home = ({ userSavedLocations, localUser }) => {
             className="text-cream bg-auburn p-2 rounded shadow-lg cursor-pointer"
             onClick={() => updateOpenMap(!openMap)}
           >
-            {openMap ? "Close Map" : "Add Weather Locations"}
+            {openMap ? "Close Map" : "Add Locations"}
           </div>
         </div>
         {openMap && (
