@@ -4,6 +4,7 @@ import Home from "./Home/Home";
 import Dashboard from "./Dashboard/Dashboard";
 import TripPlan from "./TripPlan/TripPlan";
 import ComingSoon from "./Home/ComingSoon";
+import DevBlog from "./Devblog/Devblog";
 
 interface UserSessionObject {
   name: string;
@@ -42,12 +43,15 @@ export const AppRoot = ({
     }
     switch (currentPage) {
       case "/":
-        window.history.pushState({}, "Home", "/");
+        window.history.pushState({}, "Trip Planning", "/trip_plan");
         return (
-          <Home localUser={localUser} userSavedLocations={userSavedLocations} />
+          <TripPlan
+            localUser={localUser}
+            userSavedLocations={userSavedLocations}
+          />
         );
       case "/home":
-        window.history.pushState({}, "Home", "/");
+        window.history.pushState({}, "Home", "/home");
         return (
           <Home localUser={localUser} userSavedLocations={userSavedLocations} />
         );
@@ -58,11 +62,13 @@ export const AppRoot = ({
         window.history.pushState({}, "Trip Planning", "/trip_plan");
         return (
           <TripPlan
-            user={user}
             localUser={localUser}
             userSavedLocations={userSavedLocations}
           />
         );
+      case "/development":
+        window.history.pushState({}, "Development", "/development");
+        return <DevBlog />;
     }
   };
 

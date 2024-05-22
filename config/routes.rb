@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   get '/auth/logout' => 'auth0#logout'
   get '/dashboard' => 'components#index'
   get '/trip_plan' => 'components#index'
+  get '/development' => 'components#index'
   
   patch '/users/:id' => 'users#update'
   post '/locations' => 'locations#create'

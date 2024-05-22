@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import classNames from "classnames";
 import GraphSwitcher from "../Weather/GraphSwitcher";
 import Distance from "../Distance/Distance";
 import LocationsSelector from "./Locations/Selector";
@@ -15,13 +16,11 @@ export const TripPlan = ({
   });
 
   const [weather, updateWeather] = useState({});
-  const [weatherTargets, updateWeatherTargets] = useState(trip.locations || []);
-
   const [openMap, updateOpenMap] = useState(false);
   const [savedLocations, updateSavedLocations] = useState([]);
 
   useEffect(() => {
-    const weatherUpdates = weatherTargets.map(async (loc) => {
+    const weatherUpdates = trip.locations.map(async (loc) => {
       let response = await fetch(
         `https://api.weather.gov/gridpoints/${loc.office}/${loc.office_x},${loc.office_y}/forecast`,
         {
@@ -39,14 +38,14 @@ export const TripPlan = ({
     let weatherUpdatesResolved = Promise.all(weatherUpdates).then((data) => {
       return data.map((forecast, index) => {
         return {
-          [weatherTargets[index].name]: forecast,
+          [trip.locations[index].name]: forecast,
         };
       });
     });
     weatherUpdatesResolved.then((weatherToAdd) => {
       updateWeather(Object.assign({}, ...weatherToAdd));
     });
-  }, [weatherTargets]);
+  }, [trip.locations.length]);
 
   const handleWeatherSelection = (loc) => {
     if (trip.locations.includes(loc)) {
@@ -62,17 +61,13 @@ export const TripPlan = ({
     }
   };
 
-  useEffect(() => {
-    updateWeatherTargets(trip.locations);
-  }, [trip.locations.length]);
-
   const [position, updatePosition] = useState({
     name: "Jackson Falls",
     location: { lat: 37.5081391, lng: -88.6832446 },
   });
 
   useEffect(() => {
-    const weatherUpdates = weatherTargets.map(async (loc) => {
+    const weatherUpdates = trip.locations.map(async (loc) => {
       let response = await fetch(
         `https://api.weather.gov/gridpoints/${loc.office}/${loc.office_x},${loc.office_y}/forecast`,
         {
@@ -90,14 +85,14 @@ export const TripPlan = ({
     let weatherUpdatesResolved = Promise.all(weatherUpdates).then((data) => {
       return data.map((forecast, index) => {
         return {
-          [weatherTargets[index].name]: forecast,
+          [trip.locations[index].name]: forecast,
         };
       });
     });
     weatherUpdatesResolved.then((weatherToAdd) => {
       updateWeather(Object.assign({}, weather, ...weatherToAdd));
     });
-  }, [weatherTargets]);
+  }, [trip.locations.length]);
 
   return (
     <div className="w-full flex flex-row justify-center h-full">
@@ -106,7 +101,7 @@ export const TripPlan = ({
           <h1 className="text-cream text-2xl font-bold mb-2 bg-auburn p-2 w-full text-center">
             Plan a Trip
           </h1>
-          <div className="flex flex-col justify-start h-full w-full bg-auburn text-cream max-w-3xl">
+          <div className="flex flex-col justify-start h-fit w-full bg-auburn text-cream max-w-3xl">
             <div className="flex flex-col items-center p-2">
               <div
                 className="text-cream bg-auburn p-2 rounded shadow-lg cursor-pointer"
@@ -122,8 +117,8 @@ export const TripPlan = ({
                   updatePosition,
                   savedLocations,
                   updateSavedLocations,
-                  weatherTargets,
-                  updateWeatherTargets,
+                  weatherTargets: trip.locations,
+                  updateWeatherTargets: handleWeatherSelection,
                   localUser,
                 }}
               />
@@ -133,14 +128,21 @@ export const TripPlan = ({
             locationOptions={userSavedLocations}
             updateLocations={handleWeatherSelection}
           />
-          <GraphSwitcher weather={weather} />
-          <Distance locations={trip.locations} localUser={localUser} />
+          {trip.locations.length > 0 && <GraphSwitcher weather={weather} />}
+          {trip.locations.length > 0 && (
+            <Distance locations={trip.locations} localUser={localUser} />
+          )}
           <div className="mb-16 mt-2">
             <button
-              className="bg-auburn text-cream p-2 rounded-md"
+              className={classNames("bg-auburn text-cream p-2 rounded-md", {
+                "opacity-50": trip.locations.length === 0,
+                "cusor-pointer": trip.locations.length > 0,
+              })}
               onClick={() => {
+                if (trip.locations.length === 0) return;
                 console.log(trip);
               }}
+              disabled={trip.locations.length === 0}
             >
               Save Trip
             </button>

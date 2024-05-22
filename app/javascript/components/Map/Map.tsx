@@ -67,15 +67,6 @@ export const GoogleMap = ({ position, updatePosition }) => {
       />
     );
   };
-
-  const renderControls = () => {
-    return (
-      <div className="absolute top-0 left-0 p-4">
-        <button onClick={addMarker}>Add Marker</button>
-        <button onClick={clearMarkers}>Clear Markers</button>
-      </div>
-    );
-  };
   return (
     <APIProvider
       apiKey={"AIzaSyByI8LqBihCCEq9uCD-sOjed15Y0x_wREU"}
@@ -93,16 +84,6 @@ export const GoogleMap = ({ position, updatePosition }) => {
         {renderMarkers()}
         {renderDirections()}
         <MapsService.DirectionsRenderer />
-        <MapControl position={ControlPosition.LEFT_CENTER}>
-          <div className="w-32 h-16 bg-auburn text-night flex">
-            <button className="w-full h-full" onClick={addMarker}>
-              Add Marker
-            </button>
-            <button className="w-full h-full" onClick={clearMarkers}>
-              Clear Markers
-            </button>
-          </div>
-        </MapControl>
       </Map>
     </APIProvider>
   );

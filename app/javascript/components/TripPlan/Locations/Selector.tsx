@@ -8,7 +8,7 @@ export const LocationsSelector = ({ locationOptions, updateLocations }) => {
   return (
     <form className="mb-2">
       <input
-        className="w-full p-2 bg-night text-cream rounded-t-md"
+        className="w-full p-2 bg-night text-cream rounded-t-md mt-2"
         type="text"
         placeholder="Name Your Trip"
       />
