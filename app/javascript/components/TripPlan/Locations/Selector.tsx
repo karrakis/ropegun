@@ -23,7 +23,7 @@ export const LocationsSelector = ({ locationOptions, updateLocations }) => {
           updateLocationsSelectorsVisible(!locationsSelectorsVisible);
         }}
       >
-        Add Locations
+        Add Linked Locations to Trip
       </div>
       <div
         className={classNames(

@@ -18,6 +18,11 @@ module.exports = {
     },
     minWidth: {
       'screen': '100vw'
+    },
+    extend: {
+      height: {
+        'screen-minus-header': 'calc(100vh - 4rem)',
+      },
     }
   }
 }
