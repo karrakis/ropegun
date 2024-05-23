@@ -5,7 +5,7 @@ import HeaderRightLoggedOut from "./HeaderRightLoggedOut";
 
 export const Header = ({ user, csrf, setPage }) => {
   return (
-    <div className="text-white h-16 w-full flex items-center sticky top-0 z-50 bg-night text-cream">
+    <div className="text-white h-16 w-full flex items-center sticky top-0 z-50 bg-night text-cream md">
       <HeaderLeft setPage={setPage} />
       <div id="header-right" className="justify-end flex w-full h-full">
         {!!user && (
