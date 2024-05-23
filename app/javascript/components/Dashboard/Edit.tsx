@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import classNames from "classnames";
 
 export const Edit = ({ user, localUser, setEditing, setLocalUser }) => {
   const [multipitch, setMultipitch] = useState(localUser.multipitch || 0);
@@ -78,7 +79,10 @@ export const Edit = ({ user, localUser, setEditing, setLocalUser }) => {
           alt="User Profile Image"
           src={user.picture}
         ></img>
-        <div id="user_info" className="w-full text-cream m-16">
+        <div
+          id="user_info"
+          className={classNames("w-full text-cream m-16 bg-night opacity-80")}
+        >
           <div className="w-full h-fit flex flex-row items-end  grid grid-cols-3">
             <h4 className="text-2xl text-khaki min-w-fit col-span-1">
               User Name:

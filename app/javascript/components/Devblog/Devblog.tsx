@@ -8,6 +8,7 @@ export const ComingSoon = () => {
           Development Roadmap
         </h1>
         <ul>
+          <li>Add user feedback button here</li>
           <li>Clear labeling for Y axis of weather graph</li>
           <li>Friends Lists for user accounts</li>
           <li>Invite friends to trips</li>

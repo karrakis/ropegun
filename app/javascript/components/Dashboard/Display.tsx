@@ -11,34 +11,30 @@ export const Display = ({ user, localUser, setEditing }) => {
           Edit
         </button>
       </div>
-      <div className="flex flex-row w-full h-fit">
+      <div className="flex flex-col md:flex-row w-full h-fit bg-night">
         <img
-          className="h-32 w-auto ml-16 my-16"
+          className="w-32 md:h-32 h-auto md:w-auto ml-8 md:ml-16 my-8 md:ml-16"
           alt="User Profile Image"
           src={user.picture}
         ></img>
-        <div id="user_info" className="w-full text-cream m-16">
-          <div className="w-full h-fit flex flex-row items-end  grid grid-cols-3">
-            <h4 className="text-2xl text-khaki min-w-fit col-span-1">Name:</h4>
-            <span className="text-xl ml-4 w-fit col-span-2">
+        <div id="user_info" className="w-full text-cream p-8 p-2">
+          <div className="w-fit md:w-full h-fit flex flex-col md:flex-row md:items-end">
+            <h4 className="text-2xl text-khaki min-w-fit">Name:</h4>
+            <span className="text-xl ml-4 w-fit">
               {user.given_name} {user.family_name}
             </span>
           </div>
-          <div className="w-full h-fit flex flex-row items-end mt-4  grid grid-cols-3">
-            <h4 className="text-2xl text-khaki min-w-fit col-span-1">Email:</h4>
-            <span className="text-xl ml-4 w-fit col-span-2">{user.email}</span>
+          <div className="w-full md:w-full h-fit flex flex-col md:flex-row md:items-end">
+            <h4 className="text-2xl text-khaki min-w-fit">Email:</h4>
+            <div className="text-xl ml-4 w-fit">{user.email}</div>
           </div>
-          <div className="w-full h-fit flex flex-row items-end mt-4  grid grid-cols-3">
-            <h4 className="text-2xl text-khaki min-w-fit col-span-1">
-              Home Address:
-            </h4>
-            <span className="text-xl ml-4 w-fit col-span-2">
-              {localUser.home_address}
-            </span>
+          <div className="w-full md:w-full h-fit flex flex-col md:flex-row md:items-end">
+            <h4 className="text-2xl text-khaki min-w-fit">Home Address:</h4>
+            <span className="text-xl ml-4 w-fit">{localUser.home_address}</span>
           </div>
         </div>
       </div>
-      <div className="w-full flex grid grid-cols-1 md:grid-cols-2 ml-16">
+      <div className="w-full flex grid grid-cols-1 md:grid-cols-2 bg-auburn p-2 text-cream">
         <div className="w-full grid-cols-2 flex items-end">
           <h4 className="text-2xl text-khaki">Top Rope Belay:</h4>
           <span className="text-2xl ml-2">
