@@ -13,15 +13,15 @@ module.exports = {
       ashgray: "#A4BAB7",
       khaki: "#BEA57D"
     },
-    screens: {
-      xs: '375px',
-    },
-    minWidth: {
-      'screen': '100vw'
-    },
     extend: {
+      screens: {
+        xs: '375px',
+      },
       height: {
         'screen-minus-header': 'calc(100vh - 4rem)',
+      },
+      minWidth: {
+        'screen': '100vw'
       },
     }
   }
