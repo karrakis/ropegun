@@ -2,16 +2,14 @@ import React from "react";
 
 export const Display = ({ user, localUser, setEditing }) => {
   return (
-    <>
-      <div className="w-full relative">
+    <div className="flex flex-col h-screen-minus-header overflow-scroll mb-2">
+      <div className="flex flex-col md:flex-row w-full h-fit bg-night relative">
         <button
           className="w-16 h-8 bg-cream text-night absolute top-0 right-0 cursor-pointer"
           onClick={() => setEditing(true)}
         >
           Edit
         </button>
-      </div>
-      <div className="flex flex-col md:flex-row w-full h-fit bg-night">
         <img
           className="w-32 md:h-32 h-auto md:w-auto ml-8 md:ml-16 my-8 md:ml-16"
           alt="User Profile Image"
@@ -84,7 +82,7 @@ export const Display = ({ user, localUser, setEditing }) => {
           <span className="text-2xl ml-2">{localUser.multipitch || "No"}</span>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
