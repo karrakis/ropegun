@@ -62,7 +62,7 @@ export const Edit = ({ user, localUser, setEditing, setLocalUser }) => {
 
   return (
     <>
-      <div className="w-full relative h-screen-minus-header overflow-scroll">
+      <div className="w-full relative">
         <button
           className="w-16 h-8 bg-cream text-night absolute top-0 right-0 cursor-pointer"
           onClick={(e) => {
@@ -73,9 +73,9 @@ export const Edit = ({ user, localUser, setEditing, setLocalUser }) => {
           Save
         </button>
       </div>
-      <div className="flex flex-col md:flex-row w-full h-fit bg-night">
+      <div className="flex flex-col w-full h-fit bg-night">
         <img
-          className="w-32 md:h-32 h-auto md:w-auto ml-8 md:ml-16 my-8 md:ml-16"
+          className="w-32 h-32 ml-8 md:ml-16 my-8 md:ml-16"
           alt="User Profile Image"
           src={user.picture}
         ></img>
@@ -98,7 +98,7 @@ export const Edit = ({ user, localUser, setEditing, setLocalUser }) => {
             </span>
           </div>
         </div>
-        <div className="w-full md:w-full h-fit flex flex-col md:flex-row">
+        <div className="p-8 w-full md:w-full h-fit flex flex-col md:flex-row">
           <label className="text-2xl text-khaki" htmlFor="homeAddress">
             Home Address:
           </label>
@@ -111,7 +111,7 @@ export const Edit = ({ user, localUser, setEditing, setLocalUser }) => {
           />
         </div>
       </div>
-      <div className="w-full flex grid grid-cols-1 md:grid-cols-2 pl-2 md:pl-16 gap-4 pt-4 bg-auburn">
+      <div className="w-full flex grid grid-cols-1 md:grid-cols-2 p-2 md:pl-16 gap-4 pt-4 bg-auburn">
         <div className="w-full flex items-end">
           <label className="text-2xl text-khaki" htmlFor="TopRopeBelay">
             Top Rope Belay:

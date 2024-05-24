@@ -12,7 +12,7 @@ export const Dashboard = ({ user, localUser }) => {
 
   return (
     <div className="w-full flex flex-row justify-center">
-      <div className="flex flex-col items-center p-2 bg-cream bg-opacity-50 no-scrollbar text-night h-screen overflow-scroll">
+      <div className="flex flex-col items-center p-2 bg-cream bg-opacity-50 no-scrollbar text-night h-screen-minus-header overflow-scroll">
         {editing ? (
           <Edit
             user={user}
