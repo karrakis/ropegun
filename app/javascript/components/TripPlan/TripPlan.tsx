@@ -15,9 +15,28 @@ export const TripPlan = ({
     locations: tripSavedLocations || [],
   });
 
+  const [trips, updateTrips] = useState([]);
   const [weather, updateWeather] = useState({});
   const [openMap, updateOpenMap] = useState(false);
   const [savedLocations, updateSavedLocations] = useState([]);
+
+  const fetchTrips = async () => {
+    let response = await fetch(`/trips`, {
+      method: "GET",
+      headers: {
+        Accept: "application/ld+json",
+      },
+    });
+
+    let data = await response.json();
+    return data;
+  };
+
+  useEffect(() => {
+    fetchTrips().then((trips) => {
+      updateSavedLocations(trips);
+    });
+  }, []);
 
   useEffect(() => {
     const weatherUpdates = trip.locations.map(async (loc) => {
@@ -101,6 +120,7 @@ export const TripPlan = ({
           <h1 className="text-cream text-2xl font-bold mb-2 bg-auburn p-2 w-full text-center">
             Plan a Trip
           </h1>
+          <div>{JSON.stringify(trips)}</div>
           <div className="flex flex-col justify-start h-fit w-full bg-auburn text-cream max-w-3xl">
             <div className="flex flex-col items-center p-2">
               <div

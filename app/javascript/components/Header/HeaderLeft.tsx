@@ -35,8 +35,8 @@ export const HeaderLeft = ({ setPage }) => {
         <div
           className="w-full h-full"
           style={{
-            "border-left": "2px solid #f7f7f7",
-            "border-bottom": "2px solid #f7f7f7",
+            borderLeft: "2px solid #f7f7f7",
+            borderBottom: "2px solid #f7f7f7",
             transform: "rotate(-45deg) translate(50%, 50%)",
             height: "2rem",
           }}
