@@ -125,39 +125,7 @@ export const TripPlan = ({
           <h1 className="text-cream text-2xl font-bold mb-2 bg-auburn p-2 w-full text-center">
             Plan a Trip
           </h1>
-          <select
-            className="w-fit"
-            placeholder="dsafdsafa"
-            onChange={(e) => {
-              //one of these is probably a string, the other an integer and we're using ===
-              const trip = trips.filter(
-                (trip) => trip.id === parseInt(e.target.value)
-              )[0];
-
-              updateTrip({
-                name: trip.name,
-                locations: trip.locations.map((loc) => ({
-                  name: loc.name,
-                  office: loc.office,
-                  office_x: loc.office_x,
-                  office_y: loc.office_y,
-                  location: { lat: loc.latitude, lng: loc.longitude },
-                })),
-              });
-            }}
-          >
-            <option selected disabled>
-              Select Existing Trip
-            </option>
-            {trips.map((trip) => {
-              return (
-                <option key={trip.id} value={trip.id}>
-                  {trip.name}
-                </option>
-              );
-            })}
-          </select>
-          <div className="flex flex-col justify-start h-fit w-full bg-auburn text-cream max-w-3xl">
+          <div className="flex flex-col justify-start items-center h-fit w-full bg-night text-cream max-w-3xl">
             <div className="flex flex-col items-center p-2">
               <div
                 className="text-cream bg-auburn p-2 rounded shadow-lg cursor-pointer"
@@ -179,6 +147,37 @@ export const TripPlan = ({
                 }}
               />
             )}
+            <select
+              className="w-fit p-2 bg-auburn text-cream rounded-md mb-2"
+              onChange={(e) => {
+                //one of these is probably a string, the other an integer and we're using ===
+                const trip = trips.filter(
+                  (trip) => trip.id === parseInt(e.target.value)
+                )[0];
+
+                updateTrip({
+                  name: trip.name,
+                  locations: trip.locations.map((loc) => ({
+                    name: loc.name,
+                    office: loc.office,
+                    office_x: loc.office_x,
+                    office_y: loc.office_y,
+                    location: { lat: loc.latitude, lng: loc.longitude },
+                  })),
+                });
+              }}
+            >
+              <option selected disabled>
+                Select Existing Trip
+              </option>
+              {trips.map((trip) => {
+                return (
+                  <option key={trip.id} value={trip.id}>
+                    {trip.name}
+                  </option>
+                );
+              })}
+            </select>
           </div>
           <LocationsSelector
             trip={trip}
