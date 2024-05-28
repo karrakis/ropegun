@@ -1,7 +1,12 @@
 import React, { useState, useEffect } from "react";
 import classNames from "classnames";
 
-export const LocationsSelector = ({ locationOptions, updateLocations }) => {
+export const LocationsSelector = ({
+  locationOptions,
+  updateLocations,
+  trip,
+  updateTrip,
+}) => {
   const [locationsSelectorsVisible, updateLocationsSelectorsVisible] =
     useState(false);
 
@@ -11,6 +16,7 @@ export const LocationsSelector = ({ locationOptions, updateLocations }) => {
         className="w-full p-2 bg-night text-cream rounded-t-md mt-2"
         type="text"
         placeholder="Name Your Trip"
+        onChange={(e) => updateTrip({ ...trip, name: e.target.value })}
       />
       <div
         className={classNames(

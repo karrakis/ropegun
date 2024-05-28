@@ -5,6 +5,8 @@ import Distance from "../Distance/Distance";
 import LocationsSelector from "./Locations/Selector";
 import MapControl from "../Map/MapControl";
 
+import { csrfToken } from "../../utilities/csrfToken";
+
 export const TripPlan = ({
   localUser,
   userSavedLocations,
@@ -14,6 +16,7 @@ export const TripPlan = ({
     name: "",
     locations: tripSavedLocations || [],
   });
+  const [tripSaving, updateTripSaving] = useState(false);
 
   const [trips, updateTrips] = useState([]);
   const [weather, updateWeather] = useState({});
@@ -21,7 +24,7 @@ export const TripPlan = ({
   const [savedLocations, updateSavedLocations] = useState([]);
 
   const fetchTrips = async () => {
-    let response = await fetch(`/trips`, {
+    let response = await fetch(`/api/v1/trips`, {
       method: "GET",
       headers: {
         Accept: "application/ld+json",
@@ -29,12 +32,13 @@ export const TripPlan = ({
     });
 
     let data = await response.json();
+    console.log(data);
     return data;
   };
 
   useEffect(() => {
     fetchTrips().then((trips) => {
-      updateSavedLocations(trips);
+      updateTrips(trips);
     });
   }, []);
 
@@ -113,6 +117,33 @@ export const TripPlan = ({
     });
   }, [trip.locations.length]);
 
+  console.log(JSON.stringify(trip));
+  const saveTrip = async () => {
+    updateTripSaving(true);
+    let response = await fetch(`/api/v1/trips`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": csrfToken(),
+      },
+      body: JSON.stringify({
+        trip: {
+          name: trip.name,
+          locations: JSON.stringify(
+            trip.locations.map((loc) => {
+              return loc.id;
+            })
+          ),
+          owner_id: localUser.id,
+        },
+      }),
+    });
+
+    let data = await response.json();
+    updateTripSaving(false);
+    return data;
+  };
+
   return (
     <div className="w-full flex flex-row justify-center h-full">
       <div className="flex flex-col justify-start h-fit w-full text-cream max-w-3xl">
@@ -145,6 +176,8 @@ export const TripPlan = ({
             )}
           </div>
           <LocationsSelector
+            trip={trip}
+            updateTrip={updateTrip}
             locationOptions={userSavedLocations}
             updateLocations={handleWeatherSelection}
           />
@@ -159,10 +192,11 @@ export const TripPlan = ({
                 "cusor-pointer": trip.locations.length > 0,
               })}
               onClick={() => {
-                if (trip.locations.length === 0) return;
-                console.log(trip);
+                saveTrip().then((trip) => {
+                  updateTrips([...trips, trip]);
+                });
               }}
-              disabled={trip.locations.length === 0}
+              disabled={trip.locations.length === 0 || tripSaving}
             >
               Save Trip
             </button>
