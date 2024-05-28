@@ -91,34 +91,6 @@ export const TripPlan = ({
     location: { lat: 37.5081391, lng: -88.6832446 },
   });
 
-  useEffect(() => {
-    const weatherUpdates = trip.locations.map(async (loc) => {
-      let response = await fetch(
-        `https://api.weather.gov/gridpoints/${loc.office}/${loc.office_x},${loc.office_y}/forecast`,
-        {
-          method: "GET",
-          headers: {
-            Accept: "application/ld+json",
-          },
-        }
-      );
-
-      let data = await response.json();
-      return data;
-    });
-
-    let weatherUpdatesResolved = Promise.all(weatherUpdates).then((data) => {
-      return data.map((forecast, index) => {
-        return {
-          [trip.locations[index].name]: forecast,
-        };
-      });
-    });
-    weatherUpdatesResolved.then((weatherToAdd) => {
-      updateWeather(Object.assign({}, weather, ...weatherToAdd));
-    });
-  }, [trip.locations.length]);
-
   console.log(JSON.stringify(trip));
   const saveTrip = async () => {
     updateTripSaving(true);
@@ -214,9 +186,7 @@ export const TripPlan = ({
             locationOptions={userSavedLocations}
             updateLocations={handleWeatherSelection}
           />
-          {trip.locations.length > 0 && weather.length > 0 && (
-            <GraphSwitcher weather={weather} />
-          )}
+          {trip.locations.length > 0 && <GraphSwitcher weather={weather} />}
           {trip.locations.length > 0 && (
             <Distance locations={trip.locations} localUser={localUser} />
           )}
