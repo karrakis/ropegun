@@ -44,6 +44,7 @@ export const TripPlan = ({
 
   useEffect(() => {
     const weatherUpdates = trip.locations.map(async (loc) => {
+      console.log("Weather Location: ", loc);
       let response = await fetch(
         `https://api.weather.gov/gridpoints/${loc.office}/${loc.office_x},${loc.office_y}/forecast`,
         {
@@ -66,6 +67,7 @@ export const TripPlan = ({
       });
     });
     weatherUpdatesResolved.then((weatherToAdd) => {
+      console.log("weatherToAdd:", weatherToAdd);
       updateWeather(Object.assign({}, ...weatherToAdd));
     });
   }, [trip.locations.length]);
@@ -151,7 +153,38 @@ export const TripPlan = ({
           <h1 className="text-cream text-2xl font-bold mb-2 bg-auburn p-2 w-full text-center">
             Plan a Trip
           </h1>
-          <div>{JSON.stringify(trips)}</div>
+          <select
+            className="w-fit"
+            placeholder="dsafdsafa"
+            onChange={(e) => {
+              //one of these is probably a string, the other an integer and we're using ===
+              const trip = trips.filter(
+                (trip) => trip.id === parseInt(e.target.value)
+              )[0];
+
+              updateTrip({
+                name: trip.name,
+                locations: trip.locations.map((loc) => ({
+                  name: loc.name,
+                  office: loc.office,
+                  office_x: loc.office_x,
+                  office_y: loc.office_y,
+                  location: { lat: loc.latitude, lng: loc.longitude },
+                })),
+              });
+            }}
+          >
+            <option selected disabled>
+              Select Existing Trip
+            </option>
+            {trips.map((trip) => {
+              return (
+                <option key={trip.id} value={trip.id}>
+                  {trip.name}
+                </option>
+              );
+            })}
+          </select>
           <div className="flex flex-col justify-start h-fit w-full bg-auburn text-cream max-w-3xl">
             <div className="flex flex-col items-center p-2">
               <div
@@ -181,7 +214,9 @@ export const TripPlan = ({
             locationOptions={userSavedLocations}
             updateLocations={handleWeatherSelection}
           />
-          {trip.locations.length > 0 && <GraphSwitcher weather={weather} />}
+          {trip.locations.length > 0 && weather.length > 0 && (
+            <GraphSwitcher weather={weather} />
+          )}
           {trip.locations.length > 0 && (
             <Distance locations={trip.locations} localUser={localUser} />
           )}
