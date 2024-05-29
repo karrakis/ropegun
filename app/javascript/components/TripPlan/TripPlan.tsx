@@ -158,6 +158,7 @@ export const TripPlan = ({
                 updateTrip({
                   name: trip.name,
                   locations: trip.locations.map((loc) => ({
+                    id: loc.id,
                     name: loc.name,
                     office: loc.office,
                     office_x: loc.office_x,

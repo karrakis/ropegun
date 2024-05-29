@@ -54,6 +54,9 @@ export const LocationsSelector = ({
                 id={loc.name}
                 value={loc.id}
                 onChange={() => updateLocations(loc)}
+                checked={trip.locations
+                  .map((l) => l.id === loc.id)
+                  .includes(true)}
               />
               <label htmlFor={loc.name}>{loc.name}</label>
             </div>
