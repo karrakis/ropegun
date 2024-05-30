@@ -10,8 +10,9 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_05_30_074910) do
+ActiveRecord::Schema[7.0].define(version: 2024_05_30_075736) do
   # These are extensions that must be enabled in order to support this database
+  enable_extension "pgcrypto"
   enable_extension "plpgsql"
 
   create_table "distances", force: :cascade do |t|
@@ -87,6 +88,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_30_074910) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "home_address"
+    t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
+    t.index ["uuid"], name: "index_users_on_uuid", unique: true
   end
 
   add_foreign_key "locations", "users"
