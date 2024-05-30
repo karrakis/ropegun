@@ -1,6 +1,28 @@
 import React from "react";
 
 export const Display = ({ user, localUser, setEditing }) => {
+  const sendFriendInvite = (uuid) => {
+    //create a new friendship via the friendships controller
+    fetch("/friendships", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        friendship: {
+          user_id: localUser.id,
+          friend_id: uuid,
+        },
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  };
   return (
     <>
       <div className="flex flex-col md:flex-row w-full h-fit bg-night relative">
@@ -87,10 +109,12 @@ export const Display = ({ user, localUser, setEditing }) => {
         <h2>Your UUID:</h2>
         <p>{localUser.uuid}</p>
         <h2>Send Friend Invite</h2>
-        <form>
+        <div>
           <input type="text" placeholder="Friend's UUID" />
-          <button>Send Invite</button>
-        </form>
+          <button onClick={(e) => sendFriendInvite(e.target.value)}>
+            Send Invite
+          </button>
+        </div>
         <h2>These Users Want to be Friends</h2>
         <ul>
           {localUser?.friend_requests?.map((request) => (
