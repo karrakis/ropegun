@@ -35,7 +35,7 @@ export const Display = ({ user, localUser, setEditing }) => {
 
   const acceptInvite = (uuid) => {
     // update the friendship to accepted
-    fetch(`/friendships/${uuid}`, {
+    fetch(`/friendships`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -44,6 +44,8 @@ export const Display = ({ user, localUser, setEditing }) => {
       body: JSON.stringify({
         friendship: {
           status: "accepted",
+          user_id: localUser.id,
+          friend_uuid: uuid,
         },
       }),
     })
@@ -58,12 +60,18 @@ export const Display = ({ user, localUser, setEditing }) => {
 
   const rejectInvite = (uuid) => {
     // delete the friendship
-    fetch(`/friendships/${uuid}`, {
+    fetch(`/friendships`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
         "X-CSRF-Token": csrfToken(),
       },
+      body: JSON.stringify({
+        friendship: {
+          user_id: localUser.id,
+          friend_uuid: uuid,
+        },
+      }),
     })
       .then((response) => response.json())
       .then((data) => {
@@ -189,7 +197,9 @@ export const Display = ({ user, localUser, setEditing }) => {
         <h2>Friends List</h2>
         <ul>
           {localUser?.friendships?.map((friend) => (
-            <li key={friend.id}>{friend.name}</li>
+            <li key={friend.id}>
+              {friend.name} ({friend.email})
+            </li>
           ))}
         </ul>
       </div>
