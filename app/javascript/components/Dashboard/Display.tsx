@@ -4,6 +4,11 @@ import { csrfToken } from "../../utilities/csrfToken";
 export const Display = ({ user, localUser, setEditing }) => {
   console.log("localUser:", localUser);
   const [friendId, updateFriendId] = React.useState("");
+
+  const [friendInvites, setFriendInvites] = React.useState([]);
+  const [pendingFriendRequests, setPendingFriendRequests] = React.useState([]);
+  const [friends, setFriends] = React.useState(localUser.friendships);
+
   const sendFriendInvite = (uuid) => {
     //create a new friendship via the friendships controller
     fetch("/friendships", {
@@ -18,6 +23,47 @@ export const Display = ({ user, localUser, setEditing }) => {
           friend_uuid: uuid,
         },
       }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  };
+
+  const acceptInvite = (uuid) => {
+    // update the friendship to accepted
+    fetch(`/friendships/${uuid}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": csrfToken(),
+      },
+      body: JSON.stringify({
+        friendship: {
+          status: "accepted",
+        },
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  };
+
+  const rejectInvite = (uuid) => {
+    // delete the friendship
+    fetch(`/friendships/${uuid}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": csrfToken(),
+      },
     })
       .then((response) => response.json())
       .then((data) => {
@@ -129,6 +175,8 @@ export const Display = ({ user, localUser, setEditing }) => {
           {localUser?.pending_friendship_invitations.map((request) => (
             <li key={request.id}>
               {request.name} ({request.email})
+              <button onClick={() => acceptInvite(request.uuid)}>Accept</button>
+              <button onClick={() => rejectInvite(request.uuid)}>Reject</button>
             </li>
           ))}
         </ul>
@@ -140,7 +188,7 @@ export const Display = ({ user, localUser, setEditing }) => {
         </ul>
         <h2>Friends List</h2>
         <ul>
-          {localUser?.friends?.map((friend) => (
+          {localUser?.friendships?.map((friend) => (
             <li key={friend.id}>{friend.name}</li>
           ))}
         </ul>
