@@ -22,6 +22,8 @@ export const ComingSoon = () => {
           <li>Upload/change climbing pictures</li>
           <li>Link uploaded photos to trips, downloadable by participants.</li>
           <li>Sort friends by skills and gear</li>
+          <li>Trip-specific "gear" like pots and pans</li>
+          <li>Upload GIS directions?</li>
         </ul>
       </div>
     </div>
