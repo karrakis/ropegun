@@ -1,17 +1,21 @@
 import React from "react";
+import { csrfToken } from "../../utilities/csrfToken";
 
 export const Display = ({ user, localUser, setEditing }) => {
+  console.log("localUser:", localUser);
+  const [friendId, updateFriendId] = React.useState("");
   const sendFriendInvite = (uuid) => {
     //create a new friendship via the friendships controller
     fetch("/friendships", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "X-CSRF-Token": csrfToken(),
       },
       body: JSON.stringify({
         friendship: {
           user_id: localUser.id,
-          friend_id: uuid,
+          friend_uuid: uuid,
         },
       }),
     })
@@ -110,15 +114,28 @@ export const Display = ({ user, localUser, setEditing }) => {
         <p>{localUser.uuid}</p>
         <h2>Send Friend Invite</h2>
         <div>
-          <input type="text" placeholder="Friend's UUID" />
-          <button onClick={(e) => sendFriendInvite(e.target.value)}>
+          <input
+            type="text"
+            placeholder="Friend's UUID"
+            value={friendId}
+            onChange={(e) => updateFriendId(e.target.value)}
+          />
+          <button onClick={() => sendFriendInvite(friendId)}>
             Send Invite
           </button>
         </div>
         <h2>These Users Want to be Friends</h2>
         <ul>
-          {localUser?.friend_requests?.map((request) => (
-            <li key={request.id}>{request.name}</li>
+          {localUser?.pending_friendship_invitations.map((request) => (
+            <li key={request.id}>
+              {request.name} ({request.email})
+            </li>
+          ))}
+        </ul>
+        <h2>Pending Friend Requests You've Sent</h2>
+        <ul>
+          {localUser?.pending_friend_requests.map((request) => (
+            <li key={request.id}>{request.uuid}</li>
           ))}
         </ul>
         <h2>Friends List</h2>

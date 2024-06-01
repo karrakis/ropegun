@@ -1,7 +1,7 @@
 class FriendshipsController < ApplicationController
   def create
     user = User.find(friendship_params[:user_id])
-    @friendship = user.friendships.build(friend_id: User.find_by(uuid: friendship_params[:friend_uuid]).id)
+    @friendship = Friendship.new(friend_id: User.find_by(uuid: friendship_params[:friend_uuid]).id, user_id: user.id, accepted: false)
     if @friendship.save
       flash[:notice] = "Friend request sent."
       render json: @friendship, status: :ok
@@ -19,10 +19,15 @@ class FriendshipsController < ApplicationController
   end
 
   def destroy
-    @friendship = Friendship.find_by(user_id: User.find_by(uuid: friendship_params[:friend_id]).id, friend_id: friendship_params[:user_id])
-    @friendship.destroy
-    flash[:notice] = "Friend request declined."
-    render json: { message: "Friend request declined." }, status: :ok
+    if @friendship = Friendship.find_by(user_id: User.find_by(uuid: friendship_params[:friend_uuid]).id, friend_id: friendship_params[:user_id])
+      @friendship.destroy
+      flash[:notice] = "Friend request declined."
+      render json: { message: "Friend request declined." }, status: :ok
+    elsif @friendship = Friendship.find_by(user_id: friendship_params[:user_id], friend_id: User.find_by(uuid: friendship_params[:friend_uuid]).id)
+      @friendship.destroy
+      flash[:notice] = "Friend request canceled."
+      render json: { message: "Friend request canceled." }, status: :ok
+    end
   end
 
   private

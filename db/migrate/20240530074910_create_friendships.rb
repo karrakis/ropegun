@@ -1,6 +1,6 @@
-class CreateFriendsUsers < ActiveRecord::Migration[7.0]
+class CreateFriendships < ActiveRecord::Migration[7.0]
   def change
-    create_table :friends_users do |t|
+    create_table :friendships do |t|
       t.bigint :user_id
       t.bigint :friend_id
       t.boolean :accepted, default: false

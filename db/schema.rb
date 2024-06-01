@@ -24,13 +24,13 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_30_075736) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "friends_users", force: :cascade do |t|
+  create_table "friendships", force: :cascade do |t|
     t.bigint "user_id"
     t.bigint "friend_id"
     t.boolean "accepted", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["user_id", "friend_id"], name: "index_friends_users_on_user_id_and_friend_id", unique: true
+    t.index ["user_id", "friend_id"], name: "index_friendships_on_user_id_and_friend_id", unique: true
   end
 
   create_table "locations", force: :cascade do |t|
