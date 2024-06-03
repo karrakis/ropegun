@@ -23,6 +23,9 @@ export const TripPlan = ({
   const [openMap, updateOpenMap] = useState(false);
   const [savedLocations, updateSavedLocations] = useState([]);
 
+  const [friendsToInvite, updateFriendsToInvite] = useState([]);
+  console.log("friendsToInvite:", friendsToInvite);
+
   const fetchTrips = async () => {
     let response = await fetch(`/api/v1/trips`, {
       method: "GET",
@@ -190,6 +193,45 @@ export const TripPlan = ({
           {trip.locations.length > 0 && (
             <Distance locations={trip.locations} localUser={localUser} />
           )}
+          <input
+            list="friends"
+            className="w-64 h-8 bg-cream text-night p-2 rounded-md mb-1"
+            placeholder="Invite Friends to Trip"
+            onChange={(e) => {
+              console.log("change!", e.target.value);
+              updateFriendsToInvite([
+                ...friendsToInvite,
+                localUser.friendships.filter(
+                  (friend) => friend.id === parseInt(e.target.value)
+                )[0],
+              ]);
+            }}
+          />
+          <datalist
+            id="friends"
+            className="w-fit p-2 bg-auburn text-cream rounded-md mb-2"
+          >
+            {localUser?.friendships?.map((friend) => (
+              <option
+                key={friend.id}
+                data-value={friend.id}
+                value={friend.name + " " + friend.email}
+              >
+                {friend.name} ({friend.email})
+              </option>
+            ))}
+          </datalist>
+          <div id="friends-to-invite" className="flex flex-row">
+            {friendsToInvite.map((friend) => (
+              <div
+                key={friend.id}
+                className="flex flex-col text-cream bg-auburn p-2 rounded-lg"
+              >
+                <span>{friend.name}</span>
+                <span>{friend.email}</span>
+              </div>
+            ))}
+          </div>
           <div className="mb-16 mt-2">
             <button
               className={classNames("bg-auburn text-cream p-2 rounded-md", {
