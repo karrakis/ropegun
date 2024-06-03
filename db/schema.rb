@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_05_30_075736) do
+ActiveRecord::Schema[7.0].define(version: 2024_06_03_045947) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -45,6 +45,16 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_30_075736) do
     t.datetime "updated_at", null: false
     t.index ["user_id", "latitude", "longitude"], name: "index_locations_on_user_id_and_latitude_and_longitude", unique: true
     t.index ["user_id"], name: "index_locations_on_user_id"
+  end
+
+  create_table "trip_invitations", force: :cascade do |t|
+    t.bigint "trip_id"
+    t.bigint "issuer_id"
+    t.bigint "invitee_id"
+    t.boolean "accepted", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["trip_id", "issuer_id", "invitee_id"], name: "index_trip_invitations_on_trip_id_and_issuer_id_and_invitee_id", unique: true
   end
 
   create_table "trips", force: :cascade do |t|
