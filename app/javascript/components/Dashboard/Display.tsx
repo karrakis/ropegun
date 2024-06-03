@@ -1,5 +1,7 @@
 import React from "react";
 import { csrfToken } from "../../utilities/csrfToken";
+import SectionWrapper from "./Wrappers/SectionWrapper";
+import UserInfoItem from "./Wrappers/UserInfoItem";
 
 export const Display = ({ user, localUser, setEditing }) => {
   console.log("localUser:", localUser);
@@ -114,58 +116,42 @@ export const Display = ({ user, localUser, setEditing }) => {
       </div>
       <div className="w-full flex bg-night p-2 text-cream">
         <div className="w-full grid grid-cols-1 md:grid-cols-2 bg-auburn rounded-lg p-2">
-          <div className="w-full grid-cols-2 flex items-end">
-            <h4 className="text-2xl text-khaki">Top Rope Belay:</h4>
-            <span className="text-2xl ml-2">
-              {localUser.top_rope_belay || "No"}
-            </span>
-          </div>
-          <div className="w-full grid-cols-2 flex items-end">
-            <h4 className="text-2xl text-khaki">Lead Belay:</h4>
-            <span className="text-2xl ml-2">
-              {localUser.lead_belay || "No"}
-            </span>
-          </div>
-          <div className="w-full grid-cols-2 flex items-end">
-            <h4 className="text-2xl text-khaki">Top Rope Indoor Grade:</h4>
-            <span className="text-2xl ml-2">
-              {localUser.tr_indoor_climb_grade || "?"}
-            </span>
-          </div>
-          <div className="w-full grid-cols-2 flex items-end">
-            <h4 className="text-2xl text-khaki">Lead Indoor Grade:</h4>
-            <span className="text-2xl ml-2">
-              {localUser.lead_climb_indoor_grade || "?"}
-            </span>
-          </div>
-          <div className="w-full grid-cols-2 flex items-end">
-            <h4 className="text-2xl text-khaki">Top Rope Outdoor Grade:</h4>
-            <span className="text-2xl ml-2">
-              {localUser.tr_outdoor_climb_grade || "?"}
-            </span>
-          </div>
-          <div className="w-full grid-cols-2 flex items-end">
-            <h4 className="text-2xl text-khaki">Lead Outdoor Grade:</h4>
-            <span className="text-2xl ml-2">
-              {localUser.lead_climb_outdoor_grade || "?"}
-            </span>
-          </div>
-          <div className="w-full grid-cols-2 flex items-end">
-            <h4 className="text-2xl text-khaki">Trad Lead:</h4>
-            <span className="text-2xl ml-2">{localUser.trad_lead || "No"}</span>
-          </div>
-          <div className="w-full grid-cols-2 flex items-end">
-            <h4 className="text-2xl text-khaki">Trad Outdoor Grade:</h4>
-            <span className="text-2xl ml-2">
-              {localUser.trad_climb_outdoor_grade || "?"}
-            </span>
-          </div>
-          <div className="w-full grid-cols-2 flex items-end">
-            <h4 className="text-2xl text-khaki">Multipitch:</h4>
-            <span className="text-2xl ml-2">
-              {localUser.multipitch || "No"}
-            </span>
-          </div>
+          <UserInfoItem
+            label="Top Rope Belay:"
+            value={localUser.top_rope_belay || "No"}
+          />
+          <UserInfoItem
+            label="Lead Belay:"
+            value={localUser.lead_belay || "No"}
+          />
+          <UserInfoItem
+            label="Top Rope Indoor Grade:"
+            value={localUser.tr_indoor_climb_grade || "No"}
+          />
+          <UserInfoItem
+            label="Lead Indoor Grade:"
+            value={localUser.lead_climb_indoor_grade || "?"}
+          />
+          <UserInfoItem
+            label="Top Rope Outdoor Grade:"
+            value={localUser.tr_outdoor_climb_grade || "?"}
+          />
+          <UserInfoItem
+            label="Lead Outdoor Grade:"
+            value={localUser.lead_climb_outdoor_grade || "?"}
+          />
+          <UserInfoItem
+            label="Trad Lead:"
+            value={localUser.trad_lead || "No"}
+          />
+          <UserInfoItem
+            label="Trad Outdoor Grade:"
+            value={localUser.trad_climb_outdoor_grade || "?"}
+          />
+          <UserInfoItem
+            label="Multipitch:"
+            value={localUser.multipitch || "No"}
+          />
         </div>
       </div>
       <div
@@ -203,10 +189,7 @@ export const Display = ({ user, localUser, setEditing }) => {
             </button>
           </div>
         </div>
-        <div
-          id="invites-from-others"
-          className="mt-2 w-full bg-night text-khaki text-center p-2"
-        >
+        <SectionWrapper id="invites-from-others">
           <h2 className="text-xl">Invites from Others:</h2>
           <ul className="p-2">
             {localUser?.pending_friendship_invitations.length > 0 ? (
@@ -225,11 +208,8 @@ export const Display = ({ user, localUser, setEditing }) => {
               <span>Nobody likes you.</span>
             )}
           </ul>
-        </div>
-        <div
-          id="pending-friend-requests"
-          className="mt-2 w-full bg-night text-khaki text-center p-2"
-        >
+        </SectionWrapper>
+        <SectionWrapper id="pending-friend-requests">
           <h2 className="text-xl">Pending Friend Requests You've Sent</h2>
           <ul className="p-2">
             {localUser?.pending_friend_requests.length > 0 ? (
@@ -240,11 +220,8 @@ export const Display = ({ user, localUser, setEditing }) => {
               <span>You don't like anyone.</span>
             )}
           </ul>
-        </div>
-        <div
-          id="friends-list"
-          className="mt-2 w-full bg-night text-khaki text-center p-2"
-        >
+        </SectionWrapper>
+        <SectionWrapper id="friends-list">
           <h2 className="text-xl">Friends List</h2>
           <ul className="p-2">
             {localUser?.friendships?.map((friend) => (
@@ -253,7 +230,7 @@ export const Display = ({ user, localUser, setEditing }) => {
               </li>
             ))}
           </ul>
-        </div>
+        </SectionWrapper>
       </div>
     </>
   );
