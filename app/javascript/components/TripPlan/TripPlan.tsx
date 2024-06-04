@@ -4,6 +4,7 @@ import GraphSwitcher from "../Weather/GraphSwitcher";
 import Distance from "../Distance/Distance";
 import LocationsSelector from "./Locations/Selector";
 import MapControl from "../Map/MapControl";
+import Select from "react-select";
 
 import { csrfToken } from "../../utilities/csrfToken";
 
@@ -121,6 +122,14 @@ export const TripPlan = ({
     return data;
   };
 
+  const friendSelectOptions = localUser.friendships.map((friend) => {
+    console.log("a friend", friend);
+    return {
+      value: friend.uuid,
+      label: friend.email + " - " + friend.name,
+    };
+  });
+
   return (
     <div className="w-full flex flex-row justify-center h-full">
       <div className="flex flex-col justify-start h-fit w-full text-cream max-w-3xl">
@@ -193,42 +202,21 @@ export const TripPlan = ({
           {trip.locations.length > 0 && (
             <Distance locations={trip.locations} localUser={localUser} />
           )}
-          <input
-            list="friends"
-            className="w-64 h-8 bg-cream text-night p-2 rounded-md mb-1"
-            placeholder="Invite Friends to Trip"
-            onChange={(e) => {
-              console.log("change!", e.target.value);
-              updateFriendsToInvite([
-                ...friendsToInvite,
-                localUser.friendships.filter(
-                  (friend) => friend.id === parseInt(e.target.value)
-                )[0],
-              ]);
+          <Select
+            options={friendSelectOptions}
+            isMulti
+            onChange={(selected) => {
+              console.log("selected", selected);
+              updateFriendsToInvite(selected);
             }}
           />
-          <datalist
-            id="friends"
-            className="w-fit p-2 bg-auburn text-cream rounded-md mb-2"
-          >
-            {localUser?.friendships?.map((friend) => (
-              <option
-                key={friend.id}
-                data-value={friend.id}
-                value={friend.name + " " + friend.email}
-              >
-                {friend.name} ({friend.email})
-              </option>
-            ))}
-          </datalist>
           <div id="friends-to-invite" className="flex flex-row">
             {friendsToInvite.map((friend) => (
               <div
-                key={friend.id}
+                key={friend.value}
                 className="flex flex-col text-cream bg-auburn p-2 rounded-lg"
               >
-                <span>{friend.name}</span>
-                <span>{friend.email}</span>
+                <span>{friend.label}</span>
               </div>
             ))}
           </div>
