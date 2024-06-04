@@ -8,18 +8,66 @@ import Select from "react-select";
 
 import { csrfToken } from "../../utilities/csrfToken";
 
+interface localUser {
+  id: number;
+  name: string;
+  email: string;
+  friendships: any[];
+}
+
+interface userSavedLocations {
+  id: number;
+  name: string;
+  latitude: number;
+  longitude: number;
+  office: string;
+  office_x: number;
+  office_y: number;
+}
+
+interface tripSavedLocations {
+  id: number;
+  name: string;
+  location: { lat: number; lng: number };
+  office: string;
+  office_x: number;
+  office_y: number;
+}
+
+interface TripPlanProps {
+  localUser: localUser;
+  userSavedLocations: userSavedLocations[];
+  tripSavedLocations?: tripSavedLocations[];
+}
+
+interface location {
+  id: number;
+  name: string;
+  latitude: number;
+  longitude: number;
+  office: string;
+  office_x: number;
+  office_y: number;
+}
+
+interface trips {
+  id: number;
+  name: string;
+  locations: location[];
+}
+
 export const TripPlan = ({
   localUser,
   userSavedLocations,
   tripSavedLocations = [],
-}) => {
+}: TripPlanProps) => {
   const [trip, updateTrip] = useState({
     name: "",
     locations: tripSavedLocations || [],
   });
   const [tripSaving, updateTripSaving] = useState(false);
 
-  const [trips, updateTrips] = useState([]);
+  const [trips, updateTrips] = useState<trips[]>([]);
   const [weather, updateWeather] = useState({});
   const [openMap, updateOpenMap] = useState(false);
   const [savedLocations, updateSavedLocations] = useState([]);
@@ -159,38 +207,40 @@ export const TripPlan = ({
                 }}
               />
             )}
-            <select
-              className="w-fit p-2 bg-auburn text-cream rounded-md mb-2"
-              onChange={(e) => {
-                //one of these is probably a string, the other an integer and we're using ===
-                const trip = trips.filter(
-                  (trip) => trip.id === parseInt(e.target.value)
-                )[0];
+            {trips.length > 0 && (
+              <select
+                className="w-fit p-2 bg-auburn text-cream rounded-md mb-2"
+                onChange={(e) => {
+                  //one of these is probably a string, the other an integer and we're using ===
+                  const trip = trips.filter(
+                    (trip) => trip.id === parseInt(e.target.value)
+                  )[0];
 
-                updateTrip({
-                  name: trip.name,
-                  locations: trip.locations.map((loc) => ({
-                    id: loc.id,
-                    name: loc.name,
-                    office: loc.office,
-                    office_x: loc.office_x,
-                    office_y: loc.office_y,
-                    location: { lat: loc.latitude, lng: loc.longitude },
-                  })),
-                });
-              }}
-            >
-              <option selected disabled>
-                Select Existing Trip
-              </option>
-              {trips.map((trip) => {
-                return (
-                  <option key={trip.id} value={trip.id}>
-                    {trip.name}
-                  </option>
-                );
-              })}
-            </select>
+                  updateTrip({
+                    name: trip.name,
+                    locations: trip.locations.map((loc) => ({
+                      id: loc.id,
+                      name: loc.name,
+                      office: loc.office,
+                      office_x: loc.office_x,
+                      office_y: loc.office_y,
+                      location: { lat: loc.latitude, lng: loc.longitude },
+                    })),
+                  });
+                }}
+              >
+                <option selected disabled>
+                  Select Existing Trip
+                </option>
+                {trips.map((trip) => {
+                  return (
+                    <option key={trip.id} value={trip.id}>
+                      {trip.name}
+                    </option>
+                  );
+                })}
+              </select>
+            )}
           </div>
           <LocationsSelector
             trip={trip}
