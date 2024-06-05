@@ -43,6 +43,7 @@ interface TripPlanProps {
 interface location {
   id: number;
   name: string;
+  latitude: number;
   longitude: number;
   office: string;
   office_x: number;
@@ -177,6 +178,9 @@ export const TripPlan = ({
     };
   });
 
+  const sendInvitations = () => {
+    console.log("inviting:", JSON.stringify(friendsToInvite));
+  };
   return (
     <div className="w-full flex flex-row justify-center h-full">
       <div className="flex flex-col justify-start h-fit w-full text-cream max-w-3xl">
@@ -261,16 +265,12 @@ export const TripPlan = ({
             placeholder="Invite Friends"
             className="w-full p-2  bg-auburn text-night rounded-md mb-2"
           />
-          {/* <div id="friends-to-invite" className="flex flex-row">
-            {friendsToInvite.map((friend) => (
-              <div
-                key={friend.value}
-                className="flex flex-col text-cream bg-auburn p-2 rounded-lg"
-              >
-                <span>{friend.label}</span>
-              </div>
-            ))}
-          </div> */}
+          <button
+            onClick={sendInvitations}
+            className="bg-auburn text-cream w-fit h-fit p-2 rounded-md"
+          >
+            Send Invitations
+          </button>
           <div className="mb-16 mt-2">
             <button
               className={classNames("bg-auburn text-cream p-2 rounded-md", {
