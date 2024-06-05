@@ -43,7 +43,6 @@ interface TripPlanProps {
 interface location {
   id: number;
   name: string;
-  latitude: number;
   longitude: number;
   office: string;
   office_x: number;
@@ -259,8 +258,10 @@ export const TripPlan = ({
               console.log("selected", selected);
               updateFriendsToInvite(selected);
             }}
+            placeholder="Invite Friends"
+            className="w-full p-2  bg-auburn text-night rounded-md mb-2"
           />
-          <div id="friends-to-invite" className="flex flex-row">
+          {/* <div id="friends-to-invite" className="flex flex-row">
             {friendsToInvite.map((friend) => (
               <div
                 key={friend.value}
@@ -269,7 +270,7 @@ export const TripPlan = ({
                 <span>{friend.label}</span>
               </div>
             ))}
-          </div>
+          </div> */}
           <div className="mb-16 mt-2">
             <button
               className={classNames("bg-auburn text-cream p-2 rounded-md", {
