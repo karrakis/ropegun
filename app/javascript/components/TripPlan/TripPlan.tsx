@@ -68,12 +68,6 @@ interface trip {
   trip_invitations?: any[];
 }
 
-interface tripInvitations {
-  trip_id: number;
-  issuer_id: number;
-  invitee_uuids: string;
-}
-
 export const TripPlan = ({
   localUser,
   userSavedLocations,
@@ -83,6 +77,8 @@ export const TripPlan = ({
     name: "",
     locations: tripSavedLocations || [],
   });
+
+  //possibly excessive, but ensures that when a trip is selected, it is brought up to date.
   const updateTrip = (trip) => {
     fetch(`/api/v1/trips/${trip.id}`, {
       method: "GET",
@@ -110,19 +106,25 @@ export const TripPlan = ({
     });
   };
 
+  //disables the save button while saving is in progress to prevent bad user experience.
   const [tripSaving, updateTripSaving] = useState(false);
 
+  //primarily used for the dropdown of existing trips.
   const [trips, updateTrips] = useState<trips[]>([]);
 
+  //weather data for the locations in the trip.
   const [weather, updateWeather] = useState({});
+
+  //toggle for the map control
   const [openMap, updateOpenMap] = useState(false);
+
+  //saved locations for the user.  Deprecated?
   const [savedLocations, updateSavedLocations] = useState([]);
 
+  //friends selected in the dropdown for invitations.
   const [friendsToInvite, updateFriendsToInvite] = useState([]);
-  console.log("friendsToInvite:", friendsToInvite);
 
-  console.log("trip:", trip);
-
+  //populates the dropdown of existing trips.  called by a useEffect.
   const fetchTrips = async () => {
     let response = await fetch(`/api/v1/trips`, {
       method: "GET",
@@ -141,7 +143,9 @@ export const TripPlan = ({
       updateTrips(trips);
     });
   }, []);
+  //end trip list population code
 
+  //fetches weather data for the locations in the trip, runs whenever the list of locations changes.
   useEffect(() => {
     const weatherUpdates = trip.locations.map(async (loc) => {
       console.log("Weather Location: ", loc);
@@ -172,6 +176,7 @@ export const TripPlan = ({
     });
   }, [trip.locations.length]);
 
+  //adds or removes a location from the trip.
   const handleWeatherSelection = (loc) => {
     if (trip.locations.includes(loc)) {
       updateTrip({
@@ -186,12 +191,13 @@ export const TripPlan = ({
     }
   };
 
+  //default location for the map control.  Used by MapControl to update location.
   const [position, updatePosition] = useState({
     name: "Jackson Falls",
     location: { lat: 37.5081391, lng: -88.6832446 },
   });
 
-  console.log(JSON.stringify(trip));
+  //saves the trip to the database.
   const saveTrip = async () => {
     updateTripSaving(true);
     let response = await fetch(`/api/v1/trips`, {
@@ -218,6 +224,7 @@ export const TripPlan = ({
     return data;
   };
 
+  //populates the dropdown for inviting friends.
   const friendSelectOptions = localUser.friendships.map((friend) => {
     console.log("a friend", friend);
     return {
@@ -226,6 +233,7 @@ export const TripPlan = ({
     };
   });
 
+  //sends invitations to the selected friends.
   const sendInvitations = () => {
     console.log("inviting:", JSON.stringify(friendsToInvite));
     console.log("trip:", JSON.stringify(trip));
