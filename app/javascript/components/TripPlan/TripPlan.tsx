@@ -226,6 +226,14 @@ export const TripPlan = ({
 
   //populates the dropdown for inviting friends.
   const friendSelectOptions = localUser.friendships.map((friend) => {
+    console.log("testing", trip.trip_invitations);
+    if (
+      trip.trip_invitations
+        ?.map((invitation) => invitation.invitee.uuid)
+        .includes(friend.uuid)
+    ) {
+      return;
+    }
     return {
       value: friend.uuid,
       label: friend.email + " - " + friend.name,
