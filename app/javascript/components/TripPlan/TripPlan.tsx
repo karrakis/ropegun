@@ -226,7 +226,6 @@ export const TripPlan = ({
 
   //populates the dropdown for inviting friends.
   const friendSelectOptions = localUser.friendships.map((friend) => {
-    console.log("a friend", friend);
     return {
       value: friend.uuid,
       label: friend.email + " - " + friend.name,
@@ -235,12 +234,6 @@ export const TripPlan = ({
 
   //sends invitations to the selected friends.
   const sendInvitations = () => {
-    console.log("inviting:", JSON.stringify(friendsToInvite));
-    console.log("trip:", JSON.stringify(trip));
-    console.log(
-      "friendsToInvite(uuids):",
-      friendsToInvite.map((friend) => friend.value)
-    );
     fetch(`/trip_invitations`, {
       method: "POST",
       headers: {
@@ -352,7 +345,14 @@ export const TripPlan = ({
           >
             Send Invitations
           </button>
-          <div>{JSON.stringify(trip.trip_invitations)}</div>
+          {trip.trip_invitations?.map((invitation) => {
+            return (
+              <div key={invitation.id}>
+                <h3>{invitation.invitee.name}</h3>
+                <h3>{invitation.invitee.email}</h3>
+              </div>
+            );
+          })}
           <div className="mb-16 mt-2">
             <button
               className={classNames("bg-auburn text-cream p-2 rounded-md", {

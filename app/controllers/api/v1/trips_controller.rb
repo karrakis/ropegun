@@ -27,7 +27,7 @@ class Api::V1::TripsController < ApplicationController
 
     def show
         @trip = Trip.find(params[:id])
-        render json: @trip.to_json(include: [:locations, :trip_invitations])
+        render json: @trip.to_json(include: [:locations, {trip_invitations: {include: :invitee}}])
     end
 
     private
