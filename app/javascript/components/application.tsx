@@ -12,8 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
     rootEl && JSON.parse(rootEl.getAttribute("data-local-user") || false);
 
   const userSavedLocations =
-    rootEl &&
-    JSON.parse(rootEl.getAttribute("data-locations") || false);
+    rootEl && JSON.parse(rootEl.getAttribute("data-locations") || false);
 
   console.log("application.tsx userSavedLocation:", userSavedLocations);
 

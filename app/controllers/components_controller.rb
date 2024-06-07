@@ -17,7 +17,7 @@ class ComponentsController < ApplicationController
           }&.as_json, 
           pending_friend_requests: @local_user&.friendships&.pending&.map{|friendship| 
             {uuid: friendship.friend.uuid}
-          }&.as_json
+          }&.as_json,
         }
       )
 

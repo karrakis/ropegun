@@ -10,9 +10,9 @@ export const ComingSoon = () => {
         <ul>
           <li>Add user feedback button here</li>
           <li>Clear labeling for Y axis of weather graph</li>
-          <li>Friends Lists for user accounts</li>
+          <li className="text-green-500">Friends Lists for user accounts</li>
           <li>Invite friends to trips</li>
-          <li>Save trips for later recall</li>
+          <li className="text-green-500">Save trips for later recall</li>
           <li>Available Gear tracking for Trips</li>
           <li>Available Skills tracking for Trips</li>
           <li>Group Calendar for trips (when can people go?)</li>
@@ -24,6 +24,8 @@ export const ComingSoon = () => {
           <li>Sort friends by skills and gear</li>
           <li>Trip-specific "gear" like pots and pans</li>
           <li>Upload GIS directions?</li>
+          <li>Users editing profile should be able to update their name</li>
+          <li>Users editing profile should be able to cancel the changes</li>
         </ul>
       </div>
     </div>

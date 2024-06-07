@@ -13,13 +13,20 @@ class TripInvitationsController < ApplicationController
     end
 
     def create
-        @trip_invitation = TripInvitation.new(trip_invitation_params)
+        puts "PARAMS: #{trip_invitation_params}"
+        created_invitations = []
 
-        if @trip_invitation.save
-            render json: @trip_invitation, status: :created, location: @trip_invitation
-        else
-            render json: @trip_invitation.errors, status: :unprocessable_entity
+        JSON.parse(trip_invitation_params[:invitee_uuids]).each do |uuid|
+            @trip_invitation = TripInvitation.new({trip_id: trip_invitation_params[:trip_id], issuer_id: trip_invitation_params[:issuer_id], invitee_id: User.find_by(uuid: uuid).id})
+
+            if @trip_invitation.save
+                created_invitations << @trip_invitation
+            else
+                created_invitations << @trip_invitation.errors
+            end
         end
+
+        render json: created_invitations
     end
 
     def edit
@@ -45,6 +52,6 @@ class TripInvitationsController < ApplicationController
     end
 
     def trip_invitation_params
-        params.require(:trip_invitation).permit(:trip_id, :issuer_id, :invitee_uuid, :accepted)
+        params.require(:trip_invitation).permit(:trip_id, :issuer_id, :invitee_uuids, :accepted)
     end
 end

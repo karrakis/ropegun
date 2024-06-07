@@ -14,9 +14,14 @@ Rails.application.routes.draw do
   
   patch '/users/:id' => 'users#update'
   post '/locations' => 'locations#create'
+  
   post '/friendships' => 'friendships#create'
   patch '/friendships' => 'friendships#update'
   delete '/friendships' => 'friendships#destroy'
+
+  post '/trip_invitations' => 'trip_invitations#create'
+  patch '/trip_invitations' => 'trip_invitations#update'
+  delete '/trip_invitations' => 'trip_invitations#destroy'
 
   namespace :api do
     namespace :v1 do

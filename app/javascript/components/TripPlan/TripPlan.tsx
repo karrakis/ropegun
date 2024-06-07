@@ -56,24 +56,72 @@ interface trips {
   locations: location[];
 }
 
+interface parsedLocation {
+  name: string;
+  location: { lat: number; lng: number };
+}
+
+interface trip {
+  id?: number;
+  name: string;
+  locations: parsedLocation[];
+  trip_invitations?: any[];
+}
+
+interface tripInvitations {
+  trip_id: number;
+  issuer_id: number;
+  invitee_uuids: string;
+}
+
 export const TripPlan = ({
   localUser,
   userSavedLocations,
   tripSavedLocations = [],
 }: TripPlanProps) => {
-  const [trip, updateTrip] = useState({
+  const [trip, _updateTrip] = useState<trip>({
     name: "",
     locations: tripSavedLocations || [],
   });
+  const updateTrip = (trip) => {
+    fetch(`/api/v1/trips/${trip.id}`, {
+      method: "GET",
+      headers: {
+        Accept: "application/ld+json",
+      },
+    }).then((response) => {
+      response.json().then((data) => {
+        console.log("data:", data);
+        _updateTrip({
+          id: data.id,
+          name: data.name,
+          locations: data.locations.map((loc) => {
+            return {
+              name: loc.name,
+              location: { lat: loc.latitude, lng: loc.longitude },
+              office_x: loc.office_x,
+              office_y: loc.office_y,
+              office: loc.office,
+            };
+          }),
+          trip_invitations: data.trip_invitations,
+        });
+      });
+    });
+  };
+
   const [tripSaving, updateTripSaving] = useState(false);
 
   const [trips, updateTrips] = useState<trips[]>([]);
+
   const [weather, updateWeather] = useState({});
   const [openMap, updateOpenMap] = useState(false);
   const [savedLocations, updateSavedLocations] = useState([]);
 
   const [friendsToInvite, updateFriendsToInvite] = useState([]);
   console.log("friendsToInvite:", friendsToInvite);
+
+  console.log("trip:", trip);
 
   const fetchTrips = async () => {
     let response = await fetch(`/api/v1/trips`, {
@@ -180,7 +228,31 @@ export const TripPlan = ({
 
   const sendInvitations = () => {
     console.log("inviting:", JSON.stringify(friendsToInvite));
+    console.log("trip:", JSON.stringify(trip));
+    console.log(
+      "friendsToInvite(uuids):",
+      friendsToInvite.map((friend) => friend.value)
+    );
+    fetch(`/trip_invitations`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": csrfToken(),
+      },
+      body: JSON.stringify({
+        trip_invitation: {
+          trip_id: trip.id,
+          issuer_id: localUser.id,
+          invitee_uuids: JSON.stringify(
+            friendsToInvite.map((friend) => friend.value)
+          ),
+        },
+      }),
+    }).then((response) => {
+      console.log(response);
+    });
   };
+
   return (
     <div className="w-full flex flex-row justify-center h-full">
       <div className="flex flex-col justify-start h-fit w-full text-cream max-w-3xl">
@@ -220,6 +292,7 @@ export const TripPlan = ({
                   )[0];
 
                   updateTrip({
+                    id: trip.id,
                     name: trip.name,
                     locations: trip.locations.map((loc) => ({
                       id: loc.id,
@@ -271,6 +344,7 @@ export const TripPlan = ({
           >
             Send Invitations
           </button>
+          <div>{JSON.stringify(trip.trip_invitations)}</div>
           <div className="mb-16 mt-2">
             <button
               className={classNames("bg-auburn text-cream p-2 rounded-md", {
