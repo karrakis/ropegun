@@ -11,7 +11,8 @@ export const ComingSoon = () => {
           <li>Add user feedback button here</li>
           <li>Clear labeling for Y axis of weather graph</li>
           <li className="text-green-500">Friends Lists for user accounts</li>
-          <li>Invite friends to trips</li>
+          <li className="text-green-500">Invite friends to trips</li>
+          <li className="text-green-500">Accept invitations to trips</li>
           <li className="text-green-500">Save trips for later recall</li>
           <li>Available Gear tracking for Trips</li>
           <li>Available Skills tracking for Trips</li>
@@ -26,6 +27,12 @@ export const ComingSoon = () => {
           <li>Upload GIS directions?</li>
           <li>Users editing profile should be able to update their name</li>
           <li>Users editing profile should be able to cancel the changes</li>
+          <li>List of routes to target</li>
+          <li>
+            Mountain Project style ability to add general information about a
+            location
+          </li>
+          <li>Mountain Project style ability to add photos to a location</li>
         </ul>
       </div>
     </div>

@@ -1,6 +1,4 @@
 class TripInvitationsController < ApplicationController
-    before_action :set_trip_invitation, only: [:show, :edit, :update, :destroy]
-
     def index
         @trip_invitations = TripInvitation.all
     end
@@ -33,10 +31,23 @@ class TripInvitationsController < ApplicationController
     end
 
     def update
-        if @trip_invitation.update(trip_invitation_params)
-            redirect_to @trip_invitation, notice: 'Trip invitation was successfully updated.'
+        puts "PARAMS: #{trip_invitation_params}"
+        trip_invitations = TripInvitation.where(trip_id: trip_invitation_params[:trip_id], invitee_id: trip_invitation_params[:invitee_id])
+
+        results = []
+        puts "TRIP INVITATIONS: #{trip_invitations}"
+        trip_invitations.each do |trip_invitation|
+            puts "TRIP INVITATION: #{trip_invitation}"
+            if trip_invitation.update(accepted: trip_invitation_params[:accepted])
+                results << trip_invitation
+            else
+            end
+        end
+
+        if results.length > 0
+            render json: trip_invitations.first
         else
-            render :edit
+            render json: {error: "Something went wrong"}
         end
     end
 
@@ -47,11 +58,7 @@ class TripInvitationsController < ApplicationController
 
     private
 
-    def set_trip_invitation
-        @trip_invitation = TripInvitation.find(params[:id])
-    end
-
     def trip_invitation_params
-        params.require(:trip_invitation).permit(:trip_id, :issuer_id, :invitee_uuids, :accepted)
+        params.require(:trip_invitation).permit(:trip_id, :issuer_id, :invitee_uuids, :invitee_id, :accepted)
     end
 end

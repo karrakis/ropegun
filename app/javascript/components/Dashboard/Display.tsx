@@ -83,6 +83,32 @@ export const Display = ({ user, localUser, setEditing }) => {
         console.error("Error:", error);
       });
   };
+
+  const acceptTripInvitation = (tripId) => {
+    // update the trip invitation to accepted
+    fetch(`/trip_invitations`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": csrfToken(),
+      },
+      body: JSON.stringify({
+        trip_invitation: {
+          accepted: true,
+          invitee_id: localUser.id,
+          trip_id: tripId,
+        },
+      }),
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  };
+
   return (
     <>
       <div className="flex flex-col md:flex-row w-full h-fit bg-night relative">
@@ -227,6 +253,23 @@ export const Display = ({ user, localUser, setEditing }) => {
             {localUser?.friendships?.map((friend) => (
               <li key={friend.id}>
                 {friend.name} ({friend.email})
+              </li>
+            ))}
+          </ul>
+        </SectionWrapper>
+        <SectionWrapper id="trip-invitations">
+          <h2 className="text-xl">Trip Invitations</h2>
+          <ul className="p-2">
+            {localUser?.pending_trip_invitations?.map((invitation) => (
+              <li key={invitation.id}>
+                {invitation.trip.name} ({invitation.issuer.name}) (
+                {invitation.issuer.email})
+                <button
+                  className="bg-auburn p-2 rounded-md text-cream"
+                  onClick={() => acceptTripInvitation(invitation.trip_id)}
+                >
+                  Accept
+                </button>
               </li>
             ))}
           </ul>

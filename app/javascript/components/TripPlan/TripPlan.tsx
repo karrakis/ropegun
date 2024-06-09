@@ -353,14 +353,38 @@ export const TripPlan = ({
           >
             Send Invitations
           </button>
-          {trip.trip_invitations?.map((invitation) => {
-            return (
-              <div key={invitation.id}>
-                <h3>{invitation.invitee.name}</h3>
-                <h3>{invitation.invitee.email}</h3>
-              </div>
-            );
-          })}
+          <div
+            id="pending-invitations"
+            className="flex flex-col items-center p-2 bg-night mt-2 w-full"
+          >
+            <h3 className="text-cream">Pending Invitations</h3>
+            {trip.trip_invitations
+              ?.filter((invitation) => invitation.accepted == false)
+              ?.map((invitation) => {
+                return (
+                  <div key={invitation.id}>
+                    <h3>{invitation.invitee.name}</h3>
+                    <h3>{invitation.invitee.email}</h3>
+                  </div>
+                );
+              })}
+          </div>
+          <div
+            id="guests"
+            className="flex flex-col items-center p-2 bg-night mt-2 w-full"
+          >
+            <h3 className="text-cream">Guests</h3>
+            {trip.trip_invitations
+              ?.filter((invitation) => invitation.accepted == true)
+              ?.map((invitation) => {
+                return (
+                  <div key={invitation.id}>
+                    <h3>{invitation.invitee.name}</h3>
+                    <h3>{invitation.invitee.email}</h3>
+                  </div>
+                );
+              })}
+          </div>
           <div className="mb-16 mt-2">
             <button
               className={classNames("bg-auburn text-cream p-2 rounded-md", {
