@@ -281,7 +281,10 @@ export const TripPlan = ({
             leaveFrom="opacity-100 translate-y-0"
             leaveTo="opacity-0 -translate-y-full"
           >
-            <div className="grid grid-rows-4 md:grid-cols-4 p-4 w-full text-center h-fit md:h-16">
+            <div className="grid grid-rows-5 md:grid-cols-5 p-4 w-full text-center h-fit md:h-16">
+              <div className="row-span-1 md:col-span-1 justify-center items-center bg-khaki text-night my-1 md:mx-1 h-12 flex">
+                <h3 className="">Edit Trip</h3>
+              </div>
               <div className="row-span-1 md:col-span-1 justify-center items-center bg-night text-cream my-1 md:mx-1 h-12 flex shadow-2xl">
                 <h3 className="">Weather</h3>
               </div>
