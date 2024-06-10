@@ -6,7 +6,10 @@ import LocationsSelector from "./Locations/Selector";
 import MapControl from "../Map/MapControl";
 import Select from "react-select";
 
+import { Transition } from "@headlessui/react";
+
 import { csrfToken } from "../../utilities/csrfToken";
+import classNames from "classnames";
 
 interface localUser {
   id: number;
@@ -266,10 +269,34 @@ export const TripPlan = ({
     <div className="w-full flex flex-row justify-center h-full">
       <div className="flex flex-col justify-start h-fit w-full text-cream max-w-3xl">
         <div className="flex flex-col items-center p-2 bg-cream bg-opacity-50 no-scrollbar text-auburn h-screen overflow-scroll">
-          <h1 className="text-cream text-2xl font-bold mb-2 bg-auburn p-2 w-full text-center">
+          <h1 className="text-cream text-2xl font-bold bg-auburn p-2 w-full text-center z-10">
             Plan a Trip
           </h1>
-          <div className="flex flex-col justify-start items-center h-fit w-full bg-night text-cream max-w-3xl">
+          <Transition
+            show={trip.locations.length > 0}
+            enter="transition ease duration-700 transform"
+            enterFrom="opacity-0 -translate-y-full"
+            enterTo="opacity-100 translate-y-0"
+            leave="transition ease duration-1000 transform"
+            leaveFrom="opacity-100 translate-y-0"
+            leaveTo="opacity-0 -translate-y-full"
+          >
+            <div className="grid grid-rows-4 md:grid-cols-4 p-4 w-full text-center h-fit md:h-16">
+              <div className="row-span-1 md:col-span-1 justify-center items-center bg-night text-cream my-1 md:mx-1 h-12 flex shadow-2xl">
+                <h3 className="">Weather</h3>
+              </div>
+              <div className="row-span-1 md:col-span-1 justify-center items-center bg-khaki text-night my-1 md:mx-1 h-12 flex">
+                <h3 className="">Distance</h3>
+              </div>
+              <div className="row-span-1 md:col-span-1 justify-center items-center bg-khaki text-night my-1 md:mx-1 h-12 flex">
+                <h3 className="">People</h3>
+              </div>
+              <div className="row-span-1 md:col-span-1 justify-center items-center bg-khaki text-night my-1 md:mx-1 h-12 flex">
+                <h3 className="">Skills & Gear</h3>
+              </div>
+            </div>
+          </Transition>
+          <div className="flex flex-col justify-start items-center h-fit w-full bg-night text-cream max-w-3xl z-10 shadow-2xl">
             <div className="flex flex-col items-center p-2">
               <div
                 className="text-cream bg-auburn p-2 rounded shadow-lg cursor-pointer"

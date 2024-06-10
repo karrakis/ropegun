@@ -73,7 +73,9 @@ const GraphSwitcher = ({ weather }) => {
         </div>
         <div
           className={`w-1/2 h-full flex justify-center items-center cursor-pointer ${
-            weatherDisplay === "precipitation" ? "bg-night" : "bg-auburn"
+            weatherDisplay === "precipitation"
+              ? "bg-night"
+              : "bg-khaki text-night"
           } text-cream`}
           onClick={() => updateWeatherDisplay("precipitation")}
         >

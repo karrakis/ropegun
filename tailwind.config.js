@@ -19,6 +19,7 @@ module.exports = {
       },
       height: {
         'screen-minus-header': 'calc(100vh - 4rem)',
+        '18': '4.5rem',
       },
       minWidth: {
         'screen': '100vw'
