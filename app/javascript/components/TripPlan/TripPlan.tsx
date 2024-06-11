@@ -2,9 +2,6 @@ import React, { useState, useEffect } from "react";
 import classNames from "classnames";
 import GraphSwitcher from "../Weather/GraphSwitcher";
 import Distance from "../Distance/Distance";
-import LocationsSelector from "./Locations/Selector";
-import MapControl from "../Map/MapControl";
-import Select from "react-select";
 import TripEdit from "./TripEdit/TripEdit";
 
 import { Transition } from "@headlessui/react";
@@ -76,7 +73,7 @@ export const TripPlan = ({
   userSavedLocations,
   tripSavedLocations = [],
 }: TripPlanProps) => {
-  const [activeTab, updateActiveTab] = useState("weather");
+  const [activeTab, updateActiveTab] = useState("editTrip");
 
   const [trip, _updateTrip] = useState<trip>({
     name: "",
@@ -120,14 +117,8 @@ export const TripPlan = ({
   //weather data for the locations in the trip.
   const [weather, updateWeather] = useState({});
 
-  //toggle for the map control
-  const [openMap, updateOpenMap] = useState(false);
-
   //saved locations for the user.  Deprecated?
   const [savedLocations, updateSavedLocations] = useState([]);
-
-  //friends selected in the dropdown for invitations.
-  const [friendsToInvite, updateFriendsToInvite] = useState([]);
 
   //populates the dropdown of existing trips.  called by a useEffect.
   const fetchTrips = async () => {
@@ -229,44 +220,6 @@ export const TripPlan = ({
     return data;
   };
 
-  //populates the dropdown for inviting friends.
-  const friendSelectOptions = localUser.friendships.map((friend) => {
-    console.log("testing", trip.trip_invitations);
-    if (
-      trip.trip_invitations
-        ?.map((invitation) => invitation.invitee.uuid)
-        .includes(friend.uuid)
-    ) {
-      return;
-    }
-    return {
-      value: friend.uuid,
-      label: friend.email + " - " + friend.name,
-    };
-  });
-
-  //sends invitations to the selected friends.
-  const sendInvitations = () => {
-    fetch(`/trip_invitations`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRF-Token": csrfToken(),
-      },
-      body: JSON.stringify({
-        trip_invitation: {
-          trip_id: trip.id,
-          issuer_id: localUser.id,
-          invitee_uuids: JSON.stringify(
-            friendsToInvite.map((friend) => friend.value)
-          ),
-        },
-      }),
-    }).then((response) => {
-      console.log(response);
-    });
-  };
-
   const InfoTab = ({ children, onSelect, selected }) => {
     return (
       <div
@@ -342,75 +295,37 @@ export const TripPlan = ({
               </InfoTab>
             </div>
           </Transition>
-          <TripEdit
-            trip={trip}
-            updateTrip={updateTrip}
-            trips={trips}
-            position={position}
-            updatePosition={updatePosition}
-            savedLocations={savedLocations}
-            updateSavedLocations={updateSavedLocations}
-            handleWeatherSelection={handleWeatherSelection}
-            localUser={localUser}
-          />
-          <LocationsSelector
-            trip={trip}
-            updateTrip={updateTrip}
-            locationOptions={userSavedLocations}
-            updateLocations={handleWeatherSelection}
-          />
-          {trip.locations.length > 0 && <GraphSwitcher weather={weather} />}
-          {trip.locations.length > 0 && (
+          {activeTab === "editTrip" && (
+            <TripEdit
+              trip={trip}
+              updateTrip={updateTrip}
+              trips={trips}
+              position={position}
+              updatePosition={updatePosition}
+              userSavedLocations={userSavedLocations}
+              savedLocations={savedLocations}
+              updateSavedLocations={updateSavedLocations}
+              handleWeatherSelection={handleWeatherSelection}
+              localUser={localUser}
+            />
+          )}
+          {activeTab === "weather" && trip.locations.length > 0 && (
+            <GraphSwitcher weather={weather} />
+          )}
+
+          {activeTab === "distance" && trip.locations.length > 0 && (
             <Distance locations={trip.locations} localUser={localUser} />
           )}
-          <Select
-            options={friendSelectOptions}
-            isMulti
-            onChange={(selected) => {
-              console.log("selected", selected);
-              updateFriendsToInvite(selected);
-            }}
-            placeholder="Invite Friends"
-            className="w-full p-2  bg-auburn text-night rounded-md mb-2"
-          />
-          <button
-            onClick={sendInvitations}
-            className="bg-auburn text-cream w-fit h-fit p-2 rounded-md"
-          >
-            Send Invitations
-          </button>
-          <div
-            id="pending-invitations"
-            className="flex flex-col items-center p-2 bg-night mt-2 w-full"
-          >
-            <h3 className="text-cream">Pending Invitations</h3>
-            {trip.trip_invitations
-              ?.filter((invitation) => invitation.accepted == false)
-              ?.map((invitation) => {
-                return (
-                  <div key={invitation.id}>
-                    <h3>{invitation.invitee.name}</h3>
-                    <h3>{invitation.invitee.email}</h3>
-                  </div>
-                );
-              })}
-          </div>
-          <div
-            id="guests"
-            className="flex flex-col items-center p-2 bg-night mt-2 w-full"
-          >
-            <h3 className="text-cream">Guests</h3>
-            {trip.trip_invitations
-              ?.filter((invitation) => invitation.accepted == true)
-              ?.map((invitation) => {
-                return (
-                  <div key={invitation.id}>
-                    <h3>{invitation.invitee.name}</h3>
-                    <h3>{invitation.invitee.email}</h3>
-                  </div>
-                );
-              })}
-          </div>
+          {activeTab === "people" && (
+            <div className="row-span-4 md:col-span-4 bg-cream bg-opacity-50">
+              People
+            </div>
+          )}
+          {activeTab === "skillsGear" && (
+            <div className="row-span-4 md:col-span-4 bg-cream bg-opacity-50">
+              Skills & Gear
+            </div>
+          )}
           <div className="mb-16 mt-2">
             <button
               className={classNames("bg-auburn text-cream p-2 rounded-md", {
