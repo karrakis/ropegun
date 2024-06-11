@@ -5,11 +5,11 @@ import Distance from "../Distance/Distance";
 import LocationsSelector from "./Locations/Selector";
 import MapControl from "../Map/MapControl";
 import Select from "react-select";
+import TripEdit from "./TripEdit/TripEdit";
 
 import { Transition } from "@headlessui/react";
 
 import { csrfToken } from "../../utilities/csrfToken";
-import classNames from "classnames";
 
 interface localUser {
   id: number;
@@ -76,6 +76,8 @@ export const TripPlan = ({
   userSavedLocations,
   tripSavedLocations = [],
 }: TripPlanProps) => {
+  const [activeTab, updateActiveTab] = useState("weather");
+
   const [trip, _updateTrip] = useState<trip>({
     name: "",
     locations: tripSavedLocations || [],
@@ -265,6 +267,32 @@ export const TripPlan = ({
     });
   };
 
+  const InfoTab = ({ children, onSelect, selected }) => {
+    return (
+      <div
+        className={classNames(
+          "row-span-1",
+          "md:col-span-1",
+          "justify-center",
+          "items-center",
+          "my-1",
+          "md:mx-1",
+          "h-12",
+          "flex",
+          {
+            "bg-night": selected,
+            "bg-khaki": !selected,
+            "text-cream": selected,
+            "text-night": !selected,
+          }
+        )}
+        onClick={onSelect}
+      >
+        {children}
+      </div>
+    );
+  };
+
   return (
     <div className="w-full flex flex-row justify-center h-full">
       <div className="flex flex-col justify-start h-fit w-full text-cream max-w-3xl">
@@ -282,81 +310,49 @@ export const TripPlan = ({
             leaveTo="opacity-0 -translate-y-full"
           >
             <div className="grid grid-rows-5 md:grid-cols-5 p-4 w-full text-center h-fit md:h-16">
-              <div className="row-span-1 md:col-span-1 justify-center items-center bg-khaki text-night my-1 md:mx-1 h-12 flex">
+              <InfoTab
+                onSelect={() => updateActiveTab("editTrip")}
+                selected={activeTab == "editTrip"}
+              >
                 <h3 className="">Edit Trip</h3>
-              </div>
-              <div className="row-span-1 md:col-span-1 justify-center items-center bg-night text-cream my-1 md:mx-1 h-12 flex shadow-2xl">
+              </InfoTab>
+              <InfoTab
+                onSelect={() => updateActiveTab("weather")}
+                selected={activeTab == "weather"}
+              >
                 <h3 className="">Weather</h3>
-              </div>
-              <div className="row-span-1 md:col-span-1 justify-center items-center bg-khaki text-night my-1 md:mx-1 h-12 flex">
+              </InfoTab>
+              <InfoTab
+                onSelect={() => updateActiveTab("distance")}
+                selected={activeTab == "distance"}
+              >
                 <h3 className="">Distance</h3>
-              </div>
-              <div className="row-span-1 md:col-span-1 justify-center items-center bg-khaki text-night my-1 md:mx-1 h-12 flex">
+              </InfoTab>
+              <InfoTab
+                onSelect={() => updateActiveTab("people")}
+                selected={activeTab == "people"}
+              >
                 <h3 className="">People</h3>
-              </div>
-              <div className="row-span-1 md:col-span-1 justify-center items-center bg-khaki text-night my-1 md:mx-1 h-12 flex">
+              </InfoTab>
+              <InfoTab
+                onSelect={() => updateActiveTab("skillsGear")}
+                selected={activeTab == "skillsGear"}
+              >
                 <h3 className="">Skills & Gear</h3>
-              </div>
+              </InfoTab>
             </div>
           </Transition>
-          <div className="flex flex-col justify-start items-center h-fit w-full bg-night text-cream max-w-3xl z-10 shadow-2xl">
-            <div className="flex flex-col items-center p-2">
-              <div
-                className="text-cream bg-auburn p-2 rounded shadow-lg cursor-pointer"
-                onClick={() => updateOpenMap(!openMap)}
-              >
-                {openMap ? "Close Map" : "Link New Locations to Account"}
-              </div>
-            </div>
-            {openMap && (
-              <MapControl
-                {...{
-                  position,
-                  updatePosition,
-                  savedLocations,
-                  updateSavedLocations,
-                  weatherTargets: trip.locations,
-                  updateWeatherTargets: handleWeatherSelection,
-                  localUser,
-                }}
-              />
-            )}
-            {trips.length > 0 && (
-              <select
-                className="w-fit p-2 bg-auburn text-cream rounded-md mb-2"
-                onChange={(e) => {
-                  //one of these is probably a string, the other an integer and we're using ===
-                  const trip = trips.filter(
-                    (trip) => trip.id === parseInt(e.target.value)
-                  )[0];
-
-                  updateTrip({
-                    id: trip.id,
-                    name: trip.name,
-                    locations: trip.locations.map((loc) => ({
-                      id: loc.id,
-                      name: loc.name,
-                      office: loc.office,
-                      office_x: loc.office_x,
-                      office_y: loc.office_y,
-                      location: { lat: loc.latitude, lng: loc.longitude },
-                    })),
-                  });
-                }}
-              >
-                <option selected disabled>
-                  Select Existing Trip
-                </option>
-                {trips.map((trip) => {
-                  return (
-                    <option key={trip.id} value={trip.id}>
-                      {trip.name}
-                    </option>
-                  );
-                })}
-              </select>
-            )}
-          </div>
+          <TripEdit
+            trip={trip}
+            updateTrip={updateTrip}
+            trips={trips}
+            position={position}
+            updatePosition={updatePosition}
+            savedLocations={savedLocations}
+            updateSavedLocations={updateSavedLocations}
+            handleWeatherSelection={handleWeatherSelection}
+            localUser={localUser}
+          />
           <LocationsSelector
             trip={trip}
             updateTrip={updateTrip}
