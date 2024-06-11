@@ -3,6 +3,7 @@ import classNames from "classnames";
 import GraphSwitcher from "../Weather/GraphSwitcher";
 import Distance from "../Distance/Distance";
 import TripEdit from "./TripEdit/TripEdit";
+import People from "./People/People";
 
 import { Transition } from "@headlessui/react";
 
@@ -310,16 +311,22 @@ export const TripPlan = ({
             />
           )}
           {activeTab === "weather" && trip.locations.length > 0 && (
-            <GraphSwitcher weather={weather} />
+            <div className="w-full z-10">
+              <GraphSwitcher weather={weather} />
+            </div>
           )}
 
           {activeTab === "distance" && trip.locations.length > 0 && (
-            <Distance locations={trip.locations} localUser={localUser} />
+            <div className="w-full z-10">
+              <Distance locations={trip.locations} localUser={localUser} />
+            </div>
           )}
           {activeTab === "people" && (
-            <div className="row-span-4 md:col-span-4 bg-cream bg-opacity-50">
-              People
-            </div>
+            <People
+              trip={trip}
+              localUser={localUser}
+              updateTrips={updateTrips}
+            />
           )}
           {activeTab === "skillsGear" && (
             <div className="row-span-4 md:col-span-4 bg-cream bg-opacity-50">

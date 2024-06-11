@@ -66,7 +66,7 @@ export const Distance = ({ locations, localUser }) => {
 
   return (
     <div className="w-full">
-      <h1 className="w-full text-cream bg-night mt-2 text-xl p-2 text-center rounded-t-md">
+      <h1 className="w-full text-cream bg-night text-xl p-2 text-center rounded-t-md">
         Distances
       </h1>
       {distancesReady && displayDistances()}
