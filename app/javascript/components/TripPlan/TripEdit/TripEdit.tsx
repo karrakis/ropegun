@@ -21,6 +21,8 @@ export const TripEdit = ({
   //friends selected in the dropdown for invitations.
   const [openMap, updateOpenMap] = useState(false);
 
+  console.log("trip:", trip);
+
   return (
     <>
       <div className="flex flex-col justify-start items-center h-fit w-full bg-night text-cream max-w-3xl z-10 pt-2">

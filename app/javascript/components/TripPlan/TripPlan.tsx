@@ -269,7 +269,11 @@ export const TripPlan = ({
 
           {activeTab === "distance" && trip.locations.length > 0 && (
             <div className="w-full z-10">
-              <Distance locations={trip.locations} localUser={localUser} />
+              <Distance
+                locations={trip.locations}
+                localUser={localUser}
+                trip={trip}
+              />
             </div>
           )}
           {activeTab === "people" && (

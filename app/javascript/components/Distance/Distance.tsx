@@ -2,14 +2,48 @@ import React, { useState, useEffect } from "react";
 import { asynchronousStateUpdate } from "../../utilities/asynchronousStateUpdate";
 import { getDistances } from "../../utilities/getDistances";
 
-export const Distance = ({ locations, localUser }) => {
+export const Distance = ({ locations, localUser, trip = nil }) => {
   const [distances, updateDistances] = useState({});
+  const [guestDistances, updateGuestDistances] = useState([]);
   const [distancesReady, updateDistancesReady] = useState(false);
+
+  console.log("guestDistances:", guestDistances);
 
   useEffect(() => {
     const locationUpdates = getDistances(locations, localUser);
     asynchronousStateUpdate(locationUpdates, updateDistances);
   }, [locations]);
+
+  useEffect(() => {
+    console.log("in the effect");
+    const results = trip.trip_invitations
+      .filter((invitation) => invitation.accepted == true)
+      .map(async (invitation) => {
+        const locationUpdates = getDistances(locations, invitation.invitee);
+        console.log("locationUpdates:", locationUpdates);
+        const resolutions = locationUpdates.then((toBeResolved) => {
+          let updatesResolved = Promise.all(toBeResolved).then((data) => {
+            return data.map((update) => {
+              return {
+                [update.name]: update.data,
+              };
+            });
+          });
+
+          return updatesResolved;
+        });
+        return resolutions;
+      });
+    console.log("results", results);
+    Promise.all(results).then((data) => {
+      console.log("data", data);
+      updateGuestDistances(data);
+    });
+  }, [
+    trip.trip_invitations
+      .filter((invitation) => invitation.accepted == true)
+      .map((invitation) => invitation.invitee.uuid).length,
+  ]);
 
   useEffect(() => {
     if (distances && Object.keys(distances).length > 0) {
@@ -18,6 +52,14 @@ export const Distance = ({ locations, localUser }) => {
       }
     }
   }, [distances]);
+
+  useEffect(() => {
+    if (guestDistances && Object.keys(guestDistances).length > 0) {
+      if (guestDistances[Object.keys(guestDistances)[0]].distance) {
+        updateDistancesReady(true);
+      }
+    }
+  }, [guestDistances]);
 
   const displayDistances = () => {
     return (
