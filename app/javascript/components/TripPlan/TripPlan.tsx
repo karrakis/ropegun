@@ -9,71 +9,13 @@ import { Transition } from "@headlessui/react";
 
 import { csrfToken } from "../../utilities/csrfToken";
 
-interface localUser {
-  id: number;
-  name: string;
-  email: string;
-  friendships: any[];
-}
-
-interface userSavedLocations {
-  id: number;
-  name: string;
-  latitude: number;
-  longitude: number;
-  office: string;
-  office_x: number;
-  office_y: number;
-}
-
-interface tripSavedLocations {
-  id: number;
-  name: string;
-  location: { lat: number; lng: number };
-  office: string;
-  office_x: number;
-  office_y: number;
-}
-
-interface TripPlanProps {
-  localUser: localUser;
-  userSavedLocations: userSavedLocations[];
-  tripSavedLocations?: tripSavedLocations[];
-}
-
-interface location {
-  id: number;
-  name: string;
-  latitude: number;
-  longitude: number;
-  office: string;
-  office_x: number;
-  office_y: number;
-}
-
-interface trips {
-  id: number;
-  name: string;
-  locations: location[];
-}
-
-interface parsedLocation {
-  name: string;
-  location: { lat: number; lng: number };
-}
-
-interface trip {
-  id?: number;
-  name: string;
-  locations: parsedLocation[];
-  trip_invitations?: any[];
-}
+import { TripPlanPropsType, tripsType } from "./TripPlanInterfaces";
 
 export const TripPlan = ({
   localUser,
   userSavedLocations,
   tripSavedLocations = [],
-}: TripPlanProps) => {
+}: TripPlanPropsType) => {
   const [activeTab, updateActiveTab] = useState("editTrip");
 
   const [trip, _updateTrip] = useState<trip>({
@@ -82,13 +24,14 @@ export const TripPlan = ({
   });
 
   //possibly excessive, but ensures that when a trip is selected, it is brought up to date.
-  const updateTrip = (trip) => {
+  const setTrip = (trip) => {
     fetch(`/api/v1/trips/${trip.id}`, {
       method: "GET",
       headers: {
         Accept: "application/ld+json",
       },
     }).then((response) => {
+      console.log("response:", response);
       response.json().then((data) => {
         console.log("data:", data);
         _updateTrip({
@@ -96,6 +39,7 @@ export const TripPlan = ({
           name: data.name,
           locations: data.locations.map((loc) => {
             return {
+              id: loc.id,
               name: loc.name,
               location: { lat: loc.latitude, lng: loc.longitude },
               office_x: loc.office_x,
@@ -113,7 +57,7 @@ export const TripPlan = ({
   const [tripSaving, updateTripSaving] = useState(false);
 
   //primarily used for the dropdown of existing trips.
-  const [trips, updateTrips] = useState<trips[]>([]);
+  const [trips, updateTrips] = useState<tripsType[]>([]);
 
   //weather data for the locations in the trip.
   const [weather, updateWeather] = useState({});
@@ -175,13 +119,19 @@ export const TripPlan = ({
 
   //adds or removes a location from the trip.
   const handleWeatherSelection = (loc) => {
-    if (trip.locations.includes(loc)) {
-      updateTrip({
+    console.log("trying:", loc);
+    console.log("comparing:", trip.locations);
+    console.log(trip.locations.includes(loc));
+    console.log(trip.locations.map((location) => location.id).includes(loc.id));
+    if (trip.locations.map((location) => location.id).includes(loc.id)) {
+      console.log("already in");
+      _updateTrip({
         ...trip,
-        locations: trip.locations.filter((location) => location !== loc),
+        locations: trip.locations.filter((location) => location.id !== loc.id),
       });
     } else {
-      updateTrip({
+      console.log("new location");
+      _updateTrip({
         ...trip,
         locations: trip.locations.concat(loc),
       });
@@ -299,7 +249,8 @@ export const TripPlan = ({
           {activeTab === "editTrip" && (
             <TripEdit
               trip={trip}
-              updateTrip={updateTrip}
+              setTrip={setTrip}
+              updateTrip={_updateTrip}
               trips={trips}
               position={position}
               updatePosition={updatePosition}

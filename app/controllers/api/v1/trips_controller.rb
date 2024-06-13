@@ -2,8 +2,7 @@ class Api::V1::TripsController < ApplicationController
     skip_before_action :verify_authenticity_token
     def index
         @trips = Trip.all
-        puts "TRIPS: #{@trips.to_json(include: [:locations, :trip_invitations])}"
-        render json: @trips.to_json(include: [:locations, :trip_invitations])
+        render json: @trips.to_json(include: [:locations, {trip_invitations: {include: :invitee}}])
     end
 
     def create
@@ -15,7 +14,7 @@ class Api::V1::TripsController < ApplicationController
                 JSON.parse(trip_params[:locations]).map { |id| Location.find(id) }.each do |location|
                     @trip.locations << location
                 end
-                render json: @trip.to_json(include: :locations), status: :created
+                render json: @trip.to_json(include: [:locations, {trip_invitations: {include: :invitee}}]), status: :created
             else
                 render json: @trip.errors, status: :unprocessable_entity
             end

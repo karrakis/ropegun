@@ -8,6 +8,7 @@ import LocationsSelector from "../Locations/Selector";
 export const TripEdit = ({
   trip,
   updateTrip,
+  setTrip,
   trips,
   position,
   updatePosition,
@@ -32,7 +33,8 @@ export const TripEdit = ({
                 (trip) => trip.id === parseInt(e.target.value)
               )[0];
 
-              updateTrip({
+              console.log("xxx:", trip);
+              setTrip({
                 id: trip.id,
                 name: trip.name,
                 locations: trip.locations.map((loc) => ({
@@ -86,7 +88,6 @@ export const TripEdit = ({
         locationOptions={userSavedLocations}
         updateLocations={handleWeatherSelection}
       />
-      
     </>
   );
 };
