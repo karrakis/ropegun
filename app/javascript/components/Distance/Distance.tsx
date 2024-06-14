@@ -104,7 +104,7 @@ export const AverageDistances = ({ distances, guestDistances }) => {
       console.log(minutes);
       totalDistance[
         destination
-      ].distance.rows[0].elements[0].duration.text = `${hours} hours ${minutes} minutes`;
+      ].distance.rows[0].elements[0].duration.text = `${hours} hours ${minutes} mins`;
       totalDistance[
         destination
       ].distance.rows[0].elements[0].distance.text = `${distance} mi`;
