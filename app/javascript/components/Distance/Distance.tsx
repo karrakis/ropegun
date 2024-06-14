@@ -32,12 +32,23 @@ export const Distance = ({ locations, localUser, trip = nil }) => {
 
           return updatesResolved;
         });
-        return resolutions;
+        return {
+          label: `${invitation.invitee.name} (${invitation.invitee.email})`,
+          distances: resolutions,
+        };
       });
     console.log("results", results);
     Promise.all(results).then((data) => {
       console.log("data", data);
-      updateGuestDistances(data);
+      data.map((datum) => {
+        console.log("datum:", datum);
+        datum.distances.then((resolved) => {
+          console.log("resolved:", resolved);
+          updateGuestDistances((prev) => {
+            return [...prev, { label: datum.label, distances: resolved }];
+          });
+        });
+      });
     });
   }, [
     trip.trip_invitations
@@ -61,7 +72,8 @@ export const Distance = ({ locations, localUser, trip = nil }) => {
     }
   }, [guestDistances]);
 
-  const displayDistances = () => {
+  const displayDistances = (distances) => {
+    console.log("distances:", distances);
     return (
       <table className="bg-night text-cream w-full">
         <thead className="border border-auburn w-full">
@@ -111,7 +123,17 @@ export const Distance = ({ locations, localUser, trip = nil }) => {
       <h1 className="w-full text-cream bg-night text-xl p-2 text-center rounded-t-md">
         Distances
       </h1>
-      {distancesReady && displayDistances()}
+      {distancesReady && displayDistances(distances)}
+      {guestDistances.map((guest) => {
+        return (
+          <div key={guest.label} className="w-full mt-2">
+            <h2 className="w-full text-cream bg-night text-lg p-2 text-center rounded-t-md">
+              {guest.label}
+            </h2>
+            {displayDistances(Object.assign({}, ...guest.distances))}
+          </div>
+        );
+      })}
     </div>
   );
 };
