@@ -19,44 +19,46 @@ export const Distance = ({ locations, localUser, trip = nil }) => {
 
   useEffect(() => {
     console.log("in the effect");
-    const results = trip.trip_invitations
-      .filter((invitation) => invitation.accepted == true)
-      .map(async (invitation) => {
-        const locationUpdates = getDistances(locations, invitation.invitee);
-        console.log("locationUpdates:", locationUpdates);
-        const resolutions = locationUpdates.then((toBeResolved) => {
-          let updatesResolved = Promise.all(toBeResolved).then((data) => {
-            return data.map((update) => {
-              return {
-                [update.name]: update.data,
-              };
+    if (trip.trip_invitations) {
+      const results = trip.trip_invitations
+        .filter((invitation) => invitation.accepted == true)
+        .map(async (invitation) => {
+          const locationUpdates = getDistances(locations, invitation.invitee);
+          console.log("locationUpdates:", locationUpdates);
+          const resolutions = locationUpdates.then((toBeResolved) => {
+            let updatesResolved = Promise.all(toBeResolved).then((data) => {
+              return data.map((update) => {
+                return {
+                  [update.name]: update.data,
+                };
+              });
+            });
+
+            return updatesResolved;
+          });
+          return {
+            label: `${invitation.invitee.name} (${invitation.invitee.email})`,
+            distances: resolutions,
+          };
+        });
+      console.log("results", results);
+      Promise.all(results).then((data) => {
+        console.log("data", data);
+        data.map((datum) => {
+          console.log("datum:", datum);
+          datum.distances.then((resolved) => {
+            console.log("resolved:", resolved);
+            updateGuestDistances((prev) => {
+              return [...prev, { label: datum.label, distances: resolved }];
             });
           });
-
-          return updatesResolved;
-        });
-        return {
-          label: `${invitation.invitee.name} (${invitation.invitee.email})`,
-          distances: resolutions,
-        };
-      });
-    console.log("results", results);
-    Promise.all(results).then((data) => {
-      console.log("data", data);
-      data.map((datum) => {
-        console.log("datum:", datum);
-        datum.distances.then((resolved) => {
-          console.log("resolved:", resolved);
-          updateGuestDistances((prev) => {
-            return [...prev, { label: datum.label, distances: resolved }];
-          });
         });
       });
-    });
+    }
   }, [
-    trip.trip_invitations
-      .filter((invitation) => invitation.accepted == true)
-      .map((invitation) => invitation.invitee.uuid).length,
+    trip?.trip_invitations
+      ?.filter((invitation) => invitation.accepted == true)
+      ?.map((invitation) => invitation.invitee.uuid).length,
   ]);
 
   useEffect(() => {
