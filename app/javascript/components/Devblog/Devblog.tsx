@@ -14,6 +14,9 @@ export const ComingSoon = () => {
           <li className="text-green-500">Invite friends to trips</li>
           <li className="text-green-500">Accept invitations to trips</li>
           <li className="text-green-500">Save trips for later recall</li>
+          <li className="text-green-500">
+            Average distances for people on trips
+          </li>
           <li>Available Gear tracking for Trips</li>
           <li>Available Skills tracking for Trips</li>
           <li>Group Calendar for trips (when can people go?)</li>

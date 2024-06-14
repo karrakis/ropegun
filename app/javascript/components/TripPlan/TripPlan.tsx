@@ -4,6 +4,7 @@ import GraphSwitcher from "../Weather/GraphSwitcher";
 import Distance from "../Distance/Distance";
 import TripEdit from "./TripEdit/TripEdit";
 import People from "./People/People";
+import Skills from "./Skills/Skills";
 
 import { Transition } from "@headlessui/react";
 
@@ -285,9 +286,11 @@ export const TripPlan = ({
             />
           )}
           {activeTab === "skillsGear" && (
-            <div className="row-span-4 md:col-span-4 bg-cream bg-opacity-50">
-              Skills & Gear
-            </div>
+            <Skills
+              localUser={localUser}
+              guests={trip.trip_invitations}
+              trip={trip}
+            />
           )}
           <div className="mb-16 mt-2">
             <button
