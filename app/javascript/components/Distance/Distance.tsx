@@ -2,53 +2,8 @@ import React, { useState, useEffect } from "react";
 import { asynchronousStateUpdate } from "../../utilities/asynchronousStateUpdate";
 import { getDistances } from "../../utilities/getDistances";
 
-import { AverageDistances } from "./AverageDistances";
-
-export const displayDistances = (distances) => {
-  console.log("distances:", distances);
-  return (
-    <table className="bg-night text-cream w-full">
-      <thead className="border border-auburn w-full">
-        <tr>
-          <th className="border-b border-l border-r border-auburn p-1">
-            Destination
-          </th>
-          <th className="border-b border-l border-r border-auburn p-1">
-            Miles
-          </th>
-          <th className="border-b border-l border-r border-auburn p-1">
-            Drive Time
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        {Object.keys(distances).map((destination) => {
-          if (distances[destination].distance) {
-            return (
-              <tr key={`${destination}-distance`}>
-                <td className="border-b border-l border-r border-auburn p-1">
-                  {destination}
-                </td>
-                <td className="border-b border-l border-r border-auburn p-1">
-                  {
-                    distances[destination].distance.rows[0].elements[0].distance
-                      .text
-                  }
-                </td>
-                <td className="border-b border-l border-r border-auburn p-1">
-                  {
-                    distances[destination].distance.rows[0].elements[0].duration
-                      .text
-                  }
-                </td>
-              </tr>
-            );
-          }
-        })}
-      </tbody>
-    </table>
-  );
-};
+import AverageDistances from "./AverageDistances";
+import DisplayDistances from "./DisplayDistances";
 
 export const Distance = ({ locations, localUser, trip = nil }) => {
   const [distances, updateDistances] = useState({});
@@ -134,7 +89,7 @@ export const Distance = ({ locations, localUser, trip = nil }) => {
       <h1 className="w-full text-cream bg-night text-xl p-2 text-center rounded-t-md">
         Organizer Distances
       </h1>
-      {distancesReady && displayDistances(distances)}
+      {distancesReady && <DisplayDistances distances={distances} />}
       <h1 className="w-full text-cream bg-night text-xl p-2 text-center rounded-t-md mt-2">
         Invitee Distances
       </h1>
@@ -144,7 +99,9 @@ export const Distance = ({ locations, localUser, trip = nil }) => {
             <h2 className="w-full text-cream bg-night text-lg p-2 text-center rounded-t-md">
               {guest.label}
             </h2>
-            {displayDistances(Object.assign({}, ...guest.distances))}
+            <DisplayDistances
+              distances={Object.assign({}, ...guest.distances)}
+            />
           </div>
         );
       })}

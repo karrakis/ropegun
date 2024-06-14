@@ -1,4 +1,5 @@
-import { displayDistances } from "./Distance";
+import React from "react";
+import DisplayDistances from "./DisplayDistances";
 
 export const AverageDistances = ({ distances, guestDistances }) => {
   let totalDistance = {};
@@ -105,5 +106,7 @@ export const AverageDistances = ({ distances, guestDistances }) => {
     }
   });
 
-  return displayDistances({ ...totalDistance });
+  return <DisplayDistances distances={totalDistance} />;
 };
+
+export default AverageDistances;
