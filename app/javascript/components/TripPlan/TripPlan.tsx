@@ -183,6 +183,7 @@ export const TripPlan = ({
           "md:mx-1",
           "h-12",
           "flex",
+          "cursor-pointer",
           {
             "bg-night": selected,
             "bg-khaki": !selected,
