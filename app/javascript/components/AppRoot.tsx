@@ -37,6 +37,8 @@ export const AppRoot = ({
 }: AppRootProps) => {
   const [currentPage, setPage] = useState(window.location.pathname);
 
+  console.log(currentPage);
+
   const setDisplayPage = () => {
     if (!localUser.id) {
       return <ComingSoon />;
@@ -93,7 +95,7 @@ export const AppRoot = ({
         />
       </a>
 
-      <Header user={user} csrf={csrf} setPage={setPage} />
+      <Header user={user} csrf={csrf} page={currentPage} setPage={setPage} />
       {setDisplayPage()}
     </div>
   );

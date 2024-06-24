@@ -1,11 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import logo from "../../assets/mountains-transparency5.png";
 
-export const HeaderLeft = ({ setPage }) => {
+export const HeaderLeft = ({ page, setPage }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const unfoldMenu = () => {
     setMenuOpen(!menuOpen);
   };
+
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [page]);
 
   return (
     <div

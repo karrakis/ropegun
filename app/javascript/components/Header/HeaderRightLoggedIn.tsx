@@ -4,7 +4,7 @@ export const HeaderRightLoggedIn = ({ user, csrf, setPage }) => {
   return (
     <>
       <form
-        className="button_to m-2 flex items-center justify-end"
+        className="button_to m-2 w-fit flex items-center justify-end flex-none"
         method="get"
         action="/auth/logout"
       >
@@ -20,7 +20,7 @@ export const HeaderRightLoggedIn = ({ user, csrf, setPage }) => {
       </form>
       <button
         data-turbo="false"
-        className="h-full w-auto mr-2 cursor-pointer"
+        className="h-full w-auto mr-2 cursor-pointer flex-none"
         onClick={() => setPage("/dashboard")}
       >
         <img className="h-12 w-auto" src={user.picture}></img>
