@@ -5,16 +5,16 @@ import { getDistances } from "../../utilities/getDistances";
 import AverageDistances from "./AverageDistances";
 import DisplayDistances from "./DisplayDistances";
 
-export const Distance = ({ locations, localUser, trip = nil }) => {
-  const [distances, updateDistances] = useState({});
+export const Distance = ({ locations, tripOwner, trip = nil }) => {
+  const [ownerDistances, updateOwnerDistances] = useState({});
   const [guestDistances, updateGuestDistances] = useState([]);
   const [distancesReady, updateDistancesReady] = useState(false);
 
   console.log("guestDistances:", guestDistances);
 
   useEffect(() => {
-    const locationUpdates = getDistances(locations, localUser);
-    asynchronousStateUpdate(locationUpdates, updateDistances);
+    const locationUpdates = getDistances(locations, tripOwner);
+    asynchronousStateUpdate(locationUpdates, updateOwnerDistances);
   }, [locations]);
 
   useEffect(() => {
@@ -62,12 +62,12 @@ export const Distance = ({ locations, localUser, trip = nil }) => {
   ]);
 
   useEffect(() => {
-    if (distances && Object.keys(distances).length > 0) {
-      if (distances[Object.keys(distances)[0]].distance) {
+    if (ownerDistances && Object.keys(ownerDistances).length > 0) {
+      if (ownerDistances[Object.keys(ownerDistances)[0]].distance) {
         updateDistancesReady(true);
       }
     }
-  }, [distances]);
+  }, [ownerDistances]);
 
   useEffect(() => {
     if (guestDistances && Object.keys(guestDistances).length > 0) {
@@ -84,14 +84,14 @@ export const Distance = ({ locations, localUser, trip = nil }) => {
       </h1>
       {distancesReady && (
         <AverageDistances
-          distances={distances}
+          distances={ownerDistances}
           guestDistances={guestDistances}
         />
       )}
       <h1 className="w-full text-cream bg-night text-xl p-2 text-center rounded-t-md">
         Organizer Distances
       </h1>
-      {distancesReady && <DisplayDistances distances={distances} />}
+      {distancesReady && <DisplayDistances distances={ownerDistances} />}
       <h1 className="w-full text-cream bg-night text-xl p-2 text-center rounded-t-md mt-2">
         Invitee Distances
       </h1>

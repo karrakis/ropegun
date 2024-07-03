@@ -1,8 +1,7 @@
 class Api::V1::TripsController < ApplicationController
     skip_before_action :verify_authenticity_token
     def index
-        @trips = Trip.all
-        render json: @trips.to_json(include: [:locations, :user, {trip_invitations: {include: :invitee}}])
+        render json: Trip.all.to_json(include: [:owner, :locations, {trip_invitations: {include: :invitee}}])
     end
 
     def create

@@ -38,6 +38,7 @@ export const TripPlan = ({
         _updateTrip({
           id: data.id,
           name: data.name,
+          owner: data.user,
           locations: data.locations.map((loc) => {
             return {
               id: loc.id,
@@ -199,6 +200,8 @@ export const TripPlan = ({
     );
   };
 
+  console.log("trip:", trip);
+
   return (
     <div className="w-full flex flex-row justify-center h-full">
       <div className="flex flex-col justify-start h-fit w-full text-cream max-w-3xl">
@@ -273,7 +276,7 @@ export const TripPlan = ({
             <div className="w-full z-10">
               <Distance
                 locations={trip.locations}
-                localUser={localUser}
+                tripOwner={trip.owner}
                 trip={trip}
               />
             </div>
