@@ -290,7 +290,7 @@ export const TripPlan = ({
           )}
           {activeTab === "skillsGear" && (
             <Skills
-              localUser={localUser}
+              organizer={trip.owner}
               guests={trip.trip_invitations}
               trip={trip}
             />
