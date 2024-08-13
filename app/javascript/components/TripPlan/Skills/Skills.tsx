@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import classNames from "classnames";
 
 export const SkillsTable = ({ userSkills }) => {
   const skills = {
@@ -13,32 +14,61 @@ export const SkillsTable = ({ userSkills }) => {
     trad_lead: "Trad Lead",
   };
 
+  const [selected_skills, setSelectedSkills] = useState(["lead_belay"]);
+
   console.log("userSkills", userSkills);
 
   console.log(userSkills);
   return (
-    <table>
-      <thead>
-        <tr>
-          <th>Name</th>
-          {Object.values(skills).map((skill) => {
-            return <th key={skill}>{skill}</th>;
-          })}
-        </tr>
-      </thead>
-      <tbody>
-        {userSkills.map((user) => {
+    <>
+      Add or Remove:
+      <select
+        onChange={(e) =>
+          setSelectedSkills(
+            selected_skills.includes(e.target.value)
+              ? selected_skills.filter((item) => item !== e.target.value)
+              : [...selected_skills, e.target.value]
+          )
+        }
+      >
+        {Object.entries(skills).map(([key, value]) => {
           return (
-            <tr key={user.name}>
-              <td>{user.name}</td>
-              {Object.keys(skills).map((skill) => {
-                return <td key={skill + user.email}>{user[skill]}</td>;
+            <option
+              key={key}
+              value={key}
+              className={classNames({
+                "text-auburn": selected_skills.includes(key),
+                "text-black": !selected_skills.includes(key),
               })}
-            </tr>
+            >
+              {value}
+            </option>
           );
         })}
-      </tbody>
-    </table>
+      </select>
+      <table>
+        <thead>
+          <tr>
+            <th>Name</th>
+            {selected_skills.map((skill) => {
+              return <th key={skill}>{skills[skill]}</th>;
+            })}
+          </tr>
+        </thead>
+        <tbody>
+          {userSkills.map((user) => {
+            return (
+              <tr key={user.name}>
+                <td>{user.name}</td>
+                {selected_skills.map((skill) => {
+                  return <td key={skill + user.email}>{user[skill]}</td>;
+                })}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </>
   );
 };
 
