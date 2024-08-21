@@ -20,38 +20,45 @@ export const SkillsTable = ({ userSkills }) => {
 
   console.log(userSkills);
   return (
-    <>
-      Add or Remove:
-      <select
-        onChange={(e) =>
-          setSelectedSkills(
-            selected_skills.includes(e.target.value)
-              ? selected_skills.filter((item) => item !== e.target.value)
-              : [...selected_skills, e.target.value]
-          )
-        }
-      >
-        {Object.entries(skills).map(([key, value]) => {
-          return (
-            <option
-              key={key}
-              value={key}
-              className={classNames({
-                "text-auburn": selected_skills.includes(key),
-                "text-black": !selected_skills.includes(key),
-              })}
-            >
-              {value}
-            </option>
-          );
-        })}
-      </select>
-      <table>
+    <div className="bg-night w-fit p-8">
+      <div className="rounded bg-auburn text-cream p-2">
+        <h3>Add or Remove skills from table:</h3>
+        <select
+          className="bg-night text-cream rounded p-1"
+          onChange={(e) =>
+            setSelectedSkills(
+              selected_skills.includes(e.target.value)
+                ? selected_skills.filter((item) => item !== e.target.value)
+                : [...selected_skills, e.target.value]
+            )
+          }
+        >
+          {Object.entries(skills).map(([key, value]) => {
+            return (
+              <option
+                key={key}
+                value={key}
+                className={classNames({
+                  "text-auburn": selected_skills.includes(key),
+                  "text-black": !selected_skills.includes(key),
+                })}
+              >
+                {value}
+              </option>
+            );
+          })}
+        </select>
+      </div>
+      <table className="bg-night border border-auburn w-full mt-4">
         <thead>
           <tr>
-            <th>Name</th>
+            <th className="p-2">Name</th>
             {selected_skills.map((skill) => {
-              return <th key={skill}>{skills[skill]}</th>;
+              return (
+                <th className="border-l border-auburn p-2" key={skill}>
+                  {skills[skill]}
+                </th>
+              );
             })}
           </tr>
         </thead>
@@ -59,16 +66,25 @@ export const SkillsTable = ({ userSkills }) => {
           {userSkills.map((user) => {
             return (
               <tr key={user.name}>
-                <td>{user.name}</td>
+                <td className="border-t border-auburn p-2 text-khaki">
+                  {user.name}
+                </td>
                 {selected_skills.map((skill) => {
-                  return <td key={skill + user.email}>{user[skill]}</td>;
+                  return (
+                    <td
+                      className="border-l border-t border-auburn p-2 text-cream"
+                      key={skill + user.email}
+                    >
+                      {user[skill]}
+                    </td>
+                  );
                 })}
               </tr>
             );
           })}
         </tbody>
       </table>
-    </>
+    </div>
   );
 };
 
@@ -120,8 +136,7 @@ export const Skills = ({ organizer, guests, trip }) => {
   });
 
   return (
-    <div>
-      <h3>Skills</h3>
+    <div className="bg-night w-full">
       <SkillsTable userSkills={userSkills} />
     </div>
   );

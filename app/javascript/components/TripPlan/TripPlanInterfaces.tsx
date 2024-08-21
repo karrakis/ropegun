@@ -57,3 +57,8 @@ export interface tripType {
   locations: parsedLocationType[];
   trip_invitations?: any[];
 }
+
+export interface Trip {
+  name: string;
+  locations: any[];
+}

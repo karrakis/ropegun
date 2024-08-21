@@ -10,7 +10,7 @@ import { Transition } from "@headlessui/react";
 
 import { csrfToken } from "../../utilities/csrfToken";
 
-import { TripPlanPropsType, tripsType } from "./TripPlanInterfaces";
+import { TripPlanPropsType, tripsType, Trip } from "./TripPlanInterfaces";
 
 export const TripPlan = ({
   localUser,
@@ -19,10 +19,18 @@ export const TripPlan = ({
 }: TripPlanPropsType) => {
   const [activeTab, updateActiveTab] = useState("editTrip");
 
-  const [trip, _updateTrip] = useState<trip>({
+  const defaultTrip = {
     name: "",
     locations: tripSavedLocations || [],
-  });
+  };
+
+  console.log("localStorage.trip", localStorage.trip);
+  const [trip, _updateTrip] = useState<Trip>(JSON.parse(localStorage.trip) || defaultTrip);
+
+  useEffect(() => {
+    console.log(JSON.stringify(trip));
+    localStorage.setItem("trip", JSON.stringify(trip));
+  }, [trip]);
 
   //possibly excessive, but ensures that when a trip is selected, it is brought up to date.
   const setTrip = (trip) => {
