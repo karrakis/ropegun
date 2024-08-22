@@ -18,7 +18,9 @@ export const ComingSoon = () => {
             Average distances for people on trips
           </li>
           <li>Available Gear tracking for Trips</li>
-          <li>Available Skills tracking for Trips</li>
+          <li className="text-green-500">
+            Available Skills tracking for Trips
+          </li>
           <li>Group Calendar for trips (when can people go?)</li>
           <li>Add ability to remove linked locations from account.</li>
           <li>Trip Plan location adds should add to list of saved locs.</li>
