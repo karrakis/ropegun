@@ -1,6 +1,6 @@
 import React from "react";
 import { render } from "@testing-library/react";
-import AreaGraph from "./AreaGraph";
+import Graph from "./Graph";
 
 global.ResizeObserver = require("resize-observer-polyfill");
 
@@ -17,18 +17,24 @@ jest.mock("recharts", () => {
   };
 });
 
-describe("AreaGraph", () => {
+describe("Graph", () => {
   const data = [
-    [
-      { day: "2022-01-01", place1: 10, place2: 20 },
-      { day: "2022-01-02", place1: 15, place2: 25 },
-      { day: "2022-01-03", place1: 12, place2: 22 },
-    ],
+    { name: "A", value1: 10, value2: 20 },
+    { name: "B", value1: 15, value2: 25 },
+    { name: "C", value1: 20, value2: 30 },
   ];
 
   it("renders without errors", () => {
-    render(<AreaGraph data={data} />);
+    render(<Graph data={data} />);
   });
 
-  // Add more test cases as needed
+  it("renders the correct number of lines", () => {
+    const { container } = render(<Graph data={data} />);
+    const lines = container.querySelectorAll(".recharts-line");
+
+    expect(lines.length).toBe(Object.keys(data[0]).length - 1);
+  });
+
+  // Add more tests as needed
+
 });
