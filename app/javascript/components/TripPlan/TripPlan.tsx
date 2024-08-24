@@ -25,7 +25,9 @@ export const TripPlan = ({
   };
 
   console.log("localStorage.trip", localStorage.trip);
-  const [trip, _updateTrip] = useState<Trip>(JSON.parse(localStorage.trip) || defaultTrip);
+  const [trip, _updateTrip] = useState<Trip>(
+    localStorage.trip ? JSON.parse(localStorage.trip) : defaultTrip
+  );
 
   useEffect(() => {
     console.log(JSON.stringify(trip));
