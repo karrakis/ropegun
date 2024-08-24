@@ -1792,6 +1792,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@googlemaps/jest-mocks@npm:^2.21.4":
+  version: 2.21.4
+  resolution: "@googlemaps/jest-mocks@npm:2.21.4"
+  checksum: 10c0/3aebc8f244a80ec68810abde2018b160d45fe7d37463cc28a1e2bbab22dc947cd8c75be83f6e2eef1612e008a44461b397747b539c9a9ca0e0a8f12f9302c2ce
+  languageName: node
+  linkType: hard
+
 "@headlessui/react@npm:^2.0.4":
   version: 2.0.4
   resolution: "@headlessui/react@npm:2.0.4"
@@ -2810,6 +2817,7 @@ __metadata:
     "@babel/preset-env": "npm:^7.25.4"
     "@babel/preset-react": "npm:^7.24.7"
     "@babel/preset-typescript": "npm:^7.24.7"
+    "@googlemaps/jest-mocks": "npm:^2.21.4"
     "@headlessui/react": "npm:^2.0.4"
     "@hotwired/stimulus": "npm:^3.2.1"
     "@hotwired/turbo-rails": "npm:^7.3.0"
@@ -2830,6 +2838,7 @@ __metadata:
     react-dom: "npm:^18.2.0"
     react-select: "npm:^5.8.0"
     recharts: "npm:^2.12.5"
+    resize-observer-polyfill: "npm:^1.5.1"
     tailwindcss: "npm:^3.3.2"
     typescript: "npm:^5.5.4"
   languageName: unknown
@@ -6100,6 +6109,13 @@ __metadata:
   version: 1.0.0
   resolution: "requires-port@npm:1.0.0"
   checksum: 10c0/b2bfdd09db16c082c4326e573a82c0771daaf7b53b9ce8ad60ea46aa6e30aaf475fe9b164800b89f93b748d2c234d8abff945d2551ba47bf5698e04cd7713267
+  languageName: node
+  linkType: hard
+
+"resize-observer-polyfill@npm:^1.5.1":
+  version: 1.5.1
+  resolution: "resize-observer-polyfill@npm:1.5.1"
+  checksum: 10c0/5e882475067f0b97dc07e0f37c3e335ac5bc3520d463f777cec7e894bb273eddbfecb857ae668e6fb6881fd6f6bb7148246967172139302da50fa12ea3a15d95
   languageName: node
   linkType: hard
 
