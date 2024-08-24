@@ -49,24 +49,27 @@ export const AreaGraph = ({ data }) => {
   });
 
   return (
-    <ResponsiveContainer width="100%" height={300}>
-      <AreaChart
-        width={500}
-        height={300}
-        data={list}
-        margin={{
-          top: 5,
-          right: 30,
-          bottom: 5,
-          left: 20,
-        }}
-      >
-        <XAxis dataKey="day" />
-        <YAxis />
-        <Tooltip />
-        {generateAreas(data)}
-      </AreaChart>
-    </ResponsiveContainer>
+    <>
+      <h3 className="text-center text-cream">Temperature</h3>
+      <ResponsiveContainer width="100%" height={300}>
+        <AreaChart
+          width={500}
+          height={300}
+          data={list}
+          margin={{
+            top: 5,
+            right: 30,
+            bottom: 5,
+            left: 20,
+          }}
+        >
+          <XAxis dataKey="day" />
+          <YAxis />
+          <Tooltip />
+          {generateAreas(data)}
+        </AreaChart>
+      </ResponsiveContainer>
+    </>
   );
 };
 

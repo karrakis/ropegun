@@ -68,6 +68,7 @@ const GraphSwitcher = ({ weather }) => {
             weatherDisplay === "temperature" ? "bg-night" : "bg-auburn"
           } text-cream`}
           onClick={() => updateWeatherDisplay("temperature")}
+          role="button"
         >
           Temperature
         </div>
@@ -78,6 +79,7 @@ const GraphSwitcher = ({ weather }) => {
               : "bg-khaki text-night"
           } text-cream`}
           onClick={() => updateWeatherDisplay("precipitation")}
+          role="button"
         >
           Precipitation
         </div>

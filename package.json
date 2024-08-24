@@ -10,6 +10,7 @@
     "@hotwired/stimulus": "^3.2.1",
     "@hotwired/turbo-rails": "^7.3.0",
     "@testing-library/dom": "^10.4.0",
+    "@testing-library/user-event": "^14.5.2",
     "@types/react": "^18.3.4",
     "@types/react-dom": "^18.3.0",
     "@vis.gl/react-google-maps": "^0.8.3",
