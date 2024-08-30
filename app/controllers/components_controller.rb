@@ -6,9 +6,7 @@ class ComponentsController < ApplicationController
     @local_user = User.find_by(auth0_sub: @user&.fetch("sub"))
     @local_user = @local_user&.as_json&.merge({
           friendships: @local_user&.friendships&.accepted&.as_json&.concat(@local_user&.inverse_friendships&.accepted&.as_json)&.map{|friendship|
-            puts "friendship: #{friendship}"
             friend_id = friendship["friend_id"] == @local_user.id ? friendship["user_id"] : friendship["friend_id"]
-            puts "friend_id: #{friend_id}"
             friend = User.find(friend_id)
             {uuid: friend.uuid, email: friend.email, name: friend.name }
           },

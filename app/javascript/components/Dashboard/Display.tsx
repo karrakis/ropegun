@@ -181,6 +181,21 @@ export const Display = ({ user, localUser, setEditing }) => {
         </div>
       </div>
       <div
+        id="linked-locations"
+        className="w-full bg-night text-cream p-2 flex flex-col"
+      >
+        <h1 className="w-full bg-auburn text-cream text-2xl font-strong text-center p-2">
+          Linked Locations
+        </h1>
+        <ul className="p-2">
+          {localUser?.locations?.map((location) => (
+            <li key={location.id}>
+              {location.name} ({location.office})
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div
         id="friendships"
         className="w-full flex flex-col bg-khaki items-center justify-center"
       >
