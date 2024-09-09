@@ -1,0 +1,32 @@
+<%= form_with(model: feedback) do |form| %>
+  <% if feedback.errors.any? %>
+    <div style="color: red">
+      <h2><%= pluralize(feedback.errors.count, "error") %> prohibited this feedback from being saved:</h2>
+
+      <ul>
+        <% feedback.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="flex flex-col mt-2">
+    <%= form.label :title, style: "display: block", class: "bg-khaki text-black" %>
+    <%= form.text_field :title, class: "bg-cream border border-khaki w-full text-night" %>
+  </div>
+
+  <div class="flex flex-col mt-2">
+    <%= form.label :body, style: "display: block", class: "bg-khaki text-black" %>
+    <%= form.text_field :body, class: "bg-cream border border-khaki w-full text-night" %>
+  </div>
+
+  <div class="flex flex-col mt-2">
+    <%= form.label :email, "Email (optional, only fill out if you want a response)", style: "display: block", class: "bg-khaki text-black" %>
+    <%= form.text_field :email, class: "bg-cream border border-khaki text-night" %>
+  </div>
+
+  <div class="cursor-pointer">
+    <%= form.submit %>
+  </div>
+<% end %>

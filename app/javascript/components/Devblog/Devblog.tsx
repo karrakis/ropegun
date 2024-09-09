@@ -7,6 +7,9 @@ export const ComingSoon = () => {
         <h1 className="text-4xl font-bold text-night mb-2">
           Development Roadmap
         </h1>
+        <a href="/feedbacks/new" className="rounded p-2 bg-auburn text-white">
+          Give me Feedback
+        </a>
         <ul>
           <li>Add user feedback button here</li>
           <li>Clear labeling for Y axis of weather graph</li>
@@ -38,6 +41,9 @@ export const ComingSoon = () => {
             location
           </li>
           <li>Mountain Project style ability to add photos to a location</li>
+          <li className="text-green-500">
+            Fix Build Issue with CSS Watch capabilities
+          </li>
         </ul>
       </div>
     </div>
