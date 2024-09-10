@@ -83,14 +83,12 @@ export const AppRoot = ({
     <div className="relative overflow-hidden h-screen">
       <a
         className="absolute top-0 left-0 -z-10 w-screen h-full"
-        title="Paulhaberstroh, CC BY-SA 4.0 'https://creativecommons.org/licenses/by-sa/4.0', via Wikimedia Commons"
-        href="https://commons.wikimedia.org/wiki/File:Boulder_Flatirons.jpg"
+        title="Geyikbayiri, Antalya, Turkey, by George Huestis, all rights reserved"
       >
         <img
           className="object-cover object-left h-full w-auto"
           width="512"
           alt="Geyikbayiri, Antalya, Turkey"
-          // src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/88/Boulder_Flatirons.jpg/512px-Boulder_Flatirons.jpg"
           src={require("../assets/Geyikbayiri.jpg")}
         />
       </a>

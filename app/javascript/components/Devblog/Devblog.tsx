@@ -2,8 +2,8 @@ import React from "react";
 
 export const ComingSoon = () => {
   return (
-    <div className="w-full flex justify-center my-16 min-h-screen">
-      <div className="flex flex-col items-center p-2 bg-cream bg-opacity-80 no-scrollbar text-auburn h-screen overflow-scroll">
+    <div className="w-full flex justify-center h-fit">
+      <div className="flex flex-col items-center p-2 bg-cream bg-opacity-80 text-auburn h-screen-minus-header no-scrollbar overflow-scroll">
         <h1 className="text-4xl font-bold text-night mb-2">
           Development Roadmap
         </h1>
@@ -11,7 +11,7 @@ export const ComingSoon = () => {
           Give me Feedback
         </a>
         <ul>
-          <li>Add user feedback button here</li>
+          <li className="text-green-500">Add user feedback button here</li>
           <li>Clear labeling for Y axis of weather graph</li>
           <li className="text-green-500">Friends Lists for user accounts</li>
           <li className="text-green-500">Invite friends to trips</li>
@@ -54,7 +54,7 @@ export const ComingSoon = () => {
             user is not the user who created the trip.
           </li>
           <li>Allow select/unselect for weather/distance</li>
-          <li>Scroll is broken on devblog</li>
+          <li className="text-green-500">Scroll is broken on devblog</li>
         </ul>
       </div>
     </div>
