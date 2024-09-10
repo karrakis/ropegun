@@ -44,6 +44,17 @@ export const ComingSoon = () => {
           <li className="text-green-500">
             Fix Build Issue with CSS Watch capabilities
           </li>
+          <li>
+            Location options are not updating when new locations are added to
+            users
+          </li>
+          <li>
+            Location options are not showing up correctly as selected if
+            <br />
+            user is not the user who created the trip.
+          </li>
+          <li>Allow select/unselect for weather/distance</li>
+          <li>Scroll is broken on devblog</li>
         </ul>
       </div>
     </div>
