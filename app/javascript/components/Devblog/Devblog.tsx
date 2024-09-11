@@ -45,10 +45,14 @@ export const ComingSoon = () => {
             Fix Build Issue with CSS Watch capabilities
           </li>
           <li>
+            Locations are stored with user ID, so multiple users have different
+            location IDs
+          </li>
+          <li className="ml-8 list-disc">
             Location options are not updating when new locations are added to
             users
           </li>
-          <li>
+          <li className="ml-8 list-disc">
             Location options are not showing up correctly as selected if
             <br />
             user is not the user who created the trip.

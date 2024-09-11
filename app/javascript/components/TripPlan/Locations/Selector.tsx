@@ -10,6 +10,11 @@ export const LocationsSelector = ({
   const [locationsSelectorsVisible, updateLocationsSelectorsVisible] =
     useState(false);
 
+  useEffect(() => {
+    console.log("line 14", trip.locations);
+    console.log("line 15", locationOptions);
+  }, [trip.locations]);
+
   return (
     <form className="mb-2">
       <input
@@ -46,6 +51,7 @@ export const LocationsSelector = ({
         )}
       >
         {locationOptions.map((loc) => {
+          console.log("line 45", loc.id);
           return (
             <div className="flex" key={loc.id}>
               <input
@@ -55,7 +61,11 @@ export const LocationsSelector = ({
                 value={loc.id}
                 onChange={() => updateLocations(loc)}
                 checked={trip.locations
-                  .map((l) => l.id === loc.id)
+                  .map((tripLocation) => {
+                    console.log("line 65", tripLocation.id, loc.id);
+                    console.log("line 66", tripLocation.id === loc.id);
+                    tripLocation.id === loc.id;
+                  })
                   .includes(true)}
               />
               <label htmlFor={loc.name}>{loc.name}</label>
