@@ -1,3 +1,4 @@
 class Location < ApplicationRecord
-    belongs_to :user
+    has_many :user_linked_locations
+    has_many :users, through: :user_linked_locations
 end

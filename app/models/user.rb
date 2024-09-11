@@ -1,5 +1,6 @@
 class User < ApplicationRecord
-    has_many :locations
+    has_many :user_linked_locations
+    has_many :locations, through: :user_linked_locations
     has_and_belongs_to_many :trips, join_table: :trips_users
     has_many :owned_trips, class_name: "Trip", foreign_key: "owner_id"
 

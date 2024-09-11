@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_09_09_214415) do
+ActiveRecord::Schema[7.0].define(version: 2024_09_11_070841) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -48,11 +48,11 @@ ActiveRecord::Schema[7.0].define(version: 2024_09_09_214415) do
     t.string "office"
     t.integer "office_x"
     t.integer "office_y"
-    t.bigint "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["user_id", "latitude", "longitude"], name: "index_locations_on_user_id_and_latitude_and_longitude", unique: true
-    t.index ["user_id"], name: "index_locations_on_user_id"
+    t.index ["latitude", "longitude"], name: "index_locations_on_latitude_and_longitude", unique: true
+    t.index ["name"], name: "index_locations_on_name"
+    t.index ["office"], name: "index_locations_on_office"
   end
 
   create_table "trip_invitations", force: :cascade do |t|
@@ -88,6 +88,13 @@ ActiveRecord::Schema[7.0].define(version: 2024_09_09_214415) do
     t.index ["user_id"], name: "index_trips_users_on_user_id"
   end
 
+  create_table "user_linked_locations", force: :cascade do |t|
+    t.integer "user_id"
+    t.integer "location_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "email"
     t.string "name"
@@ -110,7 +117,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_09_09_214415) do
     t.index ["uuid"], name: "index_users_on_uuid", unique: true
   end
 
-  add_foreign_key "locations", "users"
   add_foreign_key "trips", "users", column: "owner_id"
   add_foreign_key "trips_locations", "locations"
   add_foreign_key "trips_locations", "trips"
