@@ -6,29 +6,19 @@ import {
   Marker,
   useMapsLibrary,
 } from "@vis.gl/react-google-maps";
-import React, { useState } from "react";
+import { useState } from "react";
 
 import SearchBox from "./SearchBox";
 
 export const GoogleMap = ({ position, updatePosition }) => {
+  console.log("GoogleMap.tsx position:", position);
+  console.log("GoogleMap.tsx updatePosition:", updatePosition);
   // libraries needed: google.maps.RoutesLibrary
   const MapsService = useMapsLibrary("routes") || {
     DirectionsRenderer: () => null,
   };
 
   const [markers, setMarkers] = useState([]);
-
-  const addMarker = (lat, lng) => {
-    setMarkers([...markers, { lat, lng }]);
-  };
-
-  const removeMarker = (index) => {
-    setMarkers(markers.filter((_, i) => i !== index));
-  };
-
-  const clearMarkers = () => {
-    setMarkers([]);
-  };
 
   const updateMarkers = (index, lat, lng) => {
     setMarkers(

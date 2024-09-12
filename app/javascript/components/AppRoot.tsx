@@ -6,38 +6,25 @@ import TripPlan from "./TripPlan/TripPlan";
 import ComingSoon from "./Home/ComingSoon";
 import DevBlog from "./Devblog/Devblog";
 
-interface UserSessionObject {
-  name: string;
-  picture: string;
-}
+import {
+  UserSessionObject,
+  Route,
+  RouteList,
+  AppRootProps,
+  UserSavedLocation,
+  UserSavedLocations,
+} from "./types";
 
-interface Route {
-  path: string;
-  name: string;
-}
-
-interface RouteList {
-  dashboard: Route;
-}
-
-interface AppRootProps {
-  routes: RouteList;
-  user: UserSessionObject;
-  localUser: JSON;
-  csrf: string;
-  userSavedLocations: JSON;
-}
-
-export const AppRoot = ({
+export const AppRoot: React.FC<AppRootProps> = ({
   routes,
   user,
   localUser,
   csrf,
   userSavedLocations,
-}: AppRootProps) => {
+}) => {
   const [currentPage, setPage] = useState(window.location.pathname);
 
-  console.log(currentPage);
+  console.log("userSavedLocations", userSavedLocations);
 
   const setDisplayPage = () => {
     if (!localUser.id) {
