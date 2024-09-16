@@ -24,8 +24,6 @@ export const AppRoot: React.FC<AppRootProps> = ({
 }) => {
   const [currentPage, setPage] = useState(window.location.pathname);
 
-  console.log("userSavedLocations", userSavedLocations);
-
   const setDisplayPage = () => {
     if (!localUser.id) {
       return <ComingSoon />;
@@ -62,7 +60,6 @@ export const AppRoot: React.FC<AppRootProps> = ({
   };
 
   useEffect(() => {
-    console.log(currentPage);
     setDisplayPage();
   }, [currentPage]);
 

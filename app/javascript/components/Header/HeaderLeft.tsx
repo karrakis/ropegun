@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import logo from "../../assets/mountains-transparency5.png";
 
 export const HeaderLeft = ({ page, setPage }) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -17,7 +16,10 @@ export const HeaderLeft = ({ page, setPage }) => {
       className="justify-start flex w-full ml-2 cursor-pointer"
     >
       <div onClick={() => setPage("/trip_plan")} className="flex">
-        <img className="h-12" src={logo} />
+        <img
+          className="h-12"
+          src={require("../../assets/mountains-transparency5.png")}
+        />
         <span className="px-4 py-2 bg-auburn text-xl flex flex-row items-center hidden md:block">
           <span>Approach</span>
         </span>

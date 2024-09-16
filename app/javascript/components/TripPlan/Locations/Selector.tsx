@@ -15,6 +15,9 @@ export const LocationsSelector = ({
     console.log("line 15", locationOptions);
   }, [trip.locations]);
 
+  const locationIds = trip.locations.map((loc) => loc.id);
+  const locationSelected = (loc) => locationIds.includes(loc.id);
+
   return (
     <form className="mb-2">
       <input
@@ -51,7 +54,6 @@ export const LocationsSelector = ({
         )}
       >
         {locationOptions.map((loc) => {
-          console.log("line 45", loc.id);
           return (
             <div className="flex" key={loc.id}>
               <input
@@ -60,13 +62,7 @@ export const LocationsSelector = ({
                 id={loc.name}
                 value={loc.id}
                 onChange={() => updateLocations(loc)}
-                checked={trip.locations
-                  .map((tripLocation) => {
-                    console.log("line 65", tripLocation.id, loc.id);
-                    console.log("line 66", tripLocation.id === loc.id);
-                    tripLocation.id === loc.id;
-                  })
-                  .includes(true)}
+                checked={locationSelected(loc)}
               />
               <label htmlFor={loc.name}>{loc.name}</label>
             </div>

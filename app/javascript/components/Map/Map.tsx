@@ -11,8 +11,6 @@ import { useState } from "react";
 import SearchBox from "./SearchBox";
 
 export const GoogleMap = ({ position, updatePosition }) => {
-  console.log("GoogleMap.tsx position:", position);
-  console.log("GoogleMap.tsx updatePosition:", updatePosition);
   // libraries needed: google.maps.RoutesLibrary
   const MapsService = useMapsLibrary("routes") || {
     DirectionsRenderer: () => null,

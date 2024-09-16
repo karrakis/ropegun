@@ -24,13 +24,11 @@ export const TripPlan = ({
     locations: tripSavedLocations || [],
   };
 
-  console.log("localStorage.trip", localStorage.trip);
   const [trip, _updateTrip] = useState<Trip>(
     localStorage.trip ? JSON.parse(localStorage.trip) : defaultTrip
   );
 
   useEffect(() => {
-    console.log(JSON.stringify(trip));
     localStorage.setItem("trip", JSON.stringify(trip));
   }, [trip]);
 
@@ -42,9 +40,7 @@ export const TripPlan = ({
         Accept: "application/ld+json",
       },
     }).then((response) => {
-      console.log("response:", response);
       response.json().then((data) => {
-        console.log("data:", data);
         _updateTrip({
           id: data.id,
           name: data.name,
@@ -87,7 +83,6 @@ export const TripPlan = ({
     });
 
     let data = await response.json();
-    console.log(data);
     return data;
   };
 
@@ -101,7 +96,6 @@ export const TripPlan = ({
   //fetches weather data for the locations in the trip, runs whenever the list of locations changes.
   useEffect(() => {
     const weatherUpdates = trip.locations.map(async (loc) => {
-      console.log("Weather Location: ", loc);
       let response = await fetch(
         `https://api.weather.gov/gridpoints/${loc.office}/${loc.office_x},${loc.office_y}/forecast`,
         {
@@ -124,25 +118,18 @@ export const TripPlan = ({
       });
     });
     weatherUpdatesResolved.then((weatherToAdd) => {
-      console.log("weatherToAdd:", weatherToAdd);
       updateWeather(Object.assign({}, ...weatherToAdd));
     });
   }, [trip.locations.length]);
 
   //adds or removes a location from the trip.
   const handleWeatherSelection = (loc) => {
-    console.log("trying:", loc);
-    console.log("comparing:", trip.locations);
-    console.log(trip.locations.includes(loc));
-    console.log(trip.locations.map((location) => location.id).includes(loc.id));
     if (trip.locations.map((location) => location.id).includes(loc.id)) {
-      console.log("already in");
       _updateTrip({
         ...trip,
         locations: trip.locations.filter((location) => location.id !== loc.id),
       });
     } else {
-      console.log("new location");
       _updateTrip({
         ...trip,
         locations: trip.locations.concat(loc),

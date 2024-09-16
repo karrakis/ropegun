@@ -7,7 +7,6 @@ export const AverageDistances = ({ distances, guestDistances }) => {
 
   Object.keys(distances).map((destination) => {
     if (distances[destination].distance) {
-      console.log(distances[destination].distance);
       totalDistance[destination] ||= {};
       totalDistance[destination].distance ||= {};
       totalDistance[destination].distance.rows ||= [];
@@ -38,16 +37,6 @@ export const AverageDistances = ({ distances, guestDistances }) => {
   guestDistances.map((guest) => {
     guest.distances.map((distance) => {
       Object.keys(distance).map((destination) => {
-        console.log(
-          parseFloat(
-            distance[destination].distance.rows[0].elements[0].distance.text
-          )
-        );
-        console.log(
-          parseFloat(
-            distance[destination].distance.rows[0].elements[0].duration.value
-          )
-        );
         if (distance[destination].distance) {
           totalDistance[destination] ||= {};
           totalDistance[destination].distance ||= {};
@@ -95,8 +84,6 @@ export const AverageDistances = ({ distances, guestDistances }) => {
       const hours = parseInt(time / 3600);
       const minutes = (time / 60 - hours * 60).toFixed(0);
 
-      console.log(hours);
-      console.log(minutes);
       totalDistance[
         destination
       ].distance.rows[0].elements[0].duration.text = `${hours} hours ${minutes} mins`;

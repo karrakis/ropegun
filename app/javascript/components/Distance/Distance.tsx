@@ -10,21 +10,17 @@ export const Distance = ({ locations, tripOwner, trip = nil }) => {
   const [guestDistances, updateGuestDistances] = useState([]);
   const [distancesReady, updateDistancesReady] = useState(false);
 
-  console.log("guestDistances:", guestDistances);
-
   useEffect(() => {
     const locationUpdates = getDistances(locations, tripOwner);
     asynchronousStateUpdate(locationUpdates, updateOwnerDistances);
   }, [locations]);
 
   useEffect(() => {
-    console.log("in the effect");
     if (trip.trip_invitations) {
       const results = trip.trip_invitations
         .filter((invitation) => invitation.accepted == true)
         .map(async (invitation) => {
           const locationUpdates = getDistances(locations, invitation.invitee);
-          console.log("locationUpdates:", locationUpdates);
           const resolutions = locationUpdates.then((toBeResolved) => {
             let updatesResolved = Promise.all(toBeResolved).then((data) => {
               return data.map((update) => {
@@ -41,13 +37,9 @@ export const Distance = ({ locations, tripOwner, trip = nil }) => {
             distances: resolutions,
           };
         });
-      console.log("results", results);
       Promise.all(results).then((data) => {
-        console.log("data", data);
         data.map((datum) => {
-          console.log("datum:", datum);
           datum.distances.then((resolved) => {
-            console.log("resolved:", resolved);
             updateGuestDistances((prev) => {
               return [...prev, { label: datum.label, distances: resolved }];
             });

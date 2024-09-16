@@ -1,7 +1,6 @@
 import React from "react";
 
 export const DisplayDistances = ({ distances }) => {
-  console.log("distances:", distances);
   return (
     <table className="bg-night text-cream w-full">
       <thead className="border border-auburn w-full">

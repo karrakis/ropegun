@@ -14,8 +14,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const userSavedLocations =
     rootEl && JSON.parse(rootEl.getAttribute("data-locations"));
 
-  console.log("application.tsx userSavedLocation:", userSavedLocations);
-
   const csrf = document
     .querySelector("meta[name='csrf-token']")!
     .getAttribute("content");

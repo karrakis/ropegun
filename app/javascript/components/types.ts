@@ -22,7 +22,7 @@ export interface UserSavedLocation {
 export interface UserSavedLocations {
     userSavedLocations: UserSavedLocation[];
   }
-
+  
 export interface LocalUser {
     id: number;
     name: string;

@@ -4,7 +4,6 @@ import SectionWrapper from "./Wrappers/SectionWrapper";
 import UserInfoItem from "./Wrappers/UserInfoItem";
 
 export const Display = ({ user, localUser, setEditing }) => {
-  console.log("localUser:", localUser);
   const [friendId, updateFriendId] = React.useState("");
 
   const [friendInvites, setFriendInvites] = React.useState([]);
