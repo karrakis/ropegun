@@ -11,6 +11,8 @@ export const ComingSoon = () => {
           Give me Feedback
         </a>
         <ul>
+          <li>Drop concept of linked locations for users</li>
+          <li>Replace with locations linking only to trips</li>
           <li className="text-green-500">Add user feedback button here</li>
           <li>Clear labeling for Y axis of weather graph</li>
           <li className="text-green-500">Friends Lists for user accounts</li>
