@@ -31,7 +31,7 @@
     "typescript": "^5.5.4"
   },
   "scripts": {
-    "build": "esbuild app/javascript/*.* --bundle --sourcemap --outdir=app/assets/builds --public-path=/assets --loader:.png=file --loader:.jpg=file --loader:.ico=file",
+    "build": "esbuild app/javascript/*.* --bundle --sourcemap --outdir=./public/assets --loader:.png=file --loader:.jpg=file --loader:.ico=file",
     "build:css": "tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application.css --minify",
     "test": "jest",
     "coverage": "jest --coverage"

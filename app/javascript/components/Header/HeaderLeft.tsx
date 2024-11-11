@@ -18,6 +18,7 @@ export const HeaderLeft = ({ page, setPage }) => {
       <div onClick={() => setPage("/trip_plan")} className="flex">
         <img
           className="h-12"
+          // src={require("../../assets/mountains-transparency5.png")}
           src={require("../../assets/mountains-transparency5.png")}
         />
         <span className="px-4 py-2 bg-auburn text-xl flex flex-row items-center hidden md:block">
