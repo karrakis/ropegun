@@ -31,8 +31,8 @@
     "typescript": "^5.5.4"
   },
   "scripts": {
-    "build": "esbuild app/javascript/*.* --bundle --sourcemap --outdir=./public/assets --loader:.png=file --loader:.jpg=file --loader:.ico=file",
-    "build:css": "tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application.css --minify",
+    "build": "esbuild app/javascript/*.* --bundle --outdir=app/assets/builds --loader:.png=file --loader:.jpg=file --loader:.ico=file --public-path=/assets --watch asset-name:[name]-[hash",
+    "build:css": "tailwindcss -i ./app/assets/stylesheets/application.tailwind.css -o ./app/assets/builds/application.css --minify --watch",
     "test": "jest",
     "coverage": "jest --coverage"
   },

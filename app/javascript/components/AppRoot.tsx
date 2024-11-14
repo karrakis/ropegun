@@ -6,6 +6,8 @@ import TripPlan from "./TripPlan/TripPlan";
 import ComingSoon from "./Home/ComingSoon";
 import DevBlog from "./Devblog/Devblog";
 
+import {Geyikbayiri} from "../../assets/images/Geyikbayiri.jpg"
+
 import {
   UserSessionObject,
   Route,
@@ -73,7 +75,7 @@ export const AppRoot: React.FC<AppRootProps> = ({
           className="object-cover object-left h-full w-auto"
           width="512"
           alt="Geyikbayiri, Antalya, Turkey"
-          src={require("../assets/Geyikbayiri.jpg")}
+          src={require("../../assets/images/Geyikbayiri.jpg")}
         />
       </a>
 
