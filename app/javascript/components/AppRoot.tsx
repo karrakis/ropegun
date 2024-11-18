@@ -72,7 +72,7 @@ export const AppRoot: React.FC<AppRootProps> = ({
         title="Geyikbayiri, Antalya, Turkey, by George Huestis, all rights reserved"
       >
         <img
-          className="object-cover object-left h-full w-auto"
+          className="object-cover object-left w-full h-auto min-h-screen"
           width="512"
           alt="Geyikbayiri, Antalya, Turkey"
           src={require("../../assets/images/Geyikbayiri.jpg")}
