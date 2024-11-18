@@ -41,7 +41,6 @@ export interface locationType {
 }
 
 export interface tripsType {
-  id: number;
   name: string;
   locations: locationType[];
 }
@@ -56,9 +55,4 @@ export interface tripType {
   name: string;
   locations: parsedLocationType[];
   trip_invitations?: any[];
-}
-
-export interface Trip {
-  name: string;
-  locations: any[];
 }

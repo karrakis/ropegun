@@ -10,11 +10,11 @@ import { Transition } from "@headlessui/react";
 
 import { csrfToken } from "../../utilities/csrfToken";
 
-import { TripPlanPropsType, tripsType, Trip, tripType } from "./TripPlanInterfaces";
-import { Location } from "../types";
+import { TripPlanPropsType, tripsType, Trip } from "./TripPlanInterfaces";
 
 export const TripPlan = ({
   localUser,
+  userSavedLocations,
   tripSavedLocations = [],
 }: TripPlanPropsType) => {
   const [activeTab, updateActiveTab] = useState("editTrip");
@@ -33,7 +33,7 @@ export const TripPlan = ({
   }, [trip]);
 
   //possibly excessive, but ensures that when a trip is selected, it is brought up to date.
-  const setTrip = (trip: tripType) => {
+  const setTrip = (trip) => {
     fetch(`/api/v1/trips/${trip.id}`, {
       method: "GET",
       headers: {
@@ -45,7 +45,7 @@ export const TripPlan = ({
           id: data.id,
           name: data.name,
           owner: data.user,
-          locations: data.locations.map((loc: Location) => {
+          locations: data.locations.map((loc) => {
             return {
               id: loc.id,
               name: loc.name,

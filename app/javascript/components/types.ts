@@ -11,16 +11,15 @@ export interface Route {
 export interface RouteList {
     dashboard: Route;
   }
-  
-export interface UserSavedLocation {
-    id: number;
-    name: string;
-    lat: number;
-    lng: number;
-  }
 
-export interface UserSavedLocations {
-    userSavedLocations: UserSavedLocation[];
+export interface Location {
+    id?: number;
+    name: string;
+    latitude: number;
+    longitude: number;
+    office?: string;
+    office_x?: number;
+    office_y?: number;
   }
   
 export interface LocalUser {
@@ -29,6 +28,7 @@ export interface LocalUser {
     email: string;
     picture: string;
     friendships: any[];
+    trips: Trip[];
   }
 
 export interface AppRootProps {
@@ -37,19 +37,6 @@ export interface AppRootProps {
     localUser: LocalUser;
     csrf: string;
     userSavedLocations: UserSavedLocations;
-  }
-
-
-export interface Trip {
-    name: string;
-    locations: Location[];
-  }
-
-export interface Location {
-    id: number;
-    name: string;
-    lat: number;
-    lng: number;
   }
 
 export interface LocationsSelectorProps {
@@ -63,8 +50,23 @@ export interface DevblogProps {
     user: UserSessionObject;
   }
 
-export interface DevblogState {
-    feedbacks: Feedback[];
+export interface localUserType {
+    id: number;
+    name: string;
+    email: string;
+    friendships: any[];
   }
-
+  
+export interface TripPlanPropsType {
+    localUser: localUserType;
+    tripSavedLocations?: Location[];
+  }
+    
+export interface Trip {
+    id?: number;
+    name: string;
+    owner: localUserType;
+    locations: Location[];
+    trip_invitations?: any[];
+  }
   
