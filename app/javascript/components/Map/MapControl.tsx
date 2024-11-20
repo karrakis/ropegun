@@ -1,7 +1,7 @@
 import React from "react";
 import GoogleMap from "./Map";
 
-import { MapControlProps } from "../types";
+import { MapControlProps, Location } from "../types";
 
 export const MapControl = ({
   position,
@@ -25,14 +25,17 @@ export const MapControl = ({
         <div className="flex w-full">
           <button
             className="p-2 m-2 bg-cream text-auburn rounded shadow-lg"
-            onClick={() =>
+            onClick={() => {
               // updateSavedLocations(savedLocations.concat(position))\
 
-              updateTrip({
-                ...trip,
-                locations: trip.locations.concat(position),
-              })
-            }
+              if (!trip.locations.find((loc: Location) => loc.latitude === position.location.lat && loc.longitude === position.location.lng)) {
+                updateTrip({
+                  ...trip,
+                  locations: trip.locations.concat(position),
+                })
+              } else {
+              }
+            }}
           >
             Add Location
           </button>

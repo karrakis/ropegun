@@ -114,7 +114,7 @@ export const TripPlan = ({
   }, [trip.locations.length]);
 
   //adds or removes a location from the trip.
-  const handleWeatherSelection = (loc) => {
+  const handleWeatherSelection = (loc: Location) => {
     if (trip.locations.map((location) => location.id).includes(loc.id)) {
       _updateTrip({
         ...trip,

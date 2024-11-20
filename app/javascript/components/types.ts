@@ -69,8 +69,6 @@ export interface TripEditProps {
   trips: Trip[];
   position: any;
   updatePosition: (position: any) => void;
-  savedLocations: Location[];
-  updateSavedLocations: (locations: Location[]) => void;
   handleWeatherSelection: (loc: Location) => void;
   localUser: localUserType;
 }

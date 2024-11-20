@@ -1,22 +1,21 @@
 import React, { useState, useEffect } from "react";
 import classNames from "classnames";
+import { Trip, Location } from "../../types";
 
 export const LocationsSelector = ({
-  locationOptions,
-  updateLocations,
   trip,
   updateTrip,
-}) => {
+}: {trip: Trip, updateTrip: (trip: Trip) => void}) => {
   const [locationsSelectorsVisible, updateLocationsSelectorsVisible] =
     useState(false);
 
   useEffect(() => {
     console.log("line 14", trip.locations);
-    console.log("line 15", locationOptions);
   }, [trip.locations]);
 
-  const locationIds = trip.locations.map((loc) => loc.id);
-  const locationSelected = (loc) => locationIds.includes(loc.id);
+  const locationSelected = (loc: Location) => {
+    return trip.locations.find((tripLoc) => tripLoc.latitude === loc.latitude && tripLoc.longitude === loc.longitude);
+  };
 
   return (
     <form className="mb-2">
@@ -53,18 +52,21 @@ export const LocationsSelector = ({
           }
         )}
       >
-        {locationOptions.map((loc) => {
+        {trip.locations.map((loc) => {
           return (
-            <div className="flex" key={loc.id}>
-              <input
-                type="checkbox"
+            <div className="flex items-center border-b border-khaki justify-between py-2" key={loc.latitude + loc.longitude}>
+              <span className="pr-2">{loc.name}</span>
+              
+              <button
                 key={loc.id}
                 id={loc.name}
                 value={loc.id}
-                onChange={() => updateLocations(loc)}
-                checked={locationSelected(loc)}
+                onClick={() => updateTrip({
+                  ...trip,
+                  locations: trip.locations.filter((tripLoc) => tripLoc.latitude !== loc.latitude && tripLoc.longitude !== loc.longitude),
+                })}
               />
-              <label htmlFor={loc.name}>{loc.name}</label>
+              <label className="text-auburn border rounded border-auburn bg-cream px-1" htmlFor={loc.name}>x</label>
             </div>
           );
         })}

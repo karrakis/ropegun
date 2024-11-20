@@ -88,8 +88,6 @@ export const TripEdit = ({
       <LocationsSelector
         trip={trip}
         updateTrip={updateTrip}
-        locationOptions={trip.locations}
-        updateLocations={handleWeatherSelection}
       />
     </>
   );
