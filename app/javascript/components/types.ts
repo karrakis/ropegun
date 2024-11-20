@@ -74,6 +74,14 @@ export interface TripEditProps {
   handleWeatherSelection: (loc: Location) => void;
   localUser: localUserType;
 }
+
+export interface MapControlProps {
+  position: any;
+  updatePosition: (position: any) => void;
+  weatherTargets: Location[];
+  updateWeatherTargets: (loc: Location) => void;
+  localUser: localUserType;
+}
     
 export interface Trip {
     id?: number;

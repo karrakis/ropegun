@@ -14,8 +14,6 @@ export const TripEdit = ({
   trips,
   position,
   updatePosition,
-  savedLocations,
-  updateSavedLocations,
   handleWeatherSelection,
   localUser,
 }: TripEditProps) => {
@@ -70,7 +68,7 @@ export const TripEdit = ({
             className="text-cream w-full p-2 bg-auburn text-center cursor-pointer"
             onClick={() => updateOpenMap(!openMap)}
           >
-            {openMap ? "Close Map" : "Link New Locations to Account"}
+            {openMap ? "Close Map" : "Add Locations to Trip"}
           </div>
         </div>
         {openMap && (
@@ -78,10 +76,10 @@ export const TripEdit = ({
             {...{
               position,
               updatePosition,
-              savedLocations,
-              updateSavedLocations,
               weatherTargets: trip.locations,
               updateWeatherTargets: handleWeatherSelection,
+              trip,
+              updateTrip,
               localUser,
             }}
           />

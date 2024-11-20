@@ -56,7 +56,7 @@ export const TripPlan = ({
   const [tripSaving, updateTripSaving] = useState(false);
 
   //primarily used for the dropdown of existing trips.
-  const [trips, updateTrips] = useState<Trips[]>([]);
+  const [trips, updateTrips] = useState<Trip[]>([]);
 
   //weather data for the locations in the trip.
   const [weather, updateWeather] = useState({});
@@ -247,8 +247,6 @@ export const TripPlan = ({
               trips={trips}
               position={position}
               updatePosition={updatePosition}
-              savedLocations={savedLocations}
-              updateSavedLocations={updateSavedLocations}
               handleWeatherSelection={handleWeatherSelection}
               localUser={localUser}
             />
