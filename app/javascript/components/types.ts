@@ -57,10 +57,23 @@ export interface localUserType {
     friendships: any[];
   }
   
-export interface TripPlanPropsType {
+export interface TripPlanProps {
     localUser: localUserType;
-    tripSavedLocations?: Location[];
+    tripLocations?: Location[];
   }
+
+export interface TripEditProps {
+  trip: Trip;
+  setTrip: (trip: Trip) => void;
+  updateTrip: (trip: Trip) => void;
+  trips: Trip[];
+  position: any;
+  updatePosition: (position: any) => void;
+  savedLocations: Location[];
+  updateSavedLocations: (locations: Location[]) => void;
+  handleWeatherSelection: (loc: Location) => void;
+  localUser: localUserType;
+}
     
 export interface Trip {
     id?: number;
@@ -69,4 +82,7 @@ export interface Trip {
     locations: Location[];
     trip_invitations?: any[];
   }
-  
+
+  export interface Trips {
+    trips: Trip[];
+  }

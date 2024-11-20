@@ -10,18 +10,18 @@ import { Transition } from "@headlessui/react";
 
 import { csrfToken } from "../../utilities/csrfToken";
 
-import { TripPlanPropsType, tripsType, Trip, tripType } from "./TripPlanInterfaces";
+import { TripPlanProps, Trips, Trip } from "../types";
 import { Location } from "../types";
 
 export const TripPlan = ({
   localUser,
-  tripSavedLocations = [],
-}: TripPlanPropsType) => {
+  tripLocations = [],
+}: TripPlanProps) => {
   const [activeTab, updateActiveTab] = useState("editTrip");
 
   const defaultTrip = {
     name: "",
-    locations: tripSavedLocations || [],
+    locations: tripLocations || [],
   };
 
   const [trip, _updateTrip] = useState<Trip>(
@@ -33,7 +33,7 @@ export const TripPlan = ({
   }, [trip]);
 
   //possibly excessive, but ensures that when a trip is selected, it is brought up to date.
-  const setTrip = (trip: tripType) => {
+  const setTrip = (trip: Trip) => {
     fetch(`/api/v1/trips/${trip.id}`, {
       method: "GET",
       headers: {
@@ -45,16 +45,7 @@ export const TripPlan = ({
           id: data.id,
           name: data.name,
           owner: data.user,
-          locations: data.locations.map((loc: Location) => {
-            return {
-              id: loc.id,
-              name: loc.name,
-              location: { lat: loc.latitude, lng: loc.longitude },
-              office_x: loc.office_x,
-              office_y: loc.office_y,
-              office: loc.office,
-            };
-          }),
+          locations: data.locations,
           trip_invitations: data.trip_invitations,
         });
       });
@@ -65,13 +56,13 @@ export const TripPlan = ({
   const [tripSaving, updateTripSaving] = useState(false);
 
   //primarily used for the dropdown of existing trips.
-  const [trips, updateTrips] = useState<tripsType[]>([]);
+  const [trips, updateTrips] = useState<Trips[]>([]);
 
   //weather data for the locations in the trip.
   const [weather, updateWeather] = useState({});
 
   //saved locations for the user.  Deprecated?
-  const [savedLocations, updateSavedLocations] = useState([]);
+  // const [savedLocations, updateSavedLocations] = useState([]);
 
   //populates the dropdown of existing trips.  called by a useEffect.
   const fetchTrips = async () => {
@@ -256,7 +247,6 @@ export const TripPlan = ({
               trips={trips}
               position={position}
               updatePosition={updatePosition}
-              userSavedLocations={userSavedLocations}
               savedLocations={savedLocations}
               updateSavedLocations={updateSavedLocations}
               handleWeatherSelection={handleWeatherSelection}

@@ -5,6 +5,8 @@ import classNames from "classnames";
 import MapControl from "../../Map/MapControl";
 import LocationsSelector from "../Locations/Selector";
 
+import { TripEditProps } from "../../types";
+
 export const TripEdit = ({
   trip,
   updateTrip,
@@ -12,12 +14,11 @@ export const TripEdit = ({
   trips,
   position,
   updatePosition,
-  userSavedLocations,
   savedLocations,
   updateSavedLocations,
   handleWeatherSelection,
   localUser,
-}) => {
+}: TripEditProps) => {
   //friends selected in the dropdown for invitations.
   const [openMap, updateOpenMap] = useState(false);
 
@@ -45,8 +46,10 @@ export const TripEdit = ({
                   office: loc.office,
                   office_x: loc.office_x,
                   office_y: loc.office_y,
-                  location: { lat: loc.latitude, lng: loc.longitude },
+                  latitude: loc.latitude,
+                  longitude: loc.longitude
                 })),
+                owner: trip.owner,
               });
             }}
           >
@@ -87,7 +90,7 @@ export const TripEdit = ({
       <LocationsSelector
         trip={trip}
         updateTrip={updateTrip}
-        locationOptions={userSavedLocations}
+        locationOptions={trip.locations}
         updateLocations={handleWeatherSelection}
       />
     </>
