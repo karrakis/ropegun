@@ -5,11 +5,11 @@ import AreaGraph from "./AreaGraph";
 
 const GraphSwitcher = ({ weather }) => {
   const [weatherDisplay, updateWeatherDisplay] = useState("temperature");
-
+  console.log("rendering with:", weather)
   const weatherDataTemperature = Object.keys(weather).map((placeName) => {
     const days = weather[placeName].periods
-      .map((p) => p.endTime.slice(0, 10))
-      .filter((el, i, arr) => arr.indexOf(el) === i);
+    .map((p) => p.endTime.slice(0, 10))
+    .filter((el, i, arr) => arr.indexOf(el) === i);
     return days.map((day) => {
       const periods = weather[placeName].periods.filter(
         (p) =>
@@ -47,9 +47,7 @@ const GraphSwitcher = ({ weather }) => {
       );
     });
   });
-
-  console.log(weatherDataTemperature.length);
-  console.log(weatherDataPrecipitation.length);
+  
   return (
     <>
       <div className="bg-night w-full text-cream text-center pt-12">

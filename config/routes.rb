@@ -28,6 +28,7 @@ Rails.application.routes.draw do
     namespace :v1 do
       get '/distance' => 'distance#show'
       post '/distance' => 'distance#create'
+      post '/locations' => 'locations#create'
       
       get '/trips' => 'trips#index'
       post '/trips' => 'trips#create'

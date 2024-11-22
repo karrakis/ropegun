@@ -86,6 +86,7 @@ export const TripPlan = ({
   //fetches weather data for the locations in the trip, runs whenever the list of locations changes.
   useEffect(() => {
     const weatherUpdates = trip.locations.map(async (loc) => {
+      debugger
       let response = await fetch(
         `https://api.weather.gov/gridpoints/${loc.office}/${loc.office_x},${loc.office_y}/forecast`,
         {
@@ -188,8 +189,6 @@ export const TripPlan = ({
       </div>
     );
   };
-
-  console.log("trip:", trip);
 
   return (
     <div className="w-full flex flex-row justify-center h-full">

@@ -3,11 +3,11 @@ import GoogleMap from "./Map";
 
 import { MapControlProps, Location } from "../types";
 
+import { csrfToken } from "../../utilities/csrfToken";
+
 export const MapControl = ({
   position,
   updatePosition,
-  weatherTargets,
-  updateWeatherTargets,
   trip,
   updateTrip,
   localUser,
@@ -29,10 +29,45 @@ export const MapControl = ({
               // updateSavedLocations(savedLocations.concat(position))\
 
               if (!trip.locations.find((loc: Location) => loc.latitude === position.location.lat && loc.longitude === position.location.lng)) {
-                updateTrip({
-                  ...trip,
-                  locations: trip.locations.concat(position),
-                })
+                
+                fetch(
+                  `https://api.weather.gov/points/${position.latitude},${position.longitude}`,
+                  {
+                    method: "GET",
+                    headers: {
+                      Accept: "application/ld+json"
+                    }
+                  }
+                ).then((res) => res.json()).then((data) => {
+                    return {
+                      location: {
+                        latitude: position.latitude,
+                        longitude: position.longitude,
+                        name: position.name,
+                        user_id: localUser.id,
+                        office: data.gridId,
+                        office_x: data.gridX,
+                        office_y: data.gridY
+                      }
+                  }}).then((body) => {
+                    fetch(`/api/v1/locations`, {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRF-Token": csrfToken(),
+                      },
+                      body: JSON.stringify(body),
+                    }).then((res) => res.json()).then((data) => {
+                      updateTrip({
+                        ...trip,
+                        locations: trip.locations.concat(data),
+                      });
+                    });
+                  })
+                // updateTrip({
+                //   ...trip,
+                //   locations: trip.locations.concat({...position, latitude: position.location.lat, longitude: position.location.lng}),
+                // })
               } else {
               }
             }}

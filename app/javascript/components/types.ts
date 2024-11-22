@@ -78,6 +78,8 @@ export interface MapControlProps {
   weatherTargets: Location[];
   updateWeatherTargets: (loc: Location) => void;
   localUser: localUserType;
+  trip: Trip;
+  updateTrip: (trip: Trip) => void;
 }
     
 export interface Trip {
