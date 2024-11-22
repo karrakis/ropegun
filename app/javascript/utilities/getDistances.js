@@ -4,7 +4,7 @@ export const getDistances = async (locations, localUser) => {
     const locationUpdates = locations.map(async (loc) => {
       const origin = localUser.home_address;
       if (!origin) return;
-      const destination = loc.location;
+      const destination = {lat: loc.latitude, lng: loc.longitude};
   
       let response = await fetch("/api/v1/distance", {
         method: "POST",

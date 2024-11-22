@@ -13,7 +13,7 @@ class Api::V1::TripsController < ApplicationController
                 JSON.parse(trip_params[:locations]).map { |id| Location.find(id) }.each do |location|
                     @trip.locations << location
                 end
-                render json: @trip.to_json(include: [:locations, :user, {trip_invitations: {include: :invitee}}]), status: :created
+                render json: @trip.to_json(include: [:locations, :owner, {trip_invitations: {include: :invitee}}]), status: :created
             else
                 render json: @trip.errors, status: :unprocessable_entity
             end
@@ -25,7 +25,7 @@ class Api::V1::TripsController < ApplicationController
 
     def show
         @trip = Trip.find(params[:id])
-        render json: @trip.to_json(include: [:locations, :user, {trip_invitations: {include: :invitee}}])
+        render json: @trip.to_json(include: [:locations, :owner, {trip_invitations: {include: :invitee}}])
     end
 
     private

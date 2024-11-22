@@ -43,7 +43,7 @@ export const TripPlan = ({
         _updateTrip({
           id: data.id,
           name: data.name,
-          owner: data.user,
+          owner: data.owner,
           locations: data.locations,
           trip_invitations: data.trip_invitations,
         });
@@ -287,8 +287,8 @@ export const TripPlan = ({
               })}
               onClick={() => {
                 saveTrip().then((trip) => {
-                  updateTrips([...trips, trip]);
-                });
+                  updateTrips([...trips, trip])
+                })
               }}
               disabled={trip.locations.length === 0 || tripSaving}
             >

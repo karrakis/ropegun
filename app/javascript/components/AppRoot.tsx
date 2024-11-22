@@ -16,7 +16,6 @@ import {
 } from "./types";
 
 export const AppRoot: React.FC<AppRootProps> = ({
-  routes,
   user,
   localUser,
   csrf,
