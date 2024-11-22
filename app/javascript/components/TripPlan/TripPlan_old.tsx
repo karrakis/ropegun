@@ -10,18 +10,17 @@ import { Transition } from "@headlessui/react";
 
 import { csrfToken } from "../../utilities/csrfToken";
 
-import { TripPlanPropsType, tripsType, Trip } from "./TripPlanInterfaces";
+import { TripPlanProps, Trip, Location } from "../types";
 
 export const TripPlan = ({
   localUser,
-  userSavedLocations,
-  tripSavedLocations = [],
-}: TripPlanPropsType) => {
+  tripLocations = [],
+}: TripPlanProps) => {
   const [activeTab, updateActiveTab] = useState("editTrip");
 
   const defaultTrip = {
     name: "",
-    locations: tripSavedLocations || [],
+    locations: tripLocations || [],
   };
 
   const [trip, _updateTrip] = useState<Trip>(
@@ -45,11 +44,13 @@ export const TripPlan = ({
           id: data.id,
           name: data.name,
           owner: data.user,
-          locations: data.locations.map((loc) => {
+          locations: data.locations.map((loc: Location) => {
             return {
               id: loc.id,
               name: loc.name,
               location: { lat: loc.latitude, lng: loc.longitude },
+              latitude: loc.latitude,
+              longitude: loc.longitude,
               office_x: loc.office_x,
               office_y: loc.office_y,
               office: loc.office,
@@ -141,6 +142,8 @@ export const TripPlan = ({
   const [position, updatePosition] = useState({
     name: "Jackson Falls",
     location: { lat: 37.5081391, lng: -88.6832446 },
+    latitude: 37.5081391,
+    longitude: -88.6832446,
   });
 
   //saves the trip to the database.

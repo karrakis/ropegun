@@ -13,8 +13,6 @@ import {
   Route,
   RouteList,
   AppRootProps,
-  UserSavedLocation,
-  UserSavedLocations,
 } from "./types";
 
 export const AppRoot: React.FC<AppRootProps> = ({
@@ -22,7 +20,6 @@ export const AppRoot: React.FC<AppRootProps> = ({
   user,
   localUser,
   csrf,
-  userSavedLocations,
 }) => {
   const [currentPage, setPage] = useState(window.location.pathname);
 
@@ -36,13 +33,12 @@ export const AppRoot: React.FC<AppRootProps> = ({
         return (
           <TripPlan
             localUser={localUser}
-            userSavedLocations={userSavedLocations}
           />
         );
       case "/home":
         window.history.pushState({}, "Home", "/home");
         return (
-          <Home localUser={localUser} userSavedLocations={userSavedLocations} />
+          <Home localUser={localUser} />
         );
       case "/dashboard":
         window.history.pushState({}, "Dashboard", "/dashboard");
@@ -52,7 +48,6 @@ export const AppRoot: React.FC<AppRootProps> = ({
         return (
           <TripPlan
             localUser={localUser}
-            userSavedLocations={userSavedLocations}
           />
         );
       case "/development":

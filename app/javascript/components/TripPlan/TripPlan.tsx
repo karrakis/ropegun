@@ -15,13 +15,12 @@ import { Location } from "../types";
 
 export const TripPlan = ({
   localUser,
-  tripLocations = [],
 }: TripPlanProps) => {
   const [activeTab, updateActiveTab] = useState("editTrip");
 
   const defaultTrip = {
     name: "",
-    locations: tripLocations || [],
+    locations: [],
   };
 
   const [trip, _updateTrip] = useState<Trip>(
@@ -132,6 +131,8 @@ export const TripPlan = ({
   const [position, updatePosition] = useState({
     name: "Jackson Falls",
     location: { lat: 37.5081391, lng: -88.6832446 },
+    latitude: 37.5081391,
+    longitude: -88.6832446,
   });
 
   //saves the trip to the database.

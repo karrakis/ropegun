@@ -10,6 +10,8 @@ export const Home = ({ userSavedLocations, localUser }) => {
   const [position, updatePosition] = useState({
     name: "Jackson Falls",
     location: { lat: 37.5081391, lng: -88.6832446 },
+    latitude: 37.5081391,
+    longitude: -88.6832446,
   });
 
   const [openMap, updateOpenMap] = useState(weatherTargets.length === 0);

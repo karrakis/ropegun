@@ -36,7 +36,6 @@ export interface AppRootProps {
     user: UserSessionObject;
     localUser: LocalUser;
     csrf: string;
-    userSavedLocations: UserSavedLocations;
   }
 
 export interface LocationsSelectorProps {

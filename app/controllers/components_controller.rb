@@ -19,9 +19,5 @@ class ComponentsController < ApplicationController
           pending_trip_invitations: @local_user&.trip_invites_received&.pending&.as_json(include: [:issuer, :trip])
         }
       )
-
-    if @user
-      @user_saved_locations = User.find_by(auth0_sub: @user&.fetch("sub")).locations.as_json.map{|location| {id: location["id"], name: location["name"], location: {lat: location["latitude"], lng: location["longitude"]}, office: location["office"], office_x: location["office_x"], office_y: location["office_y"]}}
-    end
   end
 end
