@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { asynchronousStateUpdate } from "../../utilities/asynchronousStateUpdate";
 import { getDistances } from "../../utilities/getDistances";
+import { TripInvitation, DistanceProps } from "../types";
 
 import AverageDistances from "./AverageDistances";
 import DisplayDistances from "./DisplayDistances";
 
-export const Distance = ({ locations, tripOwner, trip = nil }) => {
+export const Distance = ({ locations, tripOwner, trip }: DistanceProps) => {
   const [ownerDistances, updateOwnerDistances] = useState({});
   const [guestDistances, updateGuestDistances] = useState([]);
   const [distancesReady, updateDistancesReady] = useState(false);
@@ -16,12 +17,12 @@ export const Distance = ({ locations, tripOwner, trip = nil }) => {
   }, [locations]);
 
   useEffect(() => {
-    if (trip.trip_invitations) {
+    if (trip?.trip_invitations && trip.trip_invitations?.length > 0) {
       const results = trip.trip_invitations
-        .filter((invitation) => invitation.accepted == true)
-        .map(async (invitation) => {
+        .filter((invitation: TripInvitation) => invitation.accepted == true)
+        .map(async (invitation: TripInvitation) => {
           const locationUpdates = getDistances(locations, invitation.invitee);
-          const resolutions = locationUpdates.then((toBeResolved) => {
+          const resolutions = locationUpdates.then((toBeResolved) => {  
             let updatesResolved = Promise.all(toBeResolved).then((data) => {
               return data.map((update) => {
                 return {

@@ -1,11 +1,26 @@
 class UsersController < ApplicationController
     def update
         @user = User.find(params[:id])
-        @user.update(user_params)
+        
+        #copilot: ArgumentError ('1' is not a valid top_rope_belay):
+        
+        
+        
+        puts "user_params: #{sanitized_params}"
+        @user.update(sanitized_params)
         render json: @user
     end
 
     private
+
+    def sanitized_params
+        params = user_params
+        params[:top_rope_belay] = params[:top_rope_belay].to_i
+        params[:lead_belay] = params[:lead_belay].to_i
+        params[:trad_lead] = params[:trad_lead].to_i
+        params[:multipitch] = params[:multipitch].to_i
+        params
+    end
 
     def user_params
         params.require(:user).permit(

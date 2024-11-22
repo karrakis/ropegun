@@ -90,6 +90,19 @@ export interface Trip {
     trip_invitations?: any[];
   }
 
+  export interface TripInvitation {
+    id: number;
+    trip_id: number;
+    invitee: localUserType;
+    accepted: boolean;
+  }
+
   export interface Trips {
     trips: Trip[];
+  }
+
+  export interface DistanceProps {
+    locations: Location[];
+    tripOwner: localUserType;
+    trip?: Trip;
   }
