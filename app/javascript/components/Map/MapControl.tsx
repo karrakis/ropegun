@@ -31,7 +31,7 @@ export const MapControl = ({
               if (!trip.locations.find((loc: Location) => loc.latitude === position.location.lat && loc.longitude === position.location.lng)) {
                 
                 fetch(
-                  `https://api.weather.gov/points/${position.latitude},${position.longitude}`,
+                  `https://api.weather.gov/points/${position.location.lat},${position.location.lng}`,
                   {
                     method: "GET",
                     headers: {
@@ -39,12 +39,12 @@ export const MapControl = ({
                     }
                   }
                 ).then((res) => res.json()).then((data) => {
+                  debugger
                     return {
                       location: {
-                        latitude: position.latitude,
-                        longitude: position.longitude,
+                        latitude: position.location.lat,
+                        longitude: position.location.lng,
                         name: position.name,
-                        user_id: localUser.id,
                         office: data.gridId,
                         office_x: data.gridX,
                         office_y: data.gridY
@@ -58,6 +58,7 @@ export const MapControl = ({
                       },
                       body: JSON.stringify(body),
                     }).then((res) => res.json()).then((data) => {
+                      console.log("data:", data);
                       updateTrip({
                         ...trip,
                         locations: trip.locations.concat(data),
