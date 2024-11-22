@@ -39,7 +39,6 @@ export const MapControl = ({
                     }
                   }
                 ).then((res) => res.json()).then((data) => {
-                  debugger
                     return {
                       location: {
                         latitude: position.location.lat,

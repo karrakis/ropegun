@@ -7,6 +7,7 @@ import {
   Area,
   Tooltip,
   ResponsiveContainer,
+  Label,
 } from "recharts";
 
 const generateRandomColor = () => {
@@ -51,7 +52,7 @@ export const AreaGraph = ({ data }) => {
   return (
     <>
       <h3 className="text-center text-cream">Temperature</h3>
-      <ResponsiveContainer width="100%" height={300}>
+      <ResponsiveContainer width="100%" height={300} className={"pb-4"}>
         <AreaChart
           width={500}
           height={300}
@@ -63,8 +64,14 @@ export const AreaGraph = ({ data }) => {
             left: 20,
           }}
         >
-          <XAxis dataKey="day" />
-          <YAxis />
+          <XAxis dataKey="day"/>
+          <YAxis>
+            <Label
+              value="Temperature (F)"
+              angle={-90}
+              position="insideLeft"
+              style={{ textAnchor: "middle", color: "cream", marginTop: "20px" }}/>
+          </YAxis>
           <Tooltip />
           {generateAreas(data)}
         </AreaChart>
