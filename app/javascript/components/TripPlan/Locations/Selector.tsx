@@ -22,7 +22,7 @@ export const LocationsSelector = ({
       <input
         className="w-full p-2 bg-night text-cream rounded-t-md mt-2"
         type="text"
-        placeholder="Name Your Trip"
+        placeholder={trip.name || "Name Your Trip"}
         onChange={(e) => updateTrip({ ...trip, name: e.target.value })}
       />
       <div

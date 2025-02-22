@@ -19,6 +19,7 @@ export const TripPlan = ({
   const [activeTab, updateActiveTab] = useState("editTrip");
 
   const defaultTrip = {
+    id: 0,
     name: "",
     locations: [],
   };
@@ -33,22 +34,28 @@ export const TripPlan = ({
 
   //possibly excessive, but ensures that when a trip is selected, it is brought up to date.
   const setTrip = (trip: Trip) => {
-    fetch(`/api/v1/trips/${trip.id}`, {
-      method: "GET",
-      headers: {
-        Accept: "application/ld+json",
-      },
-    }).then((response) => {
-      response.json().then((data) => {
-        _updateTrip({
-          id: data.id,
-          name: data.name,
-          owner: data.owner,
-          locations: data.locations,
-          trip_invitations: data.trip_invitations,
+    debugger
+    if(trip.id === 0) {
+      _updateTrip(defaultTrip);
+      return;
+    } else {
+      fetch(`/api/v1/trips/${trip.id}`, {
+        method: "GET",
+        headers: {
+          Accept: "application/ld+json",
+        },
+      }).then((response) => {
+        response.json().then((data) => {
+          _updateTrip({
+            id: data.id,
+            name: data.name,
+            owner: data.owner,
+            locations: data.locations,
+            trip_invitations: data.trip_invitations,
+          });
         });
       });
-    });
+    }
   };
 
   //disables the save button while saving is in progress to prevent bad user experience.

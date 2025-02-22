@@ -51,13 +51,14 @@ export const TripEdit = ({
               });
             }}
           >
-            <option selected disabled>
-              Select Existing Trip
+            <option selected={!trip.id} value={0}>
+              New Trip
             </option>
-            {trips.map((trip) => {
+            {trips.map((tripSelect) => {
+              debugger
               return (
-                <option key={trip.id} value={trip.id}>
-                  {trip.name}
+                <option key={tripSelect.id} value={tripSelect.id} selected={tripSelect.id == trip.id}>
+                  {tripSelect.name}
                 </option>
               );
             })}
