@@ -20,8 +20,9 @@ export const TripPlan = ({
 
   const defaultTrip = {
     id: 0,
-    name: "",
+    name: "New Trip",
     locations: [],
+    owner: localUser,
   };
 
   const [trip, _updateTrip] = useState<Trip>(
@@ -34,7 +35,6 @@ export const TripPlan = ({
 
   //possibly excessive, but ensures that when a trip is selected, it is brought up to date.
   const setTrip = (trip: Trip) => {
-    debugger
     if(trip.id === 0) {
       _updateTrip(defaultTrip);
       return;
@@ -62,7 +62,7 @@ export const TripPlan = ({
   const [tripSaving, updateTripSaving] = useState(false);
 
   //primarily used for the dropdown of existing trips.
-  const [trips, updateTrips] = useState<Trip[]>([]);
+  const [trips, updateTrips] = useState<Trip[]>([defaultTrip]);
 
   //weather data for the locations in the trip.
   const [weather, updateWeather] = useState({});
@@ -85,7 +85,7 @@ export const TripPlan = ({
 
   useEffect(() => {
     fetchTrips().then((trips) => {
-      updateTrips(trips);
+      updateTrips([defaultTrip, ...trips]);
     });
   }, []);
   //end trip list population code
@@ -166,6 +166,7 @@ export const TripPlan = ({
 
     let data = await response.json();
     updateTripSaving(false);
+    _updateTrip(data);
     return data;
   };
 

@@ -21,6 +21,7 @@ export const TripEdit = ({
   const [openMap, updateOpenMap] = useState(false);
 
   console.log("trip:", trip);
+  console.log("trips:", trips);
 
   return (
     <>
@@ -50,14 +51,11 @@ export const TripEdit = ({
                 owner: trip.owner,
               });
             }}
+            value={trip.id}
           >
-            <option selected={!trip.id} value={0}>
-              New Trip
-            </option>
             {trips.map((tripSelect) => {
-              debugger
               return (
-                <option key={tripSelect.id} value={tripSelect.id} selected={tripSelect.id == trip.id}>
+                <option key={tripSelect.id} value={tripSelect.id}>
                   {tripSelect.name}
                 </option>
               );
