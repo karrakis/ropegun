@@ -55,9 +55,10 @@ export const LocationsSelector = ({
         {trip.locations.map((loc) => {
           return (
             <div className="flex items-center border-b border-khaki justify-between py-2" key={loc.latitude + loc.longitude}>
-              <span className="pr-2">{JSON.stringify(loc)}</span>
               
+              <span className="pr-2">{loc.name}</span>
               <button
+                className="cursor-pointer text-auburn border rounded border-auburn bg-cream px-1"
                 key={loc.id}
                 id={loc.name}
                 value={loc.id}
@@ -65,8 +66,9 @@ export const LocationsSelector = ({
                   ...trip,
                   locations: trip.locations.filter((tripLoc) => tripLoc.latitude !== loc.latitude && tripLoc.longitude !== loc.longitude),
                 })}
-              />
-              <label className="text-auburn border rounded border-auburn bg-cream px-1" htmlFor={loc.name}>Remove</label>
+              >
+                Remove
+              </button>
             </div>
           );
         })}
