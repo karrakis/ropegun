@@ -14,7 +14,7 @@ export const SkillsTable = ({ userSkills }) => {
     trad_lead: "Trad Lead",
   };
 
-  const [selected_skills, setSelectedSkills] = useState(["lead_belay"]);
+  const [selected_skills, _setSelectedSkills] = useState(["lead_belay"]);
 
   console.log("userSkills", userSkills);
 
@@ -40,8 +40,9 @@ export const SkillsTable = ({ userSkills }) => {
                 value={key}
                 className={classNames({
                   "text-auburn": selected_skills.includes(key),
-                  "text-black": !selected_skills.includes(key),
-                })}
+                  "text-cream": !selected_skills.includes(key),
+                })
+                }
               >
                 {value}
               </option>
@@ -124,7 +125,7 @@ export const LeadBelayTable = ({ userSkills }) => {
   );
 };
 
-export const Skills = ({ organizer, guests, trip }) => {
+export const Skills = ({ organizer, guests }) => {
   const [tablePage, setTablePage] = useState("lead_belay");
 
   const userSkills = [];

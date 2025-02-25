@@ -12,3 +12,11 @@
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
 }
+
+.recharts-tooltip-wrapper {
+    background-color: rgb(194, 92, 92);
+    border: 1px solid #999;
+    border-radius: 5px;
+    box-shadow: 2px 2px 2px #312323;
+    padding: 10px;
+}

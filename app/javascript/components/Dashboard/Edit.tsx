@@ -87,7 +87,7 @@ export const Edit = ({ user, localUser, setEditing, setLocalUser }) => {
         >
           <div className="w-full h-fit flex flex-row items-end">
             <h4 className="text-2xl text-khaki min-w-fit col-span-1">Name:</h4>
-            <span className="text-xl ml-4 w-fit col-span-2">
+            <span className="text-xl text-cream ml-4 w-fit col-span-2">
               {user.given_name} {user.family_name}
             </span>
           </div>

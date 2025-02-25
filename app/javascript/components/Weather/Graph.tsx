@@ -10,6 +10,8 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+import CustomTooltipPrecipitation from "./CustomTooltipPrecipitation";
+
 const generateRandomColor = () => {
   return "#000000".replace(/0/g, function () {
     return (~~(Math.random() * 16)).toString(16);
@@ -50,7 +52,7 @@ export const Graph = ({ data }) => {
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="name" />
           <YAxis />
-          <Tooltip />
+          <Tooltip content={<CustomTooltipPrecipitation payload={data}/>}/>
           <Legend />
           {generateLines(data)}
         </LineChart>

@@ -10,22 +10,41 @@ import {
   Label,
 } from "recharts";
 
+import CustomTooltip from "./CustomTooltipTemperature";
+
+const colorsGoodOnWhite = [
+  "#0088FE",
+  "#00C49F",
+  "#FFBB28",
+  "#FF8042",
+  "#8884d8",
+  "#82ca9d",
+  "#ffc658",
+  "#ff8e29",
+  "#ff7300",
+  "#ff4d00",
+  "#ff0000",
+]
+
 const generateRandomColor = () => {
-  return "#000000".replace(/0/g, function () {
-    return (~~(Math.random() * 16)).toString(16);
-  });
+  // return "#000000".replace(/0/g, function () {
+  //   return (~~(Math.random() * 16)).toString(16);
+  // });
+
+  return colorsGoodOnWhite[Math.floor(Math.random() * colorsGoodOnWhite.length)];
 };
 
 const generateAreas = (data) => {
   return data.map((weather) => {
     const placeName = Object.keys(weather[0])[1];
+    const color = generateRandomColor();
     return (
       <Area
         key={placeName}
         type="monotone"
         dataKey={placeName}
-        stroke={generateRandomColor()}
-        fill={generateRandomColor()}
+        stroke={color}
+        fill={color}
         activeDot={{ r: 8 }}
       />
     );
@@ -72,7 +91,7 @@ export const AreaGraph = ({ data }) => {
               position="insideLeft"
               style={{ textAnchor: "middle", color: "cream", marginTop: "20px" }}/>
           </YAxis>
-          <Tooltip />
+          <Tooltip content={<CustomTooltip payload={data}/>}/>
           {generateAreas(data)}
         </AreaChart>
       </ResponsiveContainer>
