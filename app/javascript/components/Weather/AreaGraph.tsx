@@ -8,6 +8,7 @@ import {
   Tooltip,
   ResponsiveContainer,
   Label,
+  Legend
 } from "recharts";
 
 import CustomTooltip from "./CustomTooltipTemperature";
@@ -91,6 +92,7 @@ export const AreaGraph = ({ data }) => {
               position="insideLeft"
               style={{ textAnchor: "middle", color: "cream", marginTop: "20px" }}/>
           </YAxis>
+          <Legend />
           <Tooltip content={<CustomTooltip payload={data}/>}/>
           {generateAreas(data)}
         </AreaChart>
