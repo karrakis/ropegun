@@ -125,7 +125,7 @@ export const LeadBelayTable = ({ userSkills }) => {
   );
 };
 
-export const Skills = ({ organizer, guests }) => {
+export const Skills = ({ organizer, guests = [] }) => {
   const [tablePage, setTablePage] = useState("lead_belay");
 
   const userSkills = [];
