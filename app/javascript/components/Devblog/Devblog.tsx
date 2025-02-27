@@ -11,6 +11,8 @@ export const ComingSoon = () => {
           Give me Feedback
         </a>
         <ul>
+          <li>User name should be editable</li>
+          <li>Name should be a field at email signup</li>
           <li className="text-green-500">Drop concept of linked locations for users</li>
           <li className="text-green-500">Replace with locations linking only to trips</li>
           <li className="text-green-500">Add user feedback button here</li>
