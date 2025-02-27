@@ -1,4 +1,4 @@
-class ApiController << ActionController::ApiController
+class Api::ApiController < ActionController::API
     def authenticate
         # Check if the request is authenticated
         if request.headers['Authorization']
