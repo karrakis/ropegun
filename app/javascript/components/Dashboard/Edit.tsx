@@ -28,6 +28,8 @@ export const Edit = ({ user, localUser, setEditing, setLocalUser }) => {
 
   const [homeAddress, setHomeAddress] = useState(localUser.home_address || "");
 
+  const [name, setName] = useState(localUser.given_name || "");
+
   const updateUser = (e) => {
     e.preventDefault();
     const body = {
@@ -82,14 +84,21 @@ export const Edit = ({ user, localUser, setEditing, setLocalUser }) => {
         <div
           id="user_info"
           className={classNames(
-            "w-fit md:w-full h-fit flex flex-col md:flex-row p-8"
+            "w-fit md:w-full h-fit flex flex-col p-8"
           )}
         >
-          <div className="w-full h-fit flex flex-row items-end">
+          <div className="w-full h-fit flex flex-row items-end pb-8">
             <h4 className="text-2xl text-khaki min-w-fit col-span-1">Name:</h4>
-            <span className="text-xl text-cream ml-4 w-fit col-span-2">
+            <label className="text-xl text-cream ml-4 w-fit col-span-2">
               {user.given_name} {user.family_name}
-            </span>
+            </label>
+            <input
+              id="name"
+              type="text"
+              className="text-2xl p-2 w-full h-fit border-b"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
           </div>
           <div className="w-full md:w-full h-fit flex flex-col md:flex-row">
             <h4 className="text-2xl text-khaki min-w-fit col-span-1">Email:</h4>
