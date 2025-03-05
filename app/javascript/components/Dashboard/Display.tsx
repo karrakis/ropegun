@@ -126,7 +126,7 @@ export const Display = ({ user, localUser, setEditing }) => {
           <div className="w-fit md:w-full h-fit flex flex-col md:flex-row">
             <h4 className="text-2xl text-khaki min-w-fit">Name:</h4>
             <span className="text-xl ml-4 w-fit">
-              {user.given_name} {user.family_name}
+              {localUser.name}
             </span>
           </div>
           <div className="w-full md:w-full h-fit flex flex-col md:flex-row">
@@ -178,21 +178,6 @@ export const Display = ({ user, localUser, setEditing }) => {
             value={localUser.multipitch || "No"}
           />
         </div>
-      </div>
-      <div
-        id="linked-locations"
-        className="w-full bg-night text-cream p-2 flex flex-col"
-      >
-        <h1 className="w-full bg-auburn text-cream text-2xl font-strong text-center p-2">
-          Linked Locations
-        </h1>
-        <ul className="p-2">
-          {localUser?.locations?.map((location) => (
-            <li key={location.id}>
-              {location.name} ({location.office})
-            </li>
-          ))}
-        </ul>
       </div>
       <div
         id="friendships"

@@ -28,12 +28,13 @@ export const Edit = ({ user, localUser, setEditing, setLocalUser }) => {
 
   const [homeAddress, setHomeAddress] = useState(localUser.home_address || "");
 
-  const [name, setName] = useState(localUser.given_name || "");
+  const [name, setName] = useState(localUser.name || "");
 
   const updateUser = (e) => {
     e.preventDefault();
     const body = {
       user: {
+        name: name,
         multipitch: multipitch,
         lead_belay: leadBelay,
         trad_lead: tradLead,
@@ -58,9 +59,49 @@ export const Edit = ({ user, localUser, setEditing, setLocalUser }) => {
     })
       .then((res) => res.json())
       .then((data) => {
+        debugger
         setLocalUser(Object.assign({}, localUser, data));
       });
   };
+
+  const Bullet = ({ value, setValue, id, options }) => {
+    return (
+      <div className="w-full flex items-end">
+        <label className="text-2xl text-khaki" htmlFor={id}>
+          Lead Belay:
+        </label>
+        <select
+          id={id}
+          className="h-10 text-center w-fit text-2xl ml-2 appearance-none rounded-md bg-cream text-night cursor-pointer"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+        >
+          {options.map((option, index) => (
+            <option key={index} value={index}>
+              {option}
+            </option>
+          ))}
+        </select>
+      </div>
+    )
+  };
+
+  const TextBullet = ({ value, setValue, id }) => {
+    return (
+      <div className="w-full flex items-end">
+        <label className="text-2xl text-khaki" htmlFor={id}>
+          {id}:
+        </label>
+        <input
+          id={id}
+          type="text"
+          className="h-10 text-center text-2xl ml-2 w-12 rounded-md bg-cream text-night"
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+        />
+      </div>
+    )
+  }
 
   return (
     <>
@@ -87,15 +128,15 @@ export const Edit = ({ user, localUser, setEditing, setLocalUser }) => {
             "w-fit md:w-full h-fit flex flex-col p-8"
           )}
         >
-          <div className="w-full h-fit flex flex-row items-end pb-8">
+          <div className="w-full h-fit flex flex-row items-center pb-8">
             <h4 className="text-2xl text-khaki min-w-fit col-span-1">Name:</h4>
-            <label className="text-xl text-cream ml-4 w-fit col-span-2">
-              {user.given_name} {user.family_name}
+            <label className="text-xl text-cream ml-4 w-fit col-span-2" htmlFor="name">
+              {localUser.name}
             </label>
             <input
               id="name"
               type="text"
-              className="text-2xl p-2 w-full h-fit border-b"
+              className="ml-4 text-2xl p-2 border rounded-lg bg-cream text-night h-10"
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
@@ -114,133 +155,22 @@ export const Edit = ({ user, localUser, setEditing, setLocalUser }) => {
           <textarea
             id="homeAddress"
             type="text"
-            className="text-2xl p-2 w-full h-fit border-b"
+            className="text-2xl p-2 w-full h-fit rounded-lg bg-cream text-night"
             value={homeAddress}
             onChange={(e) => setHomeAddress(e.target.value)}
           />
         </div>
       </div>
       <div className="w-full flex grid grid-cols-1 md:grid-cols-2 p-2 md:pl-16 gap-4 pt-4 bg-auburn">
-        <div className="w-full flex items-end">
-          <label className="text-2xl text-khaki" htmlFor="TopRopeBelay">
-            Top Rope Belay:
-          </label>
-          <select
-            id="leadBelay"
-            className="h-8 w-fit text-2xl ml-2 appearance-none border-b cursor-pointer"
-            value={topRopeBelay}
-            onChange={(e) => setTopRopeBelay(e.target.value)}
-          >
-            <option value={0}>No</option>
-            <option value={1}>Yes</option>
-            <option value={2}>Rusty</option>
-          </select>
-        </div>
-        <div className="w-full flex items-end">
-          <label className="text-2xl text-khaki" htmlFor="leadBelay">
-            Lead Belay:
-          </label>
-          <select
-            id="leadBelay"
-            className="h-8 w-fit text-2xl ml-2 appearance-none border-b cursor-pointer"
-            value={leadBelay}
-            onChange={(e) => setLeadBelay(e.target.value)}
-          >
-            <option value={0}>No</option>
-            <option value={1}>Yes</option>
-            <option value={2}>Rusty</option>
-          </select>
-        </div>
-        <div className="w-full flex items-end">
-          <label className="text-2xl text-khaki" htmlFor="topRopeIndoorGrade">
-            Top Rope Indoor Grade:
-          </label>
-          <input
-            id="topRopeIndoorGrade"
-            type="text"
-            className="text-2xl ml-2 w-12 border-b"
-            value={topRopeIndoorGrade}
-            onChange={(e) => setTopRopeIndoorGrade(e.target.value)}
-          />
-        </div>
-        <div className="w-full flex items-end">
-          <label className="text-2xl text-khaki" htmlFor="leadIndoorGrade">
-            Lead Indoor Grade:
-          </label>
-          <input
-            id="leadIndoorGrade"
-            type="text"
-            className="text-2xl ml-2 w-12 border-b"
-            value={leadIndoorGrade}
-            onChange={(e) => setLeadIndoorGrade(e.target.value)}
-          />
-        </div>
-        <div className="w-full flex items-end">
-          <label className="text-2xl text-khaki" htmlFor="topRopeOutdoorGrade">
-            Top Rope Outdoor Grade:
-          </label>
-          <input
-            id="topRopeOutdoorGrade"
-            type="text"
-            className="text-2xl ml-2 w-12 border-b"
-            value={topRopeOutdoorGrade}
-            onChange={(e) => setTopRopeOutdoorGrade(e.target.value)}
-          />
-        </div>
-        <div className="w-full flex items-end">
-          <label className="text-2xl text-khaki" htmlFor="leadOutdoorGrade">
-            Lead Outdoor Grade:
-          </label>
-          <input
-            id="leadOutdoorGrade"
-            type="text"
-            className="text-2xl ml-2 w-12 border-b"
-            value={leadOutdoorGrade}
-            onChange={(e) => setLeadOutdoorGrade(e.target.value)}
-          />
-        </div>
-        <div className="w-full flex items-end">
-          <label className="text-2xl text-khaki" htmlFor="tradLead">
-            Trad Lead:
-          </label>
-          <select
-            id="tradLead"
-            className="h-8 w-fit text-2xl ml-2 appearance-none border-b cursor-pointer"
-            value={tradLead}
-            onChange={(e) => setTradLead(e.target.value)}
-          >
-            <option value={0}>No</option>
-            <option value={1}>Yes</option>
-            <option value={2}>Rusty</option>
-          </select>
-        </div>
-        <div className="w-full flex items-end">
-          <label htmlFor="tradOutdoorGrade" className="text-2xl text-khaki">
-            Trad Outdoor Grade:
-          </label>
-          <input
-            id="tradOutdoorGrade"
-            type="text"
-            className="text-2xl ml-2 w-12 border-b"
-            value={tradOutdoorGrade}
-            onChange={(e) => setTradOutdoorGrade(e.target.value)}
-          />
-        </div>
-        <div className="w-full flex items-end">
-          <label className="text-2xl text-khaki" htmlFor="multipitch">
-            Multipitch:
-          </label>
-          <select
-            id="multipitch"
-            className="h-8 w-fit text-2xl ml-2 appearance-none border-b cursor-pointer"
-            value={multipitch}
-            onChange={(e) => setMultipitch(e.target.value)}
-          >
-            <option value={0}>No</option>
-            <option value={1}>Yes</option>
-            <option value={2}>Rusty</option>
-          </select>
-        </div>
+        <Bullet value={topRopeBelay} setValue={setTopRopeBelay} id={"topRopeBelay"} options={["No", "Yes", "Rusty"]}/>
+        <Bullet value={leadBelay} setValue={setLeadBelay} id={"leadBelay"} options={["No", "Yes", "Rusty"]}/>
+        <TextBullet value={topRopeIndoorGrade} setValue={setTopRopeIndoorGrade} id={"topRopeIndoorGrade"}/>
+        <TextBullet value={leadIndoorGrade} setValue={setLeadIndoorGrade} id={"leadIndoorGrade"}/>
+        <TextBullet value={topRopeOutdoorGrade} setValue={setTopRopeOutdoorGrade} id={"topRopeOutdoorGrade"}/>
+        <TextBullet value={leadOutdoorGrade} setValue={setLeadOutdoorGrade} id={"leadOutdoorGrade"}/>
+        <Bullet value={tradLead} setValue={setTradLead} id={"tradLead"} options={["No", "Yes", "Rusty"]}/>
+        <TextBullet value={tradOutdoorGrade} setValue={setTradOutdoorGrade} id={"tradOutdoorGrade"}/>
+        <Bullet value={multipitch} setValue={setMultipitch} id={"multipitch"} options={["No", "Yes", "Rusty"]}/>
       </div>
     </>
   );
