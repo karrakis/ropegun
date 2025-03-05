@@ -14,7 +14,7 @@ export const SkillsTable = ({ userSkills }) => {
     trad_lead: "Trad Lead",
   };
 
-  const [selected_skills, _setSelectedSkills] = useState(["lead_belay"]);
+  const [selected_skills, setSelectedSkills] = useState(["lead_belay"]);
 
   console.log("userSkills", userSkills);
 
