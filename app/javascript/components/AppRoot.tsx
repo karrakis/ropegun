@@ -3,23 +3,14 @@ import Header from "./Header/Header";
 import Home from "./Home/Home";
 import Dashboard from "./Dashboard/Dashboard";
 import TripPlan from "./TripPlan/TripPlan";
-import ComingSoon from "./Home/ComingSoon";
+import ComingSoon from "./Home/Landing";
 import DevBlog from "./Devblog/Devblog";
 
-import {Geyikbayiri} from "../../assets/images/Geyikbayiri.jpg"
+import { Geyikbayiri } from "../../assets/images/Geyikbayiri.jpg";
 
-import {
-  UserSessionObject,
-  Route,
-  RouteList,
-  AppRootProps,
-} from "./types";
+import { UserSessionObject, Route, RouteList, AppRootProps } from "./types";
 
-export const AppRoot: React.FC<AppRootProps> = ({
-  user,
-  localUser,
-  csrf,
-}) => {
+export const AppRoot: React.FC<AppRootProps> = ({ user, localUser, csrf }) => {
   const [currentPage, setPage] = useState(window.location.pathname);
 
   const setDisplayPage = () => {
@@ -29,26 +20,16 @@ export const AppRoot: React.FC<AppRootProps> = ({
     switch (currentPage) {
       case "/":
         window.history.pushState({}, "Trip Planning", "/trip_plan");
-        return (
-          <TripPlan
-            localUser={localUser}
-          />
-        );
+        return <TripPlan localUser={localUser} />;
       case "/home":
         window.history.pushState({}, "Home", "/home");
-        return (
-          <Home localUser={localUser} />
-        );
+        return <Home localUser={localUser} />;
       case "/dashboard":
         window.history.pushState({}, "Dashboard", "/dashboard");
         return <Dashboard user={user} localUser={localUser} />;
       case "/trip_plan":
         window.history.pushState({}, "Trip Planning", "/trip_plan");
-        return (
-          <TripPlan
-            localUser={localUser}
-          />
-        );
+        return <TripPlan localUser={localUser} />;
       case "/development":
         window.history.pushState({}, "Development", "/development");
         return <DevBlog />;

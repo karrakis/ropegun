@@ -41,14 +41,14 @@ describe("AppRoot", () => {
         localUser={localUser}
         csrf={csrf}
         userSavedLocations={userSavedLocations}
-      />
+      />,
     );
 
     // Assert that the Dashboard component is rendered
     expect(screen.getByText("Plan a Trip")).toBeInTheDocument();
   });
 
-  it("renders the ComingSoon component when localUser.id is not defined", () => {
+  it("renders the Landing component when localUser.id is not defined", () => {
     render(
       <AppRoot
         routes={routes}
@@ -56,11 +56,11 @@ describe("AppRoot", () => {
         localUser={{}}
         csrf={csrf}
         userSavedLocations={userSavedLocations}
-      />
+      />,
     );
 
-    // Assert that the ComingSoon component is rendered
-    expect(screen.getByText("Arriving Soonish")).toBeInTheDocument();
+    // Assert that the Landing component is rendered
+    expect(screen.getByText("Going Somewhere?")).toBeInTheDocument();
   });
 
   // Add more test cases as needed
