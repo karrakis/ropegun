@@ -1,15 +1,21 @@
 const path = require('path')
+const esbuild = require("esbuild")
 
-require("esbuild").build({
+const options = {
   entryPoints: ["application.ts"],
   bundle: true,
   outdir: path.join(process.cwd(), "app/assets/builds"),
   absWorkingDir: path.join(process.cwd(), "app/javascript"),
-  watch: process.argv.includes("--watch"),
   loader: {
     '.png': 'file',
     '.svg': 'file',
     '.jpg': 'file',
     '.ico': 'file',
   },
-}).catch(() => process.exit(1))
+}
+
+if (process.argv.includes("--watch")) {
+  esbuild.context(options).then(ctx => ctx.watch()).catch(() => process.exit(1))
+} else {
+  esbuild.build(options).catch(() => process.exit(1))
+}
