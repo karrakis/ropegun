@@ -2,9 +2,13 @@ import React from "react";
 
 export const HeaderRightLoggedOut = ({ csrf }) => {
   return (
-    <form className="button_to m-2" method="post" action="/auth/auth0">
-      <button className="bg-auburn p-2 m-2" data-turbo="false" type="submit">
-        Login
+    <form className="button_to" method="post" action="/auth/auth0">
+      <button
+        className="bg-auburn p-2 m-2 w-12 h-12 flex items-center justify-center text-xs"
+        data-turbo="false"
+        type="submit"
+      >
+        Log&nbsp;In
       </button>
       <input
         type="hidden"
@@ -16,4 +20,4 @@ export const HeaderRightLoggedOut = ({ csrf }) => {
   );
 };
 
-export default HeaderRightLoggedOut
+export default HeaderRightLoggedOut;

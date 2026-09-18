@@ -7,7 +7,10 @@ export const Header = ({ user, csrf, page, setPage }) => {
   return (
     <div className="text-white h-16 w-full flex items-center sticky top-0 z-50 bg-night text-cream md">
       <HeaderLeft page={page} setPage={setPage} />
-      <div id="header-right" className="justify-end flex w-fit h-full">
+      <div
+        id="header-right"
+        className="justify-end flex w-fit h-full items-center justify-center"
+      >
         {!!user && (
           <HeaderRightLoggedIn user={user} csrf={csrf} setPage={setPage} />
         )}
