@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Sign In — Approach</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  </head>
+  <body class="relative h-screen overflow-hidden bg-night">
+
+    <%# Background image %>
+    <div class="absolute inset-0 -z-10">
+      <%= image_tag "Geyikbayiri.jpg",
+            alt: "Geyikbayiri, Antalya, Turkey",
+            class: "object-cover object-left w-full h-full" %>
+    </div>
+
+    <div class="flex items-center justify-center h-full">
+      <div class="w-full max-w-sm mx-4 bg-night bg-opacity-90 rounded-lg shadow-lg p-8 text-cream">
+
+        <h1 class="text-3xl font-bold text-cream text-center mb-2">Approach</h1>
+        <p class="text-ashgray text-center text-sm mb-8">Plan your next climb with friends.</p>
+
+        <%# Auth0 handles the actual credential collection — we kick off the flow here %>
+        <%= form_with url: "/auth/auth0", method: :post, local: true, data: { turbo: false } do |f| %>
+          <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>" autocomplete="off">
+          <button
+            type="submit"
+            class="w-full bg-auburn hover:bg-red-800 text-cream font-semibold py-3 px-4 rounded transition-colors duration-200"
+          >
+            Sign in
+          </button>
+        <% end %>
+
+        <p class="text-center text-ashgray text-xs mt-6">
+          By signing in you agree to our terms of service.
+        </p>
+      </div>
+    </div>
+
+  </body>
+</html>

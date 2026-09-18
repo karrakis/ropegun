@@ -15,7 +15,7 @@ const imagePlugin = {
         if (imageExts.some((ext) => file.endsWith(ext))) {
           fs.copyFileSync(
             path.join(buildsDir, file),
-            path.join(publicDir, file)
+            path.join(publicDir, file),
           );
         }
       }

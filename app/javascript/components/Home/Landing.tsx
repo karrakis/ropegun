@@ -7,7 +7,7 @@ export const ComingSoon = () => {
         <h1 className="text-3xl font-bold">Going Somewhere?</h1>
       </div>
       <button className="flex flex-col justify-center items-center w-full max-w-3xl bg-auburn text-cream p-4 rounded shadow-lg mt-4">
-        <a href="/trip_plan" className="text-3xl">
+        <a href="/login?return_to=/trip_plan" className="text-3xl">
           Get Going!
         </a>
       </button>

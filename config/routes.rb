@@ -1,16 +1,14 @@
 Rails.application.routes.draw do
   resources :feedbacks
-  root 'components#index'
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
-
-  # Defines the root path route ("/")
-  # root "articles#index"
+  root 'landing#index'
 
   get '/auth/auth0/callback' => 'auth0#callback'
   get '/auth/failure' => 'auth0#failure'
   get '/auth/logout' => 'auth0#logout'
+  get '/auth/login' => 'auth0#login'
+  get '/login' => 'auth0#show_login', as: :login
   get '/dashboard' => 'components#index'
-  get '/trip_plan' => 'components#index'
+  get '/trip_plan' => 'components#index', as: :trip_plan
   get '/development' => 'components#index'
   
   patch '/users/:id' => 'users#update'

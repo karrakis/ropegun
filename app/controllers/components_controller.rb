@@ -1,4 +1,5 @@
 class ComponentsController < ApplicationController
+  before_action :redirect_if_not_logged_in, only: [:index]
 
   def index
     @routes = Rails.application.routes.routes.map { |r| r.name && {r.name.to_sym => {alias: r.name, path: r.path.spec.to_s.sub(/\(\.\:format\)/, '')}}}.compact.reduce Hash.new, :merge
@@ -20,4 +21,5 @@ class ComponentsController < ApplicationController
         }
       )
   end
+
 end

@@ -4,12 +4,12 @@ export const HeaderRightLoggedIn = ({ user, csrf, setPage }) => {
   return (
     <>
       <form
-        className="button_to m-2 w-12 h-12 flex items-center justify-end flex-none"
+        className="button_to m-2 flex items-center justify-end flex-none"
         method="get"
         action="/auth/logout"
       >
         <button
-          className="p-2 h-12 w-12 bg-auburn"
+          className="bg-auburn p-2 m-2 w-12 h-12 flex items-center justify-center text-xs"
           data-turbo="false"
           type="submit"
         >

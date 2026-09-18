@@ -1,5 +1,7 @@
 class Api::V1::TripsController < ApplicationController
     skip_before_action :verify_authenticity_token
+    before_action :redirect_if_not_logged_in
+
     def index
         render json: Trip.all.to_json(include: [:owner, :locations, {trip_invitations: {include: :invitee}}])
     end
@@ -28,8 +30,17 @@ class Api::V1::TripsController < ApplicationController
         render json: @trip.to_json(include: [:locations, :owner, {trip_invitations: {include: :invitee}}])
     end
 
+    
     private
-
+    
+    def redirect_if_not_logged_in
+        puts "attempting redirection"
+        unless current_user
+            puts "no user found, redirecting to auth_login_path"
+            redirect_to auth_login_path
+        end
+    end
+    
     def trip_params
         puts "PARAMS: #{params}"
         params.require(:trip).permit(:name, :locations, :owner_id)

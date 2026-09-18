@@ -1,4 +1,12 @@
 class Auth0Controller < ApplicationController
+    def show_login
+      session[:return_to] = params[:return_to] if params[:return_to].present?
+    end
+
+    def login
+      redirect_to show_login_path
+    end
+
     def callback
       # OmniAuth stores the information returned from Auth0 and the IdP in request.env['omniauth.auth'].
       # In this code, you will pull the raw_info supplied from the id_token and assign it to the session.
@@ -18,7 +26,7 @@ class Auth0Controller < ApplicationController
 
   
       # Redirect to the URL you want after successful auth
-      redirect_to '/'
+      redirect_to session.delete(:return_to) || '/'
     end
   
     def failure
