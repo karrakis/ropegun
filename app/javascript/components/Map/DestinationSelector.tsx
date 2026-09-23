@@ -8,7 +8,6 @@ import {
   useMapsLibrary,
   useMap,
 } from "@vis.gl/react-google-maps";
-import { csrfToken } from "../../utilities/csrfToken";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -17,16 +16,19 @@ interface LatLng {
   lng: number;
 }
 
-export interface SelectedDestination {
+export interface PendingDestination {
   name: string;
-  lat: number;
-  lng: number;
+  latitude: string;
+  longitude: string;
+  office: string | null;
+  office_x: number | null;
+  office_y: number | null;
 }
 
 interface DestinationSelectorProps {
-  /** Called when the user confirms "Add to Trip". Receives the resolved location
-   *  object returned by the Rails API (with id, office, etc.) */
-  onDestinationAdded: (location: any) => void;
+  /** Called when the user confirms "Add to Trip". Receives a PendingDestination
+   *  (not yet saved to the DB — that happens on trip creation). */
+  onDestinationAdded: (location: PendingDestination) => void;
   /** Starting map centre. Defaults to a general US view if omitted. */
   defaultCenter?: LatLng;
 }
@@ -149,10 +151,10 @@ export const DestinationSelector: React.FC<DestinationSelectorProps> = ({
     setError(null);
 
     try {
-      // Try to get the NWS weather office for this point (non-fatal if it fails)
-      let office = null,
-        office_x = null,
-        office_y = null;
+      // Look up NWS grid office for weather (non-fatal — works for US only)
+      let office: string | null = null;
+      let office_x: number | null = null;
+      let office_y: number | null = null;
       try {
         const wx = await fetch(
           `https://api.weather.gov/points/${pin.lat},${pin.lng}`,
@@ -162,31 +164,19 @@ export const DestinationSelector: React.FC<DestinationSelectorProps> = ({
         office_x = wx.gridX ?? null;
         office_y = wx.gridY ?? null;
       } catch {
-        // Non-US or off-grid location — weather just won't be available
+        // Non-US or off-grid — weather unavailable, that's fine
       }
 
-      const res = await fetch("/api/v1/locations", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-CSRF-Token": csrfToken(),
-        },
-        body: JSON.stringify({
-          location: {
-            name: displayName,
-            latitude: String(pin.lat),
-            longitude: String(pin.lng),
-            office,
-            office_x,
-            office_y,
-          },
-        }),
+      onDestinationAdded({
+        name: displayName,
+        latitude: String(pin.lat),
+        longitude: String(pin.lng),
+        office,
+        office_x,
+        office_y,
       });
 
-      if (!res.ok) throw new Error(`Server error ${res.status}`);
-      const location = await res.json();
-      onDestinationAdded(location);
-      // Reset after adding
+      // Reset for next pin
       setPin(null);
       setPinName("");
       setNameInput("");

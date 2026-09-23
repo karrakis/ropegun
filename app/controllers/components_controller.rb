@@ -17,7 +17,7 @@ class ComponentsController < ApplicationController
           pending_friend_requests: @local_user&.friendships&.pending&.map{|friendship| 
             {uuid: friendship.friend.uuid}
           }&.as_json,
-          pending_trip_invitations: @local_user&.trip_invites_received&.pending&.as_json(include: [:issuer, :trip])
+          pending_trip_invitations: @local_user&.trip_memberships.where(role: :invited, accepted: false)&.as_json(include: [:issuer, :trip])
         }
       )
   end

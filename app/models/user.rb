@@ -1,16 +1,22 @@
 class User < ApplicationRecord
-    has_and_belongs_to_many :trips, join_table: :trips_users
-    has_many :owned_trips, class_name: "Trip", foreign_key: "owner_id"
+  # ── Trip relationships ────────────────────────────────────────────────────
+  has_many :owned_trips, class_name: "Trip", foreign_key: "owner_id", dependent: :destroy
+  has_many :trip_memberships, dependent: :destroy
+  has_many :trips, through: :trip_memberships
 
-    has_many :friendships, class_name: "Friendship", foreign_key: "user_id"
-    has_many :inverse_friendships, class_name: "Friendship", foreign_key: "friend_id"
+  # ── Friendships ───────────────────────────────────────────────────────────
+  has_many :friendships, class_name: "Friendship", foreign_key: "user_id"
+  has_many :inverse_friendships, class_name: "Friendship", foreign_key: "friend_id"
 
-    has_many :trip_invites_received, class_name: "TripInvitation", foreign_key: "invitee_id"
-    has_many :trip_invites_issued, class_name: "TripInvitation", foreign_key: "issuer_id"
-    
-    enum :top_rope_belay => [:no, :yes, :rusty], _prefix: :top_rope_belay
-    enum :lead_belay => [:no, :yes, :rusty], _prefix: :lead_belay
-    enum :trad_lead => [:no, :yes, :rusty], _prefix: :trad_lead
-    enum :multipitch => [:no, :yes, :rusty], _prefix: :multipitch
-    validates :email, presence: true
+  # ── Skills & Gear ─────────────────────────────────────────────────────────
+  has_many :user_skills, dependent: :destroy
+  has_many :skills, through: :user_skills
+  has_many :user_gear_items, dependent: :destroy
+  has_many :gear_items, through: :user_gear_items
+
+  # ── Trip contributions ────────────────────────────────────────────────────
+  has_many :trip_skills, dependent: :destroy
+  has_many :trip_gear_items, dependent: :destroy
+
+  validates :email, presence: true
 end
