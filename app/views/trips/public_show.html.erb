@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title><%= @trip.name.presence || "Trip" %> — Approach</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  </head>
+  <body class="bg-cream min-h-screen">
+
+    <%# Header %>
+    <div class="bg-auburn text-cream px-4 py-3 flex items-center justify-between">
+      <a href="/" class="text-cream font-bold text-lg">Approach</a>
+      <% if @local_user %>
+        <a href="/trip_plan" class="text-xs text-cream underline">My trips</a>
+      <% else %>
+        <a href="/login" class="text-xs bg-night text-cream px-3 py-1.5 rounded">Sign in</a>
+      <% end %>
+    </div>
+
+    <div class="max-w-2xl mx-auto px-4 py-6 flex flex-col gap-6">
+
+      <%# Trip name %>
+      <div>
+        <h1 class="text-2xl font-bold text-night"><%= @trip.name.presence || "Unnamed trip" %></h1>
+        <% if @trip.starts_on %>
+          <p class="text-ashgray text-sm mt-1">
+            <%= @trip.starts_on.strftime("%-b %-d") %>
+            <% if @trip.ends_on %>– <%= @trip.ends_on.strftime("%-b %-d, %Y") %><% end %>
+          </p>
+        <% end %>
+      </div>
+
+      <%# Locations %>
+      <% if @trip.locations.any? %>
+        <div class="bg-night rounded p-4">
+          <h2 class="text-cream font-semibold text-sm mb-3">Destinations</h2>
+          <ul class="flex flex-col gap-2">
+            <% @trip.locations.each do |loc| %>
+              <li>
+                <div class="text-cream text-sm font-medium"><%= loc.name %></div>
+                <div class="text-ashgray text-xs">
+                  <%= loc.latitude.to_f.round(5) %>, <%= loc.longitude.to_f.round(5) %>
+                </div>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <%# When section %>
+      <div class="bg-night rounded p-4">
+        <h2 class="text-cream font-semibold text-sm mb-3">When</h2>
+
+        <% if @trip.starts_on && @trip.ends_on %>
+          <%# Dates are set — show them %>
+          <p class="text-cream text-lg font-semibold">
+            <%= @trip.starts_on.strftime("%-b %-d") %> – <%= @trip.ends_on.strftime("%-b %-d, %Y") %>
+          </p>
+          <p class="text-ashgray text-xs mt-1">Dates confirmed by the organizer.</p>
+
+        <% else %>
+          <%# When-is-good — build a 6-week grid %>
+          <%
+            today = Date.today
+            start_day = today - today.wday  # snap to Sunday
+            days = (0..41).map { |i| start_day + i }
+            availability = @trip.extra_data&.dig("availability") || {}
+
+            # Identify the current viewer's key
+            viewer_key = @local_user ? @local_user.id.to_s : (session[:guest_availability_key] ||= SecureRandom.hex(8))
+            my_dates = availability[viewer_key] || []
+
+            # Count how many people marked each day
+            counts = Hash.new(0)
+            availability.each_value { |dates| dates.each { |d| counts[d] += 1 } }
+            total_people = availability.keys.length
+          %>
+
+          <p class="text-ashgray text-xs mb-3">
+            Mark days you can attend. Darker = more people available.
+          </p>
+
+          <%= form_with url: "/trips/#{@trip.share_token}/availability", method: :post, local: true, id: "availability-form" do |f| %>
+            <%= f.hidden_field :authenticity_token, value: form_authenticity_token %>
+            <%= f.hidden_field :viewer_key, value: viewer_key %>
+            <input type="hidden" name="selected_dates" id="selected-dates-input" value="<%= my_dates.join(',') %>">
+
+            <div class="grid grid-cols-7 gap-1 text-center mb-4">
+              <% %w[Su Mo Tu We Th Fr Sa].each do |d| %>
+                <div class="text-ashgray text-xs pb-1"><%= d %></div>
+              <% end %>
+
+              <% days.each do |day| %>
+                <%
+                  key = day.iso8601
+                  count = counts[key] || 0
+                  is_mine = my_dates.include?(key)
+                  is_past = day < today
+                  intensity = total_people > 0 ? (count.to_f / total_people) : 0
+                  bg_alpha = count > 0 ? (0.15 + intensity * 0.7).round(2) : 0.4
+                  bg_color = count > 0 ? "rgba(165,36,34,#{bg_alpha})" : "rgba(8,15,15,0.4)"
+                  ring = is_mine ? "outline: '2px solid #A52422'" : ""
+                %>
+                <button
+                  type="button"
+                  data-date="<%= key %>"
+                  class="day-toggle rounded text-xs py-1 <%= is_past ? 'opacity-30 cursor-default' : 'cursor-pointer' %> <%= is_mine ? 'ring-2 ring-auburn' : '' %>"
+                  style="background-color: <%= bg_color %>; color: <%= count > 0 ? '#EFF2C0' : '#A4BAB7' %>;"
+                  <%= 'disabled' if is_past %>
+                  title="<%= count %> available"
+                >
+                  <div><%= day.day %></div>
+                  <% if count > 0 %><div style="font-size:9px"><%= count %></div><% end %>
+                </button>
+              <% end %>
+            </div>
+
+            <button type="submit" class="bg-auburn text-cream text-sm px-4 py-2 rounded">
+              Save my availability
+            </button>
+          <% end %>
+
+          <script>
+            (function() {
+              var selected = new Set("<%= my_dates.join(',') %>".split(',').filter(Boolean));
+              var input = document.getElementById('selected-dates-input');
+
+              document.querySelectorAll('.day-toggle').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                  var date = this.dataset.date;
+                  if (selected.has(date)) {
+                    selected.delete(date);
+                    this.classList.remove('ring-2', 'ring-auburn');
+                  } else {
+                    selected.add(date);
+                    this.classList.add('ring-2', 'ring-auburn');
+                  }
+                  input.value = Array.from(selected).join(',');
+                });
+              });
+            })();
+          </script>
+        <% end %>
+      </div>
+
+      <div class="bg-night rounded p-4">
+        <h2 class="text-cream font-semibold text-sm mb-3">
+          Who's going
+          (<%= @trip.trip_memberships.where(accepted: true).count + (@trip.guest_list&.length || 0) %>)
+        </h2>
+
+        <%# Organizer %>
+        <% owner_membership = @trip.trip_memberships.find_by(role: :owner) %>
+        <% if owner_membership %>
+          <div class="relative border border-ashgray rounded p-3 pt-4 mb-2">
+            <span class="absolute -top-2.5 left-3 bg-night text-ashgray text-xs px-1 uppercase tracking-widest">organizer</span>
+            <span class="text-cream text-sm"><%= owner_membership.user.name %></span>
+          </div>
+        <% end %>
+
+        <%# Other accepted members %>
+        <% @trip.trip_memberships.where(accepted: true).where.not(role: :owner).each do |m| %>
+          <div class="text-cream text-sm py-1 border-b border-ashgray border-opacity-20 last:border-0">
+            <%= m.user.name %>
+          </div>
+        <% end %>
+
+        <%# Anonymous guests %>
+        <% (@trip.guest_list || []).sort_by { |g| g["name"] || "" }.each do |guest| %>
+          <div class="text-cream text-sm py-1 border-b border-ashgray border-opacity-20 last:border-0">
+            <%= guest["name"] %>
+          </div>
+        <% end %>
+      </div>
+
+      <%# CTA section %>
+      <div class="bg-night rounded p-4">
+        <% already_member = @local_user && @trip.trip_memberships.exists?(user_id: @local_user.id) %>
+
+        <% if already_member %>
+          <p class="text-cream text-sm">You're on this trip.</p>
+          <a href="/trip_plan" class="mt-2 inline-block bg-auburn text-cream text-sm px-4 py-2 rounded">
+            Open in Approach →
+          </a>
+
+        <% elsif @local_user %>
+          <%# Logged-in user not yet on trip — join button %>
+          <%= form_with url: "/trips/#{@trip.share_token}/join", method: :post, local: true do |f| %>
+            <%= f.hidden_field :authenticity_token, value: form_authenticity_token %>
+            <%= f.submit "Join this trip", class: "bg-auburn text-cream text-sm px-4 py-2 rounded cursor-pointer" %>
+          <% end %>
+
+        <% else %>
+          <%# Logged-out — guest name form %>
+          <h3 class="text-cream font-semibold text-sm mb-2">Add yourself as a guest</h3>
+          <p class="text-ashgray text-xs mb-3">No account needed. Just add your name so the organizer knows you're interested.</p>
+          <%= form_with url: "/trips/#{@trip.share_token}/guests", method: :post, local: true do |f| %>
+            <%= f.hidden_field :authenticity_token, value: form_authenticity_token %>
+            <div class="flex gap-2">
+              <%= f.text_field :name, placeholder: "Your name", class: "flex-1 h-9 rounded bg-cream text-night px-3 text-sm", required: true %>
+              <%= f.submit "Add me", class: "bg-auburn text-cream text-sm px-4 rounded cursor-pointer" %>
+            </div>
+          <% end %>
+          <p class="text-ashgray text-xs mt-3">
+            Have an account? <a href="/login?return_to=/trips/<%= @trip.share_token %>" class="underline text-cream">Sign in</a> to join properly.
+          </p>
+        <% end %>
+      </div>
+
+    </div>
+  </body>
+</html>

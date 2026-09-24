@@ -7,7 +7,10 @@ Rails.application.routes.draw do
   get '/auth/logout' => 'auth0#logout'
   get '/auth/login' => 'auth0#login'
   get '/login' => 'auth0#show_login', as: :login
-  get '/dashboard' => 'components#index'
+  get  '/trips/:share_token'              => 'trips#public_show'
+  post '/trips/:share_token/join'         => 'trips#join'
+  post '/trips/:share_token/guests'       => 'trips#add_guest'
+  post '/trips/:share_token/availability' => 'trips#update_availability'
   get '/trip_plan' => 'components#index', as: :trip_plan
   get '/development' => 'components#index'
   

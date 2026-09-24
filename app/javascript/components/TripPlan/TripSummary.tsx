@@ -50,7 +50,11 @@ export const TripSummary: React.FC<TripSummaryProps> = ({
       <div className="bg-auburn text-cream px-4 py-3 flex items-center justify-between">
         <h1 className="text-xl font-bold truncate">{trip.name}</h1>
         <span className="text-xs text-cream opacity-70 ml-2 shrink-0">
-          {trip.route_mode ? "Route" : "Comparing"}
+          {trip.route_mode
+            ? "Route"
+            : (trip.locations?.length ?? 0) > 1
+              ? "Comparing"
+              : null}
         </span>
       </div>
 
