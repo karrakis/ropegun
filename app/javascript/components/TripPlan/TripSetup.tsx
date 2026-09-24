@@ -149,47 +149,49 @@ export const TripSetup: React.FC<TripSetupProps> = ({
       </div>
 
       {/* Compare vs route toggle */}
-      <div className="flex flex-col gap-2 bg-night rounded p-3">
-        <div className="text-cream text-sm font-semibold mb-1">
-          How are these destinations related?
+      {locations.length > 1 && (
+        <div className="flex flex-col gap-2 bg-night rounded p-3">
+          <div className="text-cream text-sm font-semibold mb-1">
+            How are these destinations related?
+          </div>
+          <label className="flex items-start gap-3 cursor-pointer group">
+            <input
+              type="radio"
+              name="mode"
+              checked={!routeMode}
+              onChange={() => setRouteMode(false)}
+              className="mt-1 accent-auburn"
+            />
+            <div>
+              <div className="text-cream text-sm font-medium">
+                Comparing destinations
+              </div>
+              <div className="text-ashgray text-xs">
+                We haven't decided where to go yet — show weather and distance
+                for each so we can pick one.
+              </div>
+            </div>
+          </label>
+          <label className="flex items-start gap-3 cursor-pointer group mt-1">
+            <input
+              type="radio"
+              name="mode"
+              checked={routeMode}
+              onChange={() => setRouteMode(true)}
+              className="mt-1 accent-auburn"
+            />
+            <div>
+              <div className="text-cream text-sm font-medium">
+                Planned route — visiting in order
+              </div>
+              <div className="text-ashgray text-xs">
+                We're going to all of these. Drag destinations below into the
+                order we'll visit them.
+              </div>
+            </div>
+          </label>
         </div>
-        <label className="flex items-start gap-3 cursor-pointer group">
-          <input
-            type="radio"
-            name="mode"
-            checked={!routeMode}
-            onChange={() => setRouteMode(false)}
-            className="mt-1 accent-auburn"
-          />
-          <div>
-            <div className="text-cream text-sm font-medium">
-              Comparing destinations
-            </div>
-            <div className="text-ashgray text-xs">
-              We haven't decided where to go yet — show weather and distance for
-              each so we can pick one.
-            </div>
-          </div>
-        </label>
-        <label className="flex items-start gap-3 cursor-pointer group mt-1">
-          <input
-            type="radio"
-            name="mode"
-            checked={routeMode}
-            onChange={() => setRouteMode(true)}
-            className="mt-1 accent-auburn"
-          />
-          <div>
-            <div className="text-cream text-sm font-medium">
-              Planned route — visiting in order
-            </div>
-            <div className="text-ashgray text-xs">
-              We're going to all of these. Drag destinations below into the
-              order we'll visit them.
-            </div>
-          </div>
-        </label>
-      </div>
+      )}
 
       {/* Destination list */}
       <div className="flex flex-col gap-2">

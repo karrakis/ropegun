@@ -5,6 +5,7 @@ import {
 } from "../Map/DestinationSelector";
 import { TripSetup } from "./TripSetup";
 import { TripSummary } from "./TripSummary";
+import { ExistingTrips } from "./ExistingTrips";
 import { TripPlanProps } from "../types";
 import { csrfToken } from "../../utilities/csrfToken";
 
@@ -37,69 +38,15 @@ export const TripPlan = ({ localUser }: TripPlanProps) => {
       ),
     );
 
-  const handleTripCreation = (trip: TripProps) => {
-    fetch("/api/v1/trips", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRF-Token": csrfToken(),
-      },
-      body: JSON.stringify({ trip }),
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error(`Server error ${res.status}`);
-        return res.json();
-      })
-      .then((trip) => {
-        setCreatedTrip(trip);
-        setScreen("setup");
-      })
-      .catch((err) => {
-        console.error(err);
-        alert("Error creating trip. Please try again.");
-      });
-  };
-
-  const handleTripUpdate = (trip: any) => {
-    fetch(`/api/v1/trips/${trip.id}`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        "X-CSRF-Token": csrfToken(),
-      },
-      body: JSON.stringify({
-        trip: {
-          name: trip.name,
-          route_mode: trip.route_mode,
-          starts_on: trip.starts_on,
-          ends_on: trip.ends_on,
-          locations: trip.locations.map((loc: any) => ({
-            name: loc.name,
-            latitude: loc.latitude,
-            longitude: loc.longitude,
-          })),
-        },
-      }),
-    })
-      .then((res) => {
-        if (!res.ok) throw new Error(`Server error ${res.status}`);
-        return res.json();
-      })
-      .then((trip) => {
-        setCreatedTrip(trip);
-        setScreen("created");
-      })
-      .catch((err) => {
-        console.error(err);
-        alert("Error updating trip. Please try again.");
-      });
+  // Called by TripSetup after the trip is created server-side
+  const handleTripCreated = (trip: any) => {
+    setCreatedTrip(trip);
+    setScreen("created");
   };
 
   const continueRoute = () => {
     if (tripLocations.length === 0) return;
-    handleTripCreation({
-      locations: tripLocations,
-    });
+    setScreen("setup");
   };
 
   return (
@@ -112,6 +59,14 @@ export const TripPlan = ({ localUser }: TripPlanProps) => {
               <h1 className="text-cream text-2xl font-bold bg-auburn p-2 w-full text-center z-10">
                 Where to?
               </h1>
+
+              <ExistingTrips
+                localUser={localUser}
+                onTripSelected={(trip) => {
+                  setCreatedTrip(trip);
+                  setScreen("created");
+                }}
+              />
 
               <DestinationSelector
                 onDestinationAdded={handleDestinationAdded}
@@ -168,7 +123,7 @@ export const TripPlan = ({ localUser }: TripPlanProps) => {
               <TripSetup
                 locations={tripLocations}
                 localUser={localUser}
-                onTripCreated={handleTripUpdate}
+                onTripCreated={handleTripCreated}
                 onBack={() => setScreen("destinations")}
               />
             </>

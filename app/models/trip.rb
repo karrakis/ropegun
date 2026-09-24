@@ -1,9 +1,11 @@
 class Trip < ApplicationRecord
   belongs_to :owner, class_name: "User", foreign_key: :owner_id
 
-  # ── Locations (ordered by position) ──────────────────────────────────────
-  has_and_belongs_to_many :locations, -> { order("trips_locations.position ASC") },
-                           join_table: :trips_locations
+  # ── Locations ────────────────────────────────────────────────────────────────
+  # Note: order by trips_locations.position is applied in queries that JOIN the
+  # join table (e.g. .joins(:locations).order(...)). Not applied here because
+  # it breaks eager loading via includes.
+  has_and_belongs_to_many :locations, join_table: :trips_locations
 
   # ── Memberships ───────────────────────────────────────────────────────────
   has_many :trip_memberships, dependent: :destroy
