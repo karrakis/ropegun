@@ -60,6 +60,64 @@ class Api::V1::TripsController < ApplicationController
     render json: @trip.as_json(include: [:locations, :owner, { trip_memberships: { include: :user } }])
   end
 
+  def update
+    @trip = @local_user.owned_trips.find(params[:id])
+    extra_data_update = params[:trip][:extra_data]
+    if extra_data_update
+      merged = (@trip.extra_data || {}).deep_merge(extra_data_update.to_unsafe_h)
+      @trip.extra_data = merged
+    end
+    if @trip.update(trip_params)
+      render json: @trip.as_json(include: [:locations, :owner, { trip_memberships: { include: :user } }])
+    else
+      render json: @trip.errors, status: :unprocessable_entity
+    end
+  end
+
+  def distances
+    @trip = @local_user.trips.find(params[:id])
+    members = @trip.trip_memberships.accepted.includes(:user).map(&:user)
+    locations = @trip.locations
+
+    per_member = members.map do |user|
+      next { user_id: user.id, name: user.name, distances: nil } unless user.home_address.present?
+      dist_map = {}
+      locations.each do |loc|
+        destination = "#{loc.latitude},#{loc.longitude}"
+        record = Distance.find_or_create_by(origin: user.home_address, destination: destination)
+        result = record.calculate
+        if result&.dig("rows", 0, "elements", 0, "status") == "OK"
+          el = result["rows"][0]["elements"][0]
+          record.update(distance: el["distance"]["text"], duration: el["duration"]["text"])
+          dist_map[loc.id] = { distance: el["distance"]["text"], duration: el["duration"]["text"] }
+        end
+      end
+      { user_id: user.id, name: user.name, distances: dist_map }
+    end
+
+    members_with_address = members.select { |u| u.home_address.present? }
+    missing_addresses = members.length - members_with_address.length
+
+    average = {}
+    if members_with_address.any?
+      locations.each do |loc|
+        dists = per_member.filter_map { |m| m[:distances]&.dig(loc.id, :distance) }
+        durs  = per_member.filter_map { |m| m[:distances]&.dig(loc.id, :duration) }
+        average[loc.id] = { distance: dists.first, duration: durs.first } if dists.any?
+      end
+    end
+
+    render json: { per_member: per_member, average: average, missing_addresses: missing_addresses }
+  end
+
+  def choose_destination
+    @trip = @local_user.owned_trips.find(params[:id])
+    chosen = @trip.locations.find(params[:location_id])
+    @trip.locations.where.not(id: chosen.id).each { |l| @trip.locations.delete(l) }
+    @trip.update!(route_mode: true)
+    render json: @trip.as_json(include: [:locations, :owner, { trip_memberships: { include: :user } }])
+  end
+
   private
 
   def handle_locations

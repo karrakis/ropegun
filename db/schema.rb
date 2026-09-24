@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_09_22_200506) do
+ActiveRecord::Schema[7.0].define(version: 2026_09_24_015307) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -85,6 +85,8 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_22_200506) do
     t.integer "quantity", default: 1, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.jsonb "extra_data", default: {}
+    t.integer "required_quantity", default: 1
     t.index ["gear_item_id"], name: "index_trip_gear_items_on_gear_item_id"
     t.index ["trip_id", "user_id", "gear_item_id"], name: "index_trip_gear_items_on_trip_id_and_user_id_and_gear_item_id", unique: true
     t.index ["trip_id"], name: "index_trip_gear_items_on_trip_id"
@@ -121,6 +123,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_22_200506) do
     t.bigint "skill_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.jsonb "extra_data", default: {}
     t.index ["skill_id"], name: "index_trip_skills_on_skill_id"
     t.index ["trip_id", "user_id", "skill_id"], name: "index_trip_skills_on_trip_id_and_user_id_and_skill_id", unique: true
     t.index ["trip_id"], name: "index_trip_skills_on_trip_id"

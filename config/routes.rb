@@ -33,6 +33,22 @@ Rails.application.routes.draw do
       get '/trips/:id' => 'trips#show'
       patch '/trips/:id' => 'trips#update'
       delete '/trips/:id' => 'trips#destroy'
+      get '/trips/:id/distances' => 'trips#distances'
+      patch '/trips/:id/choose_destination' => 'trips#choose_destination'
+
+      post '/trip_memberships' => 'trip_memberships#create'
+      patch '/trip_memberships/:id' => 'trip_memberships#update'
+      delete '/trip_memberships/:id' => 'trip_memberships#destroy'
+
+      get  '/skills'    => 'skills#index'
+      get  '/gear_items' => 'gear_items#index'
+
+      post   '/trips/:id/skills'            => 'trip_skills#create'
+      patch  '/trip_skills/:id/volunteer'   => 'trip_skills#volunteer'
+      patch  '/trip_skills/:id/unvolunteer' => 'trip_skills#unvolunteer'
+
+      post   '/trips/:id/gear_items'              => 'trip_gear_items#create'
+      patch  '/trip_gear_items/:id/commit'        => 'trip_gear_items#commit'
       
     end
   end

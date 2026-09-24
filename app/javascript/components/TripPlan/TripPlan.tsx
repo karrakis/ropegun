@@ -4,6 +4,7 @@ import {
   PendingDestination,
 } from "../Map/DestinationSelector";
 import { TripSetup } from "./TripSetup";
+import { TripSummary } from "./TripSummary";
 import { TripPlanProps } from "../types";
 import { csrfToken } from "../../utilities/csrfToken";
 
@@ -174,6 +175,27 @@ export const TripPlan = ({ localUser }: TripPlanProps) => {
           )}
         </div>
       </div>
+
+      {/* ── Step 3: Trip Summary (full screen, replaces outer shell) ── */}
+      {screen === "created" && createdTrip && (
+        <div className="fixed inset-0 z-50 bg-cream overflow-y-auto">
+          <TripSummary
+            trip={createdTrip}
+            localUser={localUser}
+            onTripUpdated={setCreatedTrip}
+          />
+          <button
+            className="fixed bottom-4 right-4 bg-night text-cream text-xs px-3 py-2 rounded shadow"
+            onClick={() => {
+              setScreen("destinations");
+              setTripLocations([]);
+              setCreatedTrip(null);
+            }}
+          >
+            + New trip
+          </button>
+        </div>
+      )}
     </div>
   );
 };
