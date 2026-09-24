@@ -64,7 +64,6 @@ const TripCard: React.FC<TripCardProps> = ({ trip, onOpen }) => {
 
           {/* Meta */}
           <div className="flex items-center justify-between text-xs text-ashgray">
-            <span>{trip.route_mode ? "Route" : "Comparing destinations"}</span>
             <span>
               {trip.trip_memberships?.filter((m: any) => m.accepted).length ??
                 1}{" "}

@@ -1,7 +1,135 @@
 import React, { useState, useEffect } from "react";
 import { csrfToken } from "../../../utilities/csrfToken";
 
-type WhereSubTab = "locations" | "distances" | "notes";
+type WhereSubTab = "locations" | "weather" | "distances" | "notes";
+
+// ─── Weather fetch (via Rails cache layer) ────────────────────────────────────
+
+interface DailyWeather {
+  date: string;
+  tempMax: number;
+  tempMin: number;
+  precipProb: number;
+  windMax: number;
+}
+
+async function fetchWeatherForLocation(
+  locationId: number,
+): Promise<DailyWeather[]> {
+  const r = await fetch(`/api/v1/locations/${locationId}/weather`, {
+    headers: { Accept: "application/json" },
+  });
+  if (!r.ok) throw new Error(`Weather API ${r.status}`);
+  const data = await r.json();
+  return data.daily.time.map((date: string, i: number) => ({
+    date,
+    tempMax: Math.round(data.daily.temperature_2m_max[i]),
+    tempMin: Math.round(data.daily.temperature_2m_min[i]),
+    precipProb: data.daily.precipitation_probability_max[i] ?? 0,
+    windMax: Math.round(data.daily.windspeed_10m_max[i]),
+  }));
+}
+
+// ─── Weather sub-tab ──────────────────────────────────────────────────────────
+
+const WeatherSubTab = ({ locations }: { locations: any[] }) => {
+  const [weatherByLoc, setWeatherByLoc] = useState<
+    Record<number, DailyWeather[]>
+  >({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (locations.length === 0) {
+      setLoading(false);
+      return;
+    }
+    Promise.all(
+      locations.map((loc) =>
+        fetchWeatherForLocation(loc.id)
+          .then((days) => ({ id: loc.id, days }))
+          .catch(() => ({ id: loc.id, days: [] })),
+      ),
+    ).then((results) => {
+      const map: Record<number, DailyWeather[]> = {};
+      results.forEach(({ id, days }) => {
+        map[id] = days;
+      });
+      setWeatherByLoc(map);
+      setLoading(false);
+    });
+  }, [locations.map((l) => l.id).join(",")]);
+
+  if (loading)
+    return <p className="text-ashgray text-sm p-4">Loading forecast…</p>;
+  if (error) return <p className="text-red-400 text-sm p-4">{error}</p>;
+
+  return (
+    <div className="p-4 flex flex-col gap-6">
+      {locations.map((loc) => {
+        const days = weatherByLoc[loc.id] ?? [];
+        return (
+          <div key={loc.id}>
+            <h3 className="text-night font-semibold text-sm mb-2">
+              {loc.name}
+            </h3>
+            {days.length === 0 ? (
+              <p className="text-ashgray text-xs">No forecast available.</p>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs border-collapse min-w-max">
+                  <thead>
+                    <tr className="bg-night text-ashgray">
+                      <th className="px-2 py-1 text-left font-normal">Date</th>
+                      <th className="px-2 py-1 text-right font-normal">High</th>
+                      <th className="px-2 py-1 text-right font-normal">Low</th>
+                      <th className="px-2 py-1 text-right font-normal">
+                        Precip%
+                      </th>
+                      <th className="px-2 py-1 text-right font-normal">Wind</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {days.map((d, i) => (
+                      <tr
+                        key={d.date}
+                        className={`${i % 2 === 0 ? "bg-night bg-opacity-70" : "bg-night bg-opacity-60"}`}
+                      >
+                        <td className="px-2 py-1 text-ashgray">
+                          {new Date(d.date + "T12:00:00").toLocaleDateString(
+                            undefined,
+                            {
+                              month: "short",
+                              day: "numeric",
+                            },
+                          )}
+                        </td>
+                        <td className="px-2 py-1 text-right text-cream">
+                          {d.tempMax}°
+                        </td>
+                        <td className="px-2 py-1 text-right text-ashgray">
+                          {d.tempMin}°
+                        </td>
+                        <td
+                          className={`px-2 py-1 text-right ${d.precipProb >= 60 ? "text-blue-400" : d.precipProb >= 30 ? "text-blue-300 opacity-70" : "text-ashgray"}`}
+                        >
+                          {d.precipProb}%
+                        </td>
+                        <td className="px-2 py-1 text-right text-ashgray">
+                          {d.windMax} mph
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+};
 
 interface WhereTabProps {
   trip: any;
@@ -232,21 +360,23 @@ export const WhereTab: React.FC<WhereTabProps> = ({
 
       {/* Sub-tabs */}
       <div className="flex border-b border-ashgray bg-night bg-opacity-50 text-xs">
-        {(["locations", "distances", "notes"] as WhereSubTab[]).map((t) => (
-          <button
-            key={t}
-            onClick={() => setSubTab(t)}
-            className={`px-4 py-2 capitalize transition-colors ${
-              subTab === t
-                ? "text-cream border-b-2 border-auburn"
-                : "text-ashgray hover:text-cream"
-            }`}
-          >
-            {t === "locations"
-              ? "Overview"
-              : t.charAt(0).toUpperCase() + t.slice(1)}
-          </button>
-        ))}
+        {(["locations", "weather", "distances", "notes"] as WhereSubTab[]).map(
+          (t) => (
+            <button
+              key={t}
+              onClick={() => setSubTab(t)}
+              className={`px-4 py-2 capitalize transition-colors ${
+                subTab === t
+                  ? "text-cream border-b-2 border-auburn"
+                  : "text-ashgray hover:text-cream"
+              }`}
+            >
+              {t === "locations"
+                ? "Overview"
+                : t.charAt(0).toUpperCase() + t.slice(1)}
+            </button>
+          ),
+        )}
       </div>
 
       {/* Sub-tab content */}
@@ -265,7 +395,6 @@ export const WhereTab: React.FC<WhereTabProps> = ({
                   <div className="text-ashgray text-xs mt-0.5">
                     {parseFloat(loc.latitude).toFixed(5)},{" "}
                     {parseFloat(loc.longitude).toFixed(5)}
-                    {loc.office && ` · NWS ${loc.office}`}
                   </div>
                 </div>
                 {/* Compare-mode: organizer can choose this destination */}
@@ -297,14 +426,12 @@ export const WhereTab: React.FC<WhereTabProps> = ({
                   </button>
                 )}
               </div>
-              {/* Weather placeholder */}
-              <div className="mt-2 text-ashgray text-xs italic">
-                Weather: {loc.weather ? "available" : "not yet loaded"}
-              </div>
             </div>
           ))}
         </div>
       )}
+
+      {subTab === "weather" && <WeatherSubTab locations={locations} />}
 
       {subTab === "distances" && (
         <DistancesSubTab

@@ -42,6 +42,7 @@ Rails.application.routes.draw do
 
       get  '/skills'    => 'skills#index'
       get  '/gear_items' => 'gear_items#index'
+      get  '/locations/:location_id/weather' => 'location_weather#show'
 
       post   '/trips/:id/skills'            => 'trip_skills#create'
       patch  '/trip_skills/:id/volunteer'   => 'trip_skills#volunteer'

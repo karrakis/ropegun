@@ -151,29 +151,13 @@ export const DestinationSelector: React.FC<DestinationSelectorProps> = ({
     setError(null);
 
     try {
-      // Look up NWS grid office for weather (non-fatal — works for US only)
-      let office: string | null = null;
-      let office_x: number | null = null;
-      let office_y: number | null = null;
-      try {
-        const wx = await fetch(
-          `https://api.weather.gov/points/${pin.lat},${pin.lng}`,
-          { headers: { Accept: "application/ld+json" } },
-        ).then((r) => r.json());
-        office = wx.gridId ?? null;
-        office_x = wx.gridX ?? null;
-        office_y = wx.gridY ?? null;
-      } catch {
-        // Non-US or off-grid — weather unavailable, that's fine
-      }
-
       onDestinationAdded({
         name: displayName,
         latitude: String(pin.lat),
         longitude: String(pin.lng),
-        office,
-        office_x,
-        office_y,
+        office: null,
+        office_x: null,
+        office_y: null,
       });
 
       // Reset for next pin
