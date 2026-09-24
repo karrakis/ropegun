@@ -36,7 +36,10 @@ class TripsController < ApplicationController
     availability[viewer_key] = selected
 
     @trip.update!(extra_data: (@trip.extra_data || {}).merge("availability" => availability))
-    redirect_to "/trips/#{params[:share_token]}", notice: "Availability saved."
+    cal_month = params[:cal_month].presence
+    redirect_url = "/trips/#{params[:share_token]}"
+    redirect_url += "?cal_month=#{cal_month}" if cal_month&.match?(/\A\d{4}-\d{2}\z/)
+    redirect_to redirect_url, notice: "Availability saved."
   end
 
   # Anonymous guest adds their name

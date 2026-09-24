@@ -25,17 +25,53 @@ const WhenIsGood = ({
     trip.extra_data?.availability ?? {};
   const myDates: string[] = availability[localUser.id] ?? [];
 
-  // Build a 6-week grid starting from today
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  const start = new Date(today);
-  start.setDate(start.getDate() - start.getDay()); // snap to Sunday
+
+  // Month navigation state — default to current month
+  const [viewYear, setViewYear] = useState(today.getFullYear());
+  const [viewMonth, setViewMonth] = useState(today.getMonth()); // 0-indexed
+
+  const prevMonth = () => {
+    if (viewMonth === 0) {
+      setViewYear((y) => y - 1);
+      setViewMonth(11);
+    } else setViewMonth((m) => m - 1);
+  };
+  const nextMonth = () => {
+    if (viewMonth === 11) {
+      setViewYear((y) => y + 1);
+      setViewMonth(0);
+    } else setViewMonth((m) => m + 1);
+  };
+
+  const monthLabel = new Date(viewYear, viewMonth, 1).toLocaleDateString(
+    undefined,
+    {
+      month: "long",
+      year: "numeric",
+    },
+  );
+  const prevLabel = new Date(viewYear, viewMonth - 1, 1).toLocaleDateString(
+    undefined,
+    { month: "short" },
+  );
+  const nextLabel = new Date(viewYear, viewMonth + 1, 1).toLocaleDateString(
+    undefined,
+    { month: "short" },
+  );
+
+  // Build grid: full weeks covering the selected month
+  const monthStart = new Date(viewYear, viewMonth, 1);
+  const monthEnd = new Date(viewYear, viewMonth + 1, 0);
+  const gridStart = new Date(monthStart);
+  gridStart.setDate(gridStart.getDate() - gridStart.getDay());
+  const gridEnd = new Date(monthEnd);
+  gridEnd.setDate(gridEnd.getDate() + (6 - gridEnd.getDay()));
 
   const days: Date[] = [];
-  for (let i = 0; i < 42; i++) {
-    const d = new Date(start);
-    d.setDate(start.getDate() + i);
-    days.push(d);
+  for (let d = new Date(gridStart); d <= gridEnd; d.setDate(d.getDate() + 1)) {
+    days.push(new Date(d));
   }
 
   const fmt = (d: Date) => d.toISOString().slice(0, 10);
@@ -72,6 +108,24 @@ const WhenIsGood = ({
           ? "Dates have been set. Availability is shown for reference."
           : "Tap days you can attend. Darker = more people available."}
       </p>
+
+      {/* Month navigation */}
+      <div className="flex items-center justify-between mb-3">
+        <button
+          onClick={prevMonth}
+          className="text-cream text-sm px-2 py-1 bg-night rounded"
+        >
+          ← {prevLabel}
+        </button>
+        <span className="text-night font-semibold text-sm">{monthLabel}</span>
+        <button
+          onClick={nextMonth}
+          className="text-cream text-sm px-2 py-1 bg-night rounded"
+        >
+          {nextLabel} →
+        </button>
+      </div>
+
       <div className="grid grid-cols-7 gap-1 text-center">
         {DAYS.map((d) => (
           <div key={d} className="text-ashgray text-xs pb-1">
@@ -83,15 +137,16 @@ const WhenIsGood = ({
           const count = countFor(d);
           const mine = myDates.includes(key);
           const isPast = d < today;
+          const isOtherMonth = d.getMonth() !== viewMonth;
           const intensity = totalMembers > 0 ? count / totalMembers : 0;
 
           return (
             <button
               key={key}
               onClick={() => toggle(d)}
-              disabled={isPast || locked}
+              disabled={isPast || locked || isOtherMonth}
               className={`rounded text-xs py-1 transition-colors ${
-                isPast
+                isPast || isOtherMonth
                   ? "text-ashgray opacity-30 cursor-default"
                   : locked
                     ? "cursor-default"

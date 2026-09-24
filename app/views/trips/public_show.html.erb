@@ -61,30 +61,54 @@
           <p class="text-ashgray text-xs mt-1">Dates confirmed by the organizer.</p>
 
         <% else %>
-          <%# When-is-good — build a 6-week grid %>
+          <%# When-is-good — monthly calendar with prev/next navigation %>
           <%
             today = Date.today
-            start_day = today - today.wday  # snap to Sunday
-            days = (0..41).map { |i| start_day + i }
-            availability = @trip.extra_data&.dig("availability") || {}
+            # Which month are we showing? Default to current month, allow nav via ?cal_month=YYYY-MM
+            cal_param = params[:cal_month]
+            view_month = cal_param&.match?(/\A\d{4}-\d{2}\z/) ? Date.parse("#{cal_param}-01") : today.beginning_of_month
+            prev_month = (view_month - 1.month).strftime("%Y-%m")
+            next_month = (view_month + 1.month).strftime("%Y-%m")
 
-            # Identify the current viewer's key
+            # Days to show: full weeks covering the month
+            month_start = view_month.beginning_of_month
+            month_end   = view_month.end_of_month
+            grid_start  = month_start - month_start.wday
+            grid_end    = month_end + (6 - month_end.wday)
+            days = (grid_start..grid_end).to_a
+
+            availability = @trip.extra_data&.dig("availability") || {}
             viewer_key = @local_user ? @local_user.id.to_s : (session[:guest_availability_key] ||= SecureRandom.hex(8))
             my_dates = availability[viewer_key] || []
 
-            # Count how many people marked each day
             counts = Hash.new(0)
             availability.each_value { |dates| dates.each { |d| counts[d] += 1 } }
-            total_people = availability.keys.length
+            total_people = [availability.keys.length, 1].max
           %>
 
           <p class="text-ashgray text-xs mb-3">
             Mark days you can attend. Darker = more people available.
           </p>
 
+          <%# Month navigation %>
+          <div class="flex items-center justify-between mb-3">
+            <a href="/trips/<%= @trip.share_token %>?cal_month=<%= prev_month %>"
+               class="text-cream text-sm px-2 py-1 bg-night rounded hover:opacity-80">
+              &#8592; <%= Date.parse("#{prev_month}-01").strftime("%b") %>
+            </a>
+            <span class="text-cream font-semibold text-sm">
+              <%= view_month.strftime("%B %Y") %>
+            </span>
+            <a href="/trips/<%= @trip.share_token %>?cal_month=<%= next_month %>"
+               class="text-cream text-sm px-2 py-1 bg-night rounded hover:opacity-80">
+              <%= Date.parse("#{next_month}-01").strftime("%b") %> &#8594;
+            </a>
+          </div>
+
           <%= form_with url: "/trips/#{@trip.share_token}/availability", method: :post, local: true, id: "availability-form" do |f| %>
             <%= f.hidden_field :authenticity_token, value: form_authenticity_token %>
             <%= f.hidden_field :viewer_key, value: viewer_key %>
+            <%= f.hidden_field :cal_month, value: view_month.strftime("%Y-%m") %>
             <input type="hidden" name="selected_dates" id="selected-dates-input" value="<%= my_dates.join(',') %>">
 
             <div class="grid grid-cols-7 gap-1 text-center mb-4">
@@ -98,21 +122,23 @@
                   count = counts[key] || 0
                   is_mine = my_dates.include?(key)
                   is_past = day < today
-                  intensity = total_people > 0 ? (count.to_f / total_people) : 0
-                  bg_alpha = count > 0 ? (0.15 + intensity * 0.7).round(2) : 0.4
-                  bg_color = count > 0 ? "rgba(165,36,34,#{bg_alpha})" : "rgba(8,15,15,0.4)"
-                  ring = is_mine ? "outline: '2px solid #A52422'" : ""
+                  is_other_month = day.month != view_month.month
+                  intensity = count.to_f / total_people
+                  bg_color = count > 0 ? "rgba(165,36,34,#{(0.15 + intensity * 0.7).round(2)})" : "rgba(8,15,15,0.4)"
+                  text_color = count > 0 ? "#EFF2C0" : "#A4BAB7"
                 %>
                 <button
                   type="button"
                   data-date="<%= key %>"
-                  class="day-toggle rounded text-xs py-1 <%= is_past ? 'opacity-30 cursor-default' : 'cursor-pointer' %> <%= is_mine ? 'ring-2 ring-auburn' : '' %>"
-                  style="background-color: <%= bg_color %>; color: <%= count > 0 ? '#EFF2C0' : '#A4BAB7' %>;"
-                  <%= 'disabled' if is_past %>
-                  title="<%= count %> available"
+                  class="day-toggle rounded text-xs py-1 transition-opacity
+                    <%= is_past || is_other_month ? 'opacity-30 cursor-default' : 'cursor-pointer' %>
+                    <%= is_mine ? 'ring-2 ring-auburn' : '' %>"
+                  style="background-color: <%= bg_color %>; color: <%= text_color %>;"
+                  <%= 'disabled' if is_past || is_other_month %>
+                  title="<%= is_other_month ? '' : "#{count} available" %>"
                 >
                   <div><%= day.day %></div>
-                  <% if count > 0 %><div style="font-size:9px"><%= count %></div><% end %>
+                  <% if count > 0 && !is_other_month %><div style="font-size:9px"><%= count %></div><% end %>
                 </button>
               <% end %>
             </div>
