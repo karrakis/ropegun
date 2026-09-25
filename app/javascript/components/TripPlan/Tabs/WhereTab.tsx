@@ -386,16 +386,26 @@ export const WhereTab: React.FC<WhereTabProps> = ({
             <p className="text-ashgray text-sm">No locations on this trip.</p>
           )}
           {locations.map((loc: any) => (
-            <div key={loc.id} className="bg-night rounded p-3">
+            <div key={loc.id} className="bg-night rounded p-3 ">
               <div className="flex items-start justify-between">
-                <div>
-                  <div className="text-cream font-semibold text-sm">
-                    {loc.name}
+                <div className="flex justify-between w-full">
+                  <div className="flex flex-col">
+                    <div className="text-cream font-semibold text-sm">
+                      {loc.name}
+                    </div>
+                    <div className="text-ashgray text-xs mt-0.5">
+                      {parseFloat(loc.latitude).toFixed(5)},{" "}
+                      {parseFloat(loc.longitude).toFixed(5)}
+                    </div>
                   </div>
-                  <div className="text-ashgray text-xs mt-0.5">
-                    {parseFloat(loc.latitude).toFixed(5)},{" "}
-                    {parseFloat(loc.longitude).toFixed(5)}
-                  </div>
+                  <a
+                    href={`https://www.google.com/maps/dir/?api=1&destination=${loc.latitude},${loc.longitude}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center justify-center mt-1.5 text-xs bg-cream text-night px-2 py-0.5 rounded hover:opacity-80"
+                  >
+                    Directions ↗
+                  </a>
                 </div>
                 {/* Compare-mode: organizer can choose this destination */}
                 {isOrganizer && !trip.route_mode && locations.length > 1 && (

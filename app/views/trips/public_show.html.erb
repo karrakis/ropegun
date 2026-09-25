@@ -36,13 +36,20 @@
       <% if @trip.locations.any? %>
         <div class="bg-night rounded p-4">
           <h2 class="text-cream font-semibold text-sm mb-3">Destinations</h2>
-          <ul class="flex flex-col gap-2">
+          <ul class="flex flex-row gap-3">
             <% @trip.locations.each do |loc| %>
-              <li>
-                <div class="text-cream text-sm font-medium"><%= loc.name %></div>
-                <div class="text-ashgray text-xs">
+              <li class="flex flex-row justify-between w-full">
+                <div class="flex flex-col">
+                  <div class="text-cream text-sm font-medium"><%= loc.name %></div>
+                  <div class="text-ashgray text-xs">
                   <%= loc.latitude.to_f.round(5) %>, <%= loc.longitude.to_f.round(5) %>
+                  </div>
                 </div>
+                <a href="https://www.google.com/maps/dir/?api=1&destination=<%= loc.latitude %>,<%= loc.longitude %>"
+                   target="_blank" rel="noopener noreferrer"
+                   class="flex items-center justify-center mt-1 text-xs bg-cream text-night px-2 py-0.5 rounded hover:opacity-80">
+                  Directions ↗
+                </a>
               </li>
             <% end %>
           </ul>
