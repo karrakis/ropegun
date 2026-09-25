@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 
 interface TripCardProps {
   trip: any;
@@ -105,21 +105,12 @@ interface ExistingTripsProps {
   onTripSelected: (trip: any) => void;
 }
 
-const STORAGE_KEY = "ropegun_trips_list_collapsed";
-
 export const ExistingTrips: React.FC<ExistingTripsProps> = ({
   localUser,
   onTripSelected,
 }) => {
   const [trips, setTrips] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  const [collapsed, setCollapsed] = useState<boolean>(() => {
-    try {
-      return localStorage.getItem(STORAGE_KEY) === "1";
-    } catch {
-      return false;
-    }
-  });
   const [search, setSearch] = useState("");
 
   useEffect(() => {
@@ -138,19 +129,10 @@ export const ExistingTrips: React.FC<ExistingTripsProps> = ({
       });
   }, []);
 
-  const toggleCollapsed = () => {
-    setCollapsed((v) => {
-      const next = !v;
-      try {
-        localStorage.setItem(STORAGE_KEY, next ? "1" : "0");
-      } catch {}
-      return next;
-    });
-  };
-
-  // Nothing to show while loading or if no trips
-  if (loading) return null;
-  if (trips.length === 0) return null;
+  if (loading)
+    return <p className="text-ashgray text-sm p-4">Loading trips…</p>;
+  if (trips.length === 0)
+    return <p className="text-ashgray text-sm p-4">No trips yet.</p>;
 
   const showSearch = trips.length > 6;
   const filtered = search.trim()
@@ -163,40 +145,21 @@ export const ExistingTrips: React.FC<ExistingTripsProps> = ({
     : trips;
 
   return (
-    <div className="w-full mb-2">
-      {/* Section header */}
-      <button
-        className="w-full flex items-center justify-between px-3 py-2 bg-night bg-opacity-70 text-cream text-sm font-semibold rounded-t"
-        onClick={toggleCollapsed}
-      >
-        <span>Your trips ({trips.length})</span>
-        <span
-          className={`text-ashgray text-xs transform transition-transform ${collapsed ? "rotate-0" : "rotate-180"}`}
-        >
-          &#9660;
-        </span>
-      </button>
-
-      {!collapsed && (
-        <div className="flex flex-col gap-1 bg-night bg-opacity-30 p-2 rounded-b">
-          {showSearch && (
-            <input
-              className="w-full h-8 rounded bg-night text-cream px-3 text-sm focus:outline-none focus:ring-1 focus:ring-auburn mb-1"
-              placeholder="Search trips…"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-            />
-          )}
-          {filtered.length === 0 && (
-            <p className="text-ashgray text-xs px-1">
-              No trips match your search.
-            </p>
-          )}
-          {filtered.map((trip) => (
-            <TripCard key={trip.id} trip={trip} onOpen={onTripSelected} />
-          ))}
-        </div>
+    <div className="w-full flex flex-col gap-2 p-2">
+      {showSearch && (
+        <input
+          className="w-full h-8 rounded bg-night text-cream px-3 text-sm focus:outline-none focus:ring-1 focus:ring-auburn"
+          placeholder="Search trips…"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+        />
       )}
+      {filtered.length === 0 && (
+        <p className="text-ashgray text-xs px-1">No trips match your search.</p>
+      )}
+      {filtered.map((trip) => (
+        <TripCard key={trip.id} trip={trip} onOpen={onTripSelected} />
+      ))}
     </div>
   );
 };

@@ -11,7 +11,24 @@ import { Geyikbayiri } from "../../assets/images/Geyikbayiri.jpg";
 import { UserSessionObject, Route, RouteList, AppRootProps } from "./types";
 
 export const AppRoot: React.FC<AppRootProps> = ({ user, localUser, csrf }) => {
-  const [currentPage, setPage] = useState(window.location.pathname);
+  const [currentPage, setCurrentPage] = useState(window.location.pathname);
+
+  // Navigate: updates the URL and notifies all listeners (this component and
+  // any nested router, e.g. TripPlan) via a popstate event.
+  const goToPage = (path: string) => {
+    if (path !== window.location.pathname) {
+      window.history.pushState({}, "", path);
+    }
+    window.dispatchEvent(new PopStateEvent("popstate"));
+  };
+
+  // Keep currentPage in sync with the URL for back/forward navigation and
+  // for navigations triggered elsewhere (e.g. TripPlan's internal router).
+  useEffect(() => {
+    const onPop = () => setCurrentPage(window.location.pathname);
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
 
   const setDisplayPage = () => {
     if (!localUser.id) {
@@ -19,20 +36,20 @@ export const AppRoot: React.FC<AppRootProps> = ({ user, localUser, csrf }) => {
     }
     switch (currentPage) {
       case "/":
-        window.history.pushState({}, "Trip Planning", "/trip_plan");
         return <TripPlan localUser={localUser} />;
       case "/home":
-        window.history.pushState({}, "Home", "/home");
         return <Home localUser={localUser} />;
       case "/dashboard":
-        window.history.pushState({}, "Dashboard", "/dashboard");
         return <Dashboard user={user} localUser={localUser} />;
       case "/trip_plan":
-        window.history.pushState({}, "Trip Planning", "/trip_plan");
         return <TripPlan localUser={localUser} />;
       case "/development":
-        window.history.pushState({}, "Development", "/development");
         return <DevBlog />;
+      default:
+        if (currentPage.startsWith("/trip_plan/")) {
+          return <TripPlan localUser={localUser} />;
+        }
+        return null;
     }
   };
 
@@ -54,7 +71,7 @@ export const AppRoot: React.FC<AppRootProps> = ({ user, localUser, csrf }) => {
         />
       </a>
 
-      <Header user={user} csrf={csrf} page={currentPage} setPage={setPage} />
+      <Header user={user} csrf={csrf} page={currentPage} setPage={goToPage} />
       {setDisplayPage()}
     </div>
   );

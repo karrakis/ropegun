@@ -11,7 +11,11 @@ Rails.application.routes.draw do
   post '/trips/:share_token/join'         => 'trips#join'
   post '/trips/:share_token/guests'       => 'trips#add_guest'
   post '/trips/:share_token/availability' => 'trips#update_availability'
-  get '/trip_plan' => 'components#index', as: :trip_plan
+  get '/trip_plan'          => 'components#index', as: :trip_plan
+  get '/trip_plan/trips'    => 'components#index'
+  get '/trip_plan/new'      => 'components#index'
+  get '/trip_plan/new/setup' => 'components#index'
+  get '/trip_plan/:id'      => 'components#index'
   get '/development' => 'components#index'
   
   patch '/users/:id' => 'users#update'

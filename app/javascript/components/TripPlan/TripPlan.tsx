@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   DestinationSelector,
   PendingDestination,
@@ -9,16 +9,71 @@ import { ExistingTrips } from "./ExistingTrips";
 import { TripPlanProps } from "../types";
 import { csrfToken } from "../../utilities/csrfToken";
 
-type Screen = "destinations" | "setup" | "created";
+// ─── URL-based navigation ─────────────────────────────────────────────────────
+
+function currentPath() {
+  return window.location.pathname;
+}
+
+function navigate(path: string) {
+  window.history.pushState({}, "", path);
+  window.dispatchEvent(new PopStateEvent("popstate"));
+}
+
+function parsePath(path: string): { screen: string; tripId: string | null } {
+  if (path === "/trip_plan" || path === "/trip_plan/")
+    return { screen: "home", tripId: null };
+  if (path === "/trip_plan/trips") return { screen: "existing", tripId: null };
+  if (path === "/trip_plan/new")
+    return { screen: "destinations", tripId: null };
+  if (path === "/trip_plan/new/setup") return { screen: "setup", tripId: null };
+  const idMatch = path.match(/^\/trip_plan\/(\d+)$/);
+  if (idMatch) return { screen: "created", tripId: idMatch[1] };
+  return { screen: "home", tripId: null };
+}
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 export const TripPlan = ({ localUser }: TripPlanProps) => {
-  const [screen, setScreen] = useState<Screen>("destinations");
+  const [path, setPath] = useState(currentPath());
   const [tripLocations, setTripLocations] = useState<PendingDestination[]>([]);
   const [createdTrip, setCreatedTrip] = useState<any>(null);
+  const [tripLoading, setTripLoading] = useState(false);
+
+  // Listen for popstate (back/forward + our navigate() calls)
+  useEffect(() => {
+    const onPop = () => setPath(currentPath());
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+  }, []);
+
+  const { screen, tripId } = parsePath(path);
+
+  // When URL says "created/:id" but we don't have the trip in memory, fetch it
+  useEffect(() => {
+    if (
+      screen === "created" &&
+      tripId &&
+      (!createdTrip || String(createdTrip.id) !== tripId)
+    ) {
+      setTripLoading(true);
+      fetch(`/api/v1/trips/${tripId}`, {
+        headers: { Accept: "application/json" },
+      })
+        .then((r) => r.json())
+        .then((t) => {
+          setCreatedTrip(t);
+          setTripLoading(false);
+        })
+        .catch(() => {
+          setTripLoading(false);
+          navigate("/trip_plan");
+        });
+    }
+  }, [screen, tripId]);
 
   const handleDestinationAdded = (location: PendingDestination) => {
     setTripLocations((prev) => {
-      // Dedup by lat/lng
       if (
         prev.find(
           (l) =>
@@ -38,35 +93,79 @@ export const TripPlan = ({ localUser }: TripPlanProps) => {
       ),
     );
 
-  // Called by TripSetup after the trip is created server-side
   const handleTripCreated = (trip: any) => {
     setCreatedTrip(trip);
-    setScreen("created");
+    navigate(`/trip_plan/${trip.id}`);
   };
 
   const continueRoute = () => {
     if (tripLocations.length === 0) return;
-    setScreen("setup");
+    navigate("/trip_plan/new/setup");
   };
 
   return (
     <div className="w-full flex flex-row justify-center h-full">
       <div className="flex flex-col justify-start h-fit w-full text-cream max-w-3xl h-screen-minus-header">
         <div className="flex flex-col items-center p-2 bg-cream bg-opacity-50 no-scrollbar text-auburn grow overflow-scroll">
-          {/* ── Step 1: pick destinations ── */}
+          {/* ── Home ── */}
+          {screen === "home" && (
+            <div className="w-full flex flex-col items-center justify-center grow gap-4 py-12 px-4">
+              <h1 className="text-cream text-2xl font-bold bg-auburn p-2 w-full text-center">
+                Trip Planning
+              </h1>
+              <div className="flex flex-col w-full max-w-sm gap-3 mt-4">
+                <button
+                  className="w-full bg-auburn text-cream py-4 rounded text-lg font-semibold shadow"
+                  onClick={() => navigate("/trip_plan/new")}
+                >
+                  + Start a new trip
+                </button>
+                <button
+                  className="w-full bg-night text-cream py-4 rounded text-lg font-semibold shadow"
+                  onClick={() => navigate("/trip_plan/trips")}
+                >
+                  Open an existing trip
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* ── Existing trips ── */}
+          {screen === "existing" && (
+            <>
+              <h1 className="text-cream text-2xl font-bold bg-auburn p-2 w-full text-center z-10">
+                Your Trips
+              </h1>
+              <div className="w-full mt-2">
+                <ExistingTrips
+                  localUser={localUser}
+                  onTripSelected={(trip) => {
+                    setCreatedTrip(trip);
+                    navigate(`/trip_plan/${trip.id}`);
+                  }}
+                />
+              </div>
+              <button
+                className="mt-4 text-night text-sm underline"
+                onClick={() => navigate("/trip_plan")}
+              >
+                ← Back
+              </button>
+            </>
+          )}
+
+          {/* ── Pick destinations ── */}
           {screen === "destinations" && (
             <>
               <h1 className="text-cream text-2xl font-bold bg-auburn p-2 w-full text-center z-10">
                 Where to?
               </h1>
-
-              <ExistingTrips
-                localUser={localUser}
-                onTripSelected={(trip) => {
-                  setCreatedTrip(trip);
-                  setScreen("created");
-                }}
-              />
+              <button
+                className="self-start text-night text-sm underline mt-2 ml-1"
+                onClick={() => navigate("/trip_plan")}
+              >
+                ← Back
+              </button>
 
               <DestinationSelector
                 onDestinationAdded={handleDestinationAdded}
@@ -95,7 +194,6 @@ export const TripPlan = ({ localUser }: TripPlanProps) => {
                           <div className="font-medium text-sm">{loc.name}</div>
                           <div className="text-xs text-ashgray">
                             {loc.latitude}, {loc.longitude}
-                            {loc.office && ` · NWS ${loc.office}`}
                           </div>
                         </div>
                         <button
@@ -114,7 +212,7 @@ export const TripPlan = ({ localUser }: TripPlanProps) => {
             </>
           )}
 
-          {/* ── Step 2: name, mode, reorder, create ── */}
+          {/* ── Setup ── */}
           {screen === "setup" && (
             <>
               <h1 className="text-cream text-2xl font-bold bg-auburn p-2 w-full text-center z-10">
@@ -124,27 +222,31 @@ export const TripPlan = ({ localUser }: TripPlanProps) => {
                 locations={tripLocations}
                 localUser={localUser}
                 onTripCreated={handleTripCreated}
-                onBack={() => setScreen("destinations")}
+                onBack={() => navigate("/trip_plan/new")}
               />
             </>
           )}
         </div>
       </div>
 
-      {/* ── Step 3: Trip Summary (full screen, replaces outer shell) ── */}
-      {screen === "created" && createdTrip && (
+      {/* ── Trip Summary ── */}
+      {screen === "created" && (
         <div className="fixed inset-0 z-50 bg-cream overflow-y-auto">
-          <TripSummary
-            trip={createdTrip}
-            localUser={localUser}
-            onTripUpdated={setCreatedTrip}
-          />
+          {tripLoading || !createdTrip ? (
+            <p className="text-ashgray text-sm p-8">Loading trip…</p>
+          ) : (
+            <TripSummary
+              trip={createdTrip}
+              localUser={localUser}
+              onTripUpdated={setCreatedTrip}
+            />
+          )}
           <button
             className="fixed bottom-4 right-4 bg-night text-cream text-xs px-3 py-2 rounded shadow"
             onClick={() => {
-              setScreen("destinations");
               setTripLocations([]);
               setCreatedTrip(null);
+              navigate("/trip_plan");
             }}
           >
             + New trip
