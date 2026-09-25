@@ -64,8 +64,15 @@ class Api::V1::TripsController < ApplicationController
     @trip = @local_user.owned_trips.find(params[:id])
     extra_data_update = params[:trip][:extra_data]
     if extra_data_update
-      merged = (@trip.extra_data || {}).deep_merge(extra_data_update.to_unsafe_h)
-      @trip.extra_data = merged
+      extra_data_hash = extra_data_update.respond_to?(:to_unsafe_h) ? extra_data_update.to_unsafe_h : extra_data_update
+
+      if (guest_name = extra_data_hash.delete("remove_guest") || extra_data_hash.delete(:remove_guest))
+        @trip.guest_list = (@trip.guest_list || []).reject { |g| g["name"] == guest_name }
+      end
+
+      if extra_data_hash.present?
+        @trip.extra_data = (@trip.extra_data || {}).deep_merge(extra_data_hash)
+      end
     end
     if @trip.update(trip_params)
       render json: @trip.as_json(include: [:locations, :owner, { trip_memberships: { include: :user } }])
