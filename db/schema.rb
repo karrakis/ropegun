@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_09_24_015307) do
+ActiveRecord::Schema[7.0].define(version: 2026_09_25_000001) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -141,6 +141,8 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_24_015307) do
     t.uuid "share_token", default: -> { "gen_random_uuid()" }, null: false
     t.jsonb "guest_list", default: []
     t.jsonb "extra_data", default: {}
+    t.datetime "archived_at"
+    t.index ["archived_at"], name: "index_trips_on_archived_at"
     t.index ["share_token"], name: "index_trips_on_share_token", unique: true
   end
 

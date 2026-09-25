@@ -115,6 +115,12 @@ class Api::V1::TripsController < ApplicationController
     render json: @trip.as_json(include: trip_include)
   end
 
+  def destroy
+    @trip = @local_user.owned_trips.find(params[:id])
+    @trip.archive!
+    head :no_content
+  end
+
   private
 
   def trip_include
