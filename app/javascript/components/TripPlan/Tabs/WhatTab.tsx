@@ -69,6 +69,37 @@ const GearSubTab = ({
     if (res.ok) onTripUpdated(await res.json());
   };
 
+  const setRequiredQuantity = async (
+    tripGearId: number,
+    requiredQuantity: number,
+  ) => {
+    const res = await fetch(`/api/v1/trip_gear_items/${tripGearId}`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": csrfToken(),
+      },
+      body: JSON.stringify({ required_quantity: requiredQuantity }),
+    });
+    if (res.ok) onTripUpdated(await res.json());
+  };
+
+  const removeGearItem = async (tripGearId: number) => {
+    const res = await fetch(`/api/v1/trip_gear_items/${tripGearId}`, {
+      method: "DELETE",
+      headers: { "X-CSRF-Token": csrfToken() },
+    });
+    if (res.ok) onTripUpdated(await res.json());
+  };
+
+  const [commitQuantities, setCommitQuantities] = useState<
+    Record<number, number>
+  >({});
+  const commitQuantityFor = (tripGearId: number) =>
+    commitQuantities[tripGearId] ?? 1;
+  const setCommitQuantityFor = (tripGearId: number, value: number) =>
+    setCommitQuantities((prev) => ({ ...prev, [tripGearId]: value }));
+
   return (
     <div className="p-4 flex flex-col gap-3">
       {tripGear.length === 0 && (
@@ -120,12 +151,26 @@ const GearSubTab = ({
                 Withdraw ({myCommitment.quantity})
               </button>
             ) : (
-              <button
-                className="text-xs bg-auburn text-cream px-2 py-1 rounded"
-                onClick={() => commit(item.id, 1)}
-              >
-                I'll bring this
-              </button>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  min={1}
+                  value={commitQuantityFor(item.id)}
+                  onChange={(e) =>
+                    setCommitQuantityFor(
+                      item.id,
+                      Math.max(1, parseInt(e.target.value, 10) || 1),
+                    )
+                  }
+                  className="w-14 h-7 rounded bg-cream bg-opacity-10 text-cream text-xs px-1"
+                />
+                <button
+                  className="text-xs bg-auburn text-cream px-2 py-1 rounded"
+                  onClick={() => commit(item.id, commitQuantityFor(item.id))}
+                >
+                  I'll bring this
+                </button>
+              </div>
             )}
 
             {/* Commitments list */}
@@ -136,6 +181,34 @@ const GearSubTab = ({
                     {c.user_name} ({c.quantity})
                   </span>
                 ))}
+              </div>
+            )}
+
+            {/* Organizer controls */}
+            {isOrganizer && (
+              <div className="mt-2 pt-2 border-t border-ashgray border-opacity-20 flex items-center justify-between">
+                <label className="flex items-center gap-1 text-ashgray text-xs">
+                  Required:
+                  <input
+                    type="number"
+                    min={1}
+                    defaultValue={required}
+                    className="w-14 h-6 rounded bg-cream bg-opacity-10 text-cream text-xs px-1"
+                    onBlur={(e) => {
+                      const val = Math.max(
+                        1,
+                        parseInt(e.target.value, 10) || 1,
+                      );
+                      if (val !== required) setRequiredQuantity(item.id, val);
+                    }}
+                  />
+                </label>
+                <button
+                  className="text-xs text-auburn underline"
+                  onClick={() => removeGearItem(item.id)}
+                >
+                  Remove
+                </button>
               </div>
             )}
           </div>

@@ -5,7 +5,7 @@ class Api::V1::TripsController < ApplicationController
 
   def index
     trips = @local_user.trips.includes(:locations, :owner, :trip_memberships)
-    render json: trips.as_json(include: [:owner, :locations, { trip_memberships: { include: :user } }])
+    render json: trips.as_json(include: trip_include)
   end
 
   def create
@@ -34,7 +34,7 @@ class Api::V1::TripsController < ApplicationController
             "UPDATE trips_locations SET position = #{index} WHERE trip_id = #{@trip.id} AND location_id = #{location.id}"
           )
         end
-        render json: @trip.as_json(include: [:locations, :owner, { trip_memberships: { include: :user } }]),
+        render json: @trip.as_json(include: trip_include),
                status: :created
       else
         render json: @trip.errors, status: :unprocessable_entity
@@ -44,24 +44,14 @@ class Api::V1::TripsController < ApplicationController
     end
   end
 
-  def update
-    @trip = @local_user.trips.find(params[:id])
-    handle_locations
-    
-    if @trip.update(trip_params)
-      render json: @trip.as_json(include: [:locations, :owner, { trip_memberships: { include: :user } }])
-    else
-      render json: @trip.errors, status: :unprocessable_entity
-    end
-  end
-
   def show
     @trip = @local_user.trips.find(params[:id])
-    render json: @trip.as_json(include: [:locations, :owner, { trip_memberships: { include: :user } }])
+    render json: @trip.as_json(include: trip_include)
   end
 
   def update
     @trip = @local_user.owned_trips.find(params[:id])
+    handle_locations
     extra_data_update = params[:trip][:extra_data]
     if extra_data_update
       extra_data_hash = extra_data_update.respond_to?(:to_unsafe_h) ? extra_data_update.to_unsafe_h : extra_data_update
@@ -75,7 +65,7 @@ class Api::V1::TripsController < ApplicationController
       end
     end
     if @trip.update(trip_params)
-      render json: @trip.as_json(include: [:locations, :owner, { trip_memberships: { include: :user } }])
+      render json: @trip.as_json(include: trip_include)
     else
       render json: @trip.errors, status: :unprocessable_entity
     end
@@ -122,10 +112,16 @@ class Api::V1::TripsController < ApplicationController
     chosen = @trip.locations.find(params[:location_id])
     @trip.locations.where.not(id: chosen.id).each { |l| @trip.locations.delete(l) }
     @trip.update!(route_mode: true)
-    render json: @trip.as_json(include: [:locations, :owner, { trip_memberships: { include: :user } }])
+    render json: @trip.as_json(include: trip_include)
   end
 
   private
+
+  def trip_include
+    [:locations, :owner, { trip_memberships: { include: :user } },
+     { trip_skills: { include: :skill, methods: [:volunteers] } },
+     { trip_gear_items: { include: :gear_item, methods: [:commitments, :committed_quantity] } }]
+  end
 
   def handle_locations
     location_data = params[:trip][:locations] || []

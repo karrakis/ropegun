@@ -16,7 +16,7 @@ class Api::V1::TripSkillsController < ApplicationController
     user = User.find(params[:user_id])
     volunteers = trip_skill.extra_data&.fetch("volunteers", []) || []
     unless volunteers.any? { |v| v["user_id"] == user.id }
-      volunteers << { user_id: user.id, user_name: user.name }
+      volunteers << { "user_id" => user.id, "user_name" => user.name }
       trip_skill.update!(extra_data: (trip_skill.extra_data || {}).merge("volunteers" => volunteers))
     end
     render json: trip_skill.trip.reload.as_json(include: trip_include)
@@ -39,6 +39,7 @@ class Api::V1::TripSkillsController < ApplicationController
 
   def trip_include
     [:locations, :owner, { trip_memberships: { include: :user } },
-     { trip_skills: { include: :skill } }, { trip_gear_items: { include: :gear_item } }]
+     { trip_skills: { include: :skill, methods: [:volunteers] } },
+     { trip_gear_items: { include: :gear_item, methods: [:commitments, :committed_quantity] } }]
   end
 end

@@ -57,6 +57,8 @@ Rails.application.routes.draw do
 
       post   '/trips/:id/gear_items'              => 'trip_gear_items#create'
       patch  '/trip_gear_items/:id/commit'        => 'trip_gear_items#commit'
+      patch  '/trip_gear_items/:id'                => 'trip_gear_items#update'
+      delete '/trip_gear_items/:id'                => 'trip_gear_items#destroy'
       
     end
   end
