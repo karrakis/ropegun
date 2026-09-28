@@ -114,18 +114,35 @@ trip_skills,trip_gear_items,friendships}.yml`, `test/test_helper.rb`,
 `config/environments/test.rb`,
 `db/migrate/20260925000003_make_foreign_keys_deferrable.rb`
 
-### 1.2 ⬜ Frontend component test scaffolding
+### 1.2 ✅ Frontend component test scaffolding
 
-- Verify the existing Jest config actually runs (`npm test` or whatever
-  the `package.json` script is) against a trivial smoke test first.
-- Write one solid example suite (recommend `WhatTab.tsx`'s `GearSubTab`,
-  since it has the most interesting recent logic: commit quantities,
-  organizer edit/remove) to serve as the pattern for future component
-  tests.
-- Decide on a light convention doc (a few lines in this file or a
-  `test/README` — not a big separate guide) for what "enough" frontend
-  coverage looks like at MVP stage: interaction/behavior tests over
-  snapshot tests.
+Correction to this section's original premise: the codebase already had
+4 passing Jest suites (`AppRoot.test.jsx`, three `Weather/*.test.jsx`
+files) — not zero. Confirmed the config runs cleanly (`npx jest`, all
+existing suites green) before adding anything new.
+
+- Added `WhatTab.test.tsx` as the reference example, covering
+  `GearSubTab` (the sub-component with the most interesting recent
+  logic — commit quantities, organizer add/remove) by rendering the
+  exported `WhatTab` (defaults to the "gear" sub-tab on mount, since
+  `GearSubTab` itself isn't exported directly). Covers: empty state,
+  rendering needed/committed counts and existing commitments,
+  organizer-only controls being hidden from non-organizers, committing
+  to an item (POST with the right body, `onTripUpdated` called with the
+  response), and organizer item removal (DELETE). `fetch` is mocked
+  per-URL rather than globally stubbed once, since the component fires
+  a catalogue fetch on mount plus a distinct fetch per interaction.
+- Convention for "enough" frontend coverage at MVP stage (light,
+  in-line rather than a separate doc): prefer interaction/behavior tests
+  via Testing Library (`render` + `userEvent` + `screen` queries) over
+  snapshot tests; assert on user-visible text/roles and on the
+  `fetch` calls a component makes, not on internal state or markup
+  structure; one reference suite per meaningfully-complex component is
+  enough for now — don't chase full coverage before Phase 2+ features
+  land.
+- Full suite (`npx jest`) passes: 5 suites, 12 tests, no regressions.
+
+**Files:** `app/javascript/components/TripPlan/Tabs/WhatTab.test.tsx`
 
 ### 1.3 ⬜ Wire tests into a lightweight CI check
 
