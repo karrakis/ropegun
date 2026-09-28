@@ -94,11 +94,15 @@ const GearSubTab = ({
   };
 
   const [commitQuantities, setCommitQuantities] = useState<
-    Record<number, number>
+    Record<number, string>
   >({});
   const commitQuantityFor = (tripGearId: number) =>
-    commitQuantities[tripGearId] ?? 1;
-  const setCommitQuantityFor = (tripGearId: number, value: number) =>
+    commitQuantities[tripGearId] ?? "0";
+  const commitQuantityNumberFor = (tripGearId: number) => {
+    const n = parseInt(commitQuantityFor(tripGearId), 10);
+    return Number.isNaN(n) ? 0 : Math.max(0, n);
+  };
+  const setCommitQuantityFor = (tripGearId: number, value: string) =>
     setCommitQuantities((prev) => ({ ...prev, [tripGearId]: value }));
 
   return (
@@ -155,19 +159,23 @@ const GearSubTab = ({
               <div className="flex items-center gap-2">
                 <input
                   type="number"
-                  min={1}
+                  min={0}
                   value={commitQuantityFor(item.id)}
                   onChange={(e) =>
-                    setCommitQuantityFor(
-                      item.id,
-                      Math.max(1, parseInt(e.target.value, 10) || 1),
-                    )
+                    setCommitQuantityFor(item.id, e.target.value)
                   }
+                  onBlur={(e) => {
+                    if (e.target.value === "") {
+                      setCommitQuantityFor(item.id, "0");
+                    }
+                  }}
                   className="w-14 h-7 rounded bg-cream bg-opacity-10 text-cream text-xs px-1"
                 />
                 <button
                   className="text-xs bg-auburn text-cream px-2 py-1 rounded"
-                  onClick={() => commit(item.id, commitQuantityFor(item.id))}
+                  onClick={() =>
+                    commit(item.id, commitQuantityNumberFor(item.id))
+                  }
                 >
                   I'll bring this
                 </button>
@@ -232,7 +240,7 @@ const GearSubTab = ({
                 value={catalogueQuery}
                 onChange={(e) => setCatalogueQuery(e.target.value)}
                 placeholder="Search gear…"
-                className="w-full h-8 rounded bg-cream bg-opacity-10 text-cream text-sm px-2"
+                className="w-full h-8 rounded bg-cream bg-opacity-10 text-night text-sm px-2"
               />
               <div className="flex flex-col gap-1 max-h-64 overflow-y-auto bg-night rounded p-2">
                 {catalogue

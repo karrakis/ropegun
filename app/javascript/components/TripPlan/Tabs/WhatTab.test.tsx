@@ -142,6 +142,8 @@ describe("WhatTab (gear sub-tab)", () => {
       />,
     );
     await screen.findByText("Tent");
+    await userEvent.clear(screen.getByRole("spinbutton"));
+    await userEvent.type(screen.getByRole("spinbutton"), "1");
     await userEvent.click(
       screen.getByRole("button", { name: "I'll bring this" }),
     );
@@ -158,6 +160,38 @@ describe("WhatTab (gear sub-tab)", () => {
     await waitFor(() =>
       expect(onTripUpdated).toHaveBeenCalledWith(updatedTrip),
     );
+  });
+
+  test("the commit quantity field defaults to 0 and can be fully cleared", async () => {
+    const trip = baseTrip({
+      trip_gear_items: [
+        {
+          id: 100,
+          gear_item_id: 5,
+          gear_item: { name: "Tent" },
+          required_quantity: 2,
+          committed_quantity: 0,
+          commitments: [],
+        },
+      ],
+    });
+    render(
+      <WhatTab
+        trip={trip}
+        localUser={localUser}
+        isOrganizer={false}
+        onTripUpdated={jest.fn()}
+      />,
+    );
+    await screen.findByText("Tent");
+    const input = screen.getByRole("spinbutton");
+    expect(input).toHaveValue(0);
+
+    await userEvent.clear(input);
+    expect(input).toHaveValue(null);
+
+    await userEvent.click(document.body);
+    expect(input).toHaveValue(0);
   });
 
   test("organizers can remove a gear item, issuing a DELETE", async () => {
@@ -233,10 +267,7 @@ describe("WhatTab (gear sub-tab)", () => {
     expect(screen.getByText("Climbing Harness")).toBeInTheDocument();
     expect(screen.getByText("12cm Quickdraw")).toBeInTheDocument();
 
-    await userEvent.type(
-      screen.getByPlaceholderText("Search gear…"),
-      "helmet",
-    );
+    await userEvent.type(screen.getByPlaceholderText("Search gear…"), "helmet");
 
     expect(screen.getByText("Climbing Helmet")).toBeInTheDocument();
     expect(screen.queryByText("Climbing Harness")).not.toBeInTheDocument();
