@@ -22,15 +22,10 @@ class ComponentsController < ApplicationController
           pending_friend_requests: @local_user&.friendships&.pending&.map{|friendship| 
             {uuid: friendship.friend.uuid}
           }&.as_json,
-          # TripMembership has no :issuer association (that only exists on
-          # the legacy, no-longer-written-to TripInvitation model) — the
-          # previous `as_json(include: [:issuer, :trip])` here raised
-          # ActiveRecord::AssociationNotFoundError for any user with a
-          # pending trip invite, crashing this whole page. Built by hand
-          # instead: the trip owner is the de facto issuer of an invite
-          # (only owners can create trip_memberships), embedded at
-          # friend-tier visibility for the same reason as the friendships
-          # list above.
+          # TripMembership has no :issuer association — the trip owner is
+          # the de facto issuer of an invite (only owners can create
+          # trip_memberships), embedded at friend-tier visibility for the
+          # same reason as the friendships list above.
           pending_trip_invitations: @local_user&.trip_memberships&.where(role: :invited, accepted: false)&.includes(trip: :owner)&.map { |membership|
             {
               id: membership.id,

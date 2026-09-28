@@ -28,45 +28,58 @@ access to the history. `destroy` now calls `@trip.archive!` and returns
 **Files:** `app/controllers/api/v1/trips_controller.rb`, `app/models/trip.rb`,
 `db/migrate/20260925000001_add_archived_at_to_trips.rb`
 
-### 0.2 ⬜ Remove legacy trip-invitation code — **on hold, re-scoped**
+### 0.2 ✅ Remove legacy trip-invitation code
 
-Attempted this and had to revert it. Correction to the earlier research:
-`TripInvitation` / `trip_invitations` is **not fully dead**. `AppRoot.tsx`
-has a client-side route for `/dashboard` that renders
-`Dashboard/Dashboard.tsx` → `Display.tsx`, which is a real, reachable
-page (friends list, pending friend requests, and a "Trip Invitations"
-section with an "Accept" button). That button PATCHes the legacy
-`/trip_invitations` endpoint.
+Attempted this early and had to revert it — at the time, `Dashboard/Display.tsx`'s
+"Trip Invitations" Accept button still PATCHed the legacy `/trip_invitations`
+endpoint, so deleting the model/controller/routes then would have 500'd a
+real (if already-broken) page. Re-scoped to land after the Dashboard
+rebuild swapped that button over to the real `TripMembership` accept
+flow (4.5) — confirmed done, so the fast-follow removal landed here:
 
-However, the data feeding that section (`localUser.pending_trip_invitations`)
-already comes from `trip_memberships` (the new system) via
-`components_controller.rb`, not from the `trip_invitations` table. Since
-`TRIP_SUMMARY_PLAN.md` confirms no new rows are ever written to
-`trip_invitations` anymore, that "Accept" button's PATCH request will
-never find a matching legacy record — **the button is already
-non-functional in production**, even though the page around it still
-renders. So: the table is genuinely unused for real data, but the
-model/controller/routes can't be deleted yet without also fixing this
-page, or the `/dashboard` route will break/500.
+- Deleted `app/models/trip_invitation.rb`,
+  `app/controllers/trip_invitations_controller.rb`, and the three
+  `/trip_invitations` routes.
+- Removed `Trip`'s `has_many :trip_invitations, dependent: :destroy`
+  (dead association, no code read/wrote it anymore) and the now-dangling
+  comment in `components_controller.rb` that referenced the model by
+  name.
+- Migration `20260928130000_drop_legacy_trip_invitations_and_trips_users.rb`
+  drops both `trip_invitations` (never had real FK constraints — plain
+  bigint columns) and `trips_users` (the pre-`TripMembership` join
+  table, fully superseded per `20260922200506`'s own comment
+  acknowledging it as replaced) — `trips_users`' deferrable FKs are
+  removed explicitly first via `remove_foreign_key` before `drop_table`.
+  `down` recreates both tables with their original shape for
+  reversibility.
+- Confirmed via grep that no test fixture, frontend component actually
+  rendered/imported anywhere, or other model referenced either table or
+  the `TripInvitation` class before deleting anything — the only
+  frontend remnants (`Distance.tsx`'s `TripInvitation` TS interface,
+  `TripPlanOld.tsx`) are already fully dead/unimported files from the
+  same earlier era, left as-is since they're a pure frontend-type
+  concern with no dependency on the Ruby model and weren't part of this
+  request's scope.
 
-Re-scoped as: rebuild/retire the `/dashboard` page (friends list +
-invitations UI) as part of **Phase 4** (it's profile/social-adjacent
-anyway), swapping the "Accept" button over to the `TripMembership`
-accept flow already used elsewhere. _Then_ remove `TripInvitation` model/
-controller/routes and drop the `trip_invitations` + `trips_users` tables
-as a fast follow. Not attempting a standalone removal before that.
+**Tests:** no test changes needed — nothing in the test suite exercised
+`TripInvitation` directly; `test/controllers/components_controller_test.rb`'s
+`pending_trip_invitations` assertions were already testing the
+`TripMembership`-backed JSON shape from 4.5, unaffected by removing the
+unrelated legacy model.
 
-**Files (deferred to Phase 4):** `app/javascript/components/Dashboard/*`,
-`config/routes.rb`, `app/controllers/trip_invitations_controller.rb`,
-`app/models/trip_invitation.rb`, `app/models/trip.rb` (drop the
-`has_many :trip_invitations` line), new migration for both tables
+Full suite (`bin/rails test`): 85 runs, same 7 pre-existing unrelated
+failures, no new ones. Frontend (`npx jest`): 9 suites / 35 tests, all
+passing (no frontend changes were needed for this phase).
 
-**Update:** the `/dashboard` rebuild landed in 4.5 — the "Accept" button
-now uses the real `TripMembership` flow. The legacy `TripInvitation`
-model/controller/routes/tables removal described above is still not done
-and remains the fast-follow to pick up next.
+**Files:** `app/models/trip_invitation.rb` (deleted),
+`app/controllers/trip_invitations_controller.rb` (deleted),
+`app/models/trip.rb`, `app/controllers/components_controller.rb`,
+`config/routes.rb`,
+`db/migrate/20260928130000_drop_legacy_trip_invitations_and_trips_users.rb`
+(new)
 
 ---
+
 
 ## Phase 1 — Testing foundation
 
@@ -856,6 +869,13 @@ additional test lines added.
 `app/javascript/components/Dashboard/ProfileForm.test.tsx`
 
 ---
+
+## Plan status: all phases complete
+
+Phases 0–5 are all ✅. Remaining known gaps are all in "Explicitly
+deferred" below (out of scope by design, not oversights) — nothing left
+on this list is blocking. Future work should track TRIP_SUMMARY_PLAN.md's
+post-MVP section or open a new planning doc rather than reopening this one.
 
 ## Explicitly deferred (not in this plan)
 

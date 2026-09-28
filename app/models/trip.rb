@@ -24,9 +24,6 @@ class Trip < ApplicationRecord
   # ── Comment thread ────────────────────────────────────────────────────────
   has_many :trip_comments, dependent: :destroy
 
-  # ── Legacy — keep until trip_invitations controller is refactored ─────────
-  has_many :trip_invitations, dependent: :destroy
-
   before_create :ensure_owner_membership
 
   # ── Real-time sync ────────────────────────────────────────────────────────
