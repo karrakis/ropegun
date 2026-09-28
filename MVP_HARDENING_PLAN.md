@@ -12,6 +12,7 @@ Status legend: ⬜ not started · 🔷 in progress · ✅ done
 ## Phase 0 — Quick fixes & housekeeping
 
 ### 0.1 ✅ Fix `trips#destroy` 500
+
 `config/routes.rb` defines `delete '/trips/:id' => 'trips#destroy'` but
 `Api::V1::TripsController` had no `destroy` action. **Implemented as a
 soft delete**: added `archived_at:datetime` to `trips`
@@ -28,6 +29,7 @@ access to the history. `destroy` now calls `@trip.archive!` and returns
 `db/migrate/20260925000001_add_archived_at_to_trips.rb`
 
 ### 0.2 ⬜ Remove legacy trip-invitation code — **on hold, re-scoped**
+
 Attempted this and had to revert it. Correction to the earlier research:
 `TripInvitation` / `trip_invitations` is **not fully dead**. `AppRoot.tsx`
 has a client-side route for `/dashboard` that renders
@@ -50,7 +52,7 @@ page, or the `/dashboard` route will break/500.
 Re-scoped as: rebuild/retire the `/dashboard` page (friends list +
 invitations UI) as part of **Phase 4** (it's profile/social-adjacent
 anyway), swapping the "Accept" button over to the `TripMembership`
-accept flow already used elsewhere. *Then* remove `TripInvitation` model/
+accept flow already used elsewhere. _Then_ remove `TripInvitation` model/
 controller/routes and drop the `trip_invitations` + `trips_users` tables
 as a fast follow. Not attempting a standalone removal before that.
 
@@ -71,6 +73,7 @@ Jest/RTL being fully configured (`jest.config.js`, `jest.setup.js`,
 `__mocks__/`).
 
 ### 1.1 ⬜ Backend request/test scaffolding
+
 - Add fixtures (or a factory pattern — decide `fixtures` vs. `factory_bot`;
   recommend sticking with Rails fixtures since that's already the
   convention in `test/fixtures`) for `User`, `Trip`, `TripMembership`,
@@ -87,6 +90,7 @@ Jest/RTL being fully configured (`jest.config.js`, `jest.setup.js`,
   here specifically).
 
 ### 1.2 ⬜ Frontend component test scaffolding
+
 - Verify the existing Jest config actually runs (`npm test` or whatever
   the `package.json` script is) against a trivial smoke test first.
 - Write one solid example suite (recommend `WhatTab.tsx`'s `GearSubTab`,
@@ -99,6 +103,7 @@ Jest/RTL being fully configured (`jest.config.js`, `jest.setup.js`,
   snapshot tests.
 
 ### 1.3 ⬜ Wire tests into a lightweight CI check
+
 No CI currently exists (no `.github/workflows`). Add a minimal GitHub
 Actions workflow that runs `bin/rails test` and `npm test` on push/PR.
 Keep it minimal — this isn't the place to add linting/coverage
@@ -116,6 +121,7 @@ viewing the same trip won't see each other's changes without a manual
 reload.
 
 ### 2.1 ⬜ Decide transport
+
 Recommendation: **ActionCable**, one channel per trip
 (`TripChannel`, stream identified by trip id), broadcasting a lightweight
 "trip changed, re-fetch" event (or the full updated trip JSON if small
@@ -125,6 +131,7 @@ way `ActionController::Live` (SSE) would. Revisit only if ActionCable
 setup proves painful in practice.
 
 ### 2.2 ⬜ Backend: broadcast on mutation
+
 Add broadcasts to the existing mutation points: `trips_controller#update`,
 `trip_gear_items_controller#commit/update/destroy`,
 `trip_skills_controller#volunteer`, membership add/remove, and (once built)
@@ -133,12 +140,14 @@ the comment endpoints from Phase 3. Keep this DRY — a single
 from each action, rather than duplicating broadcast calls.
 
 ### 2.3 ⬜ Frontend: subscribe + refetch
+
 Subscribe to the trip's channel when a trip is open (`TripPlan.tsx` or
 wherever the trip is loaded), refetch on message, unsubscribe on unmount.
 Add a small visual indicator (e.g. "someone else is updating this trip…")
 optional — not required for MVP but cheap and nice.
 
 ### 2.4 ⬜ Tests
+
 Channel test (subscribes correctly, broadcasts fire on mutation) using
 the Phase 1 scaffolding as the pattern.
 
@@ -152,21 +161,25 @@ the Phase 1 scaffolding as the pattern.
 Builds on Phase 2 so new comments show up live, not just on refresh.
 
 ### 3.1 ⬜ Data model
+
 Simple flat comment thread per trip (not per-field/per-gear-item — keep
 scope tight for MVP): `TripComment belongs_to :trip, belongs_to :user`,
 `body:text`, timestamps. New migration + model + test.
 
 ### 3.2 ⬜ Backend
+
 `Api::V1::TripCommentsController` — index (paginated or just "load all,
 it's a trip not a forum"), create, destroy (own comment or organizer).
 Broadcast new comments via the Phase 2 channel.
 
 ### 3.3 ⬜ Frontend
+
 New tab or section (check `TRIP_SUMMARY_PLAN.md`'s tab layout — likely
 fits best as part of an existing tab or a new "Discuss" tab) with a
 simple list + composer, consistent with existing tab patterns.
 
 ### 3.4 ⬜ Tests
+
 Controller request tests + one frontend interaction test (post a
 comment, see it appear).
 
@@ -183,7 +196,9 @@ naturally one of these visibility settings, not a one-off boolean —
 building the general visibility model first avoids retrofitting.
 
 ### 4.1 ⬜ Design the visibility model
+
 Proposed three tiers per relevant profile field:
+
 - **Public** — visible to anyone (including on a public trip share link)
 - **Friends-only** — visible only to accepted friends
 - **App-only** — never shown to other users, but usable by the app itself
@@ -205,6 +220,7 @@ visibility map — decide during implementation, but keep it in the same
 settings UI regardless.
 
 ### 4.2 ⬜ Backend
+
 Update `UsersController` (or add a `ProfilesController`) with an update
 action that accepts the field values + visibility map together. Add a
 serializer/`as_json` mode that filters fields by requester relationship
@@ -216,12 +232,14 @@ since leaking a field that should've been friends-only or app-only is a
 real privacy bug, not just a UX one.
 
 ### 4.3 ⬜ Frontend
+
 New profile edit page (replacing the current one) with per-field
 visibility controls — probably a simple three-way toggle next to each
 field rather than a separate settings screen, so the privacy choice
 stays next to the data it protects.
 
 ### 4.4 ⬜ Tests
+
 This is the phase most worth over-testing: request tests asserting a
 stranger genuinely cannot see friends-only or app-only fields via any
 endpoint, not just the intended one. Add a test that specifically hits
@@ -240,6 +258,7 @@ Explicit opt-in required (`discoverable_by_search`, defaulting to
 the current UUID-only friend-add flow's exclusivity, not the flow itself.
 
 ### 5.1 ⬜ Backend search endpoint
+
 `GET /api/v1/users/search?q=...` matching name or email, scoped to
 `discoverable_by_search: true` only, excluding the requester, excluding
 users already friended/pending. Rate-limit or at least cap result count
@@ -249,6 +268,7 @@ maybe avatar — never email in the response body itself, even though
 email was the search key, unless the searching user already knows it).
 
 ### 5.2 ⬜ Frontend
+
 Add a search box to `WhoTab`'s `InviteForm` alongside the existing
 friends-list picker, and to wherever friend-adding currently lives
 (`friendships_controller`'s consumer). Sending a friend request from
@@ -256,6 +276,7 @@ search results reuses the existing `Friendship` create flow — no new
 invite mechanism needed.
 
 ### 5.3 ⬜ Tests
+
 Confirm non-discoverable users never appear in search results, even to
 someone who has their exact email. Confirm rate/count limits work.
 

@@ -1,0 +1,8 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+alpine_trip:
+  name: Alpine Traverse
+  owner: alice
+  route_mode: false
+  starts_on: <%= 3.days.from_now.to_date %>
+  ends_on: <%= 5.days.from_now.to_date %>

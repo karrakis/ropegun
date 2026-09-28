@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_09_25_000001) do
+ActiveRecord::Schema[7.0].define(version: 2026_09_25_000003) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -198,21 +198,21 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_25_000001) do
     t.index ["uuid"], name: "index_users_on_uuid", unique: true
   end
 
-  add_foreign_key "trip_gear_items", "gear_items"
-  add_foreign_key "trip_gear_items", "trips"
-  add_foreign_key "trip_gear_items", "users"
-  add_foreign_key "trip_memberships", "trips"
-  add_foreign_key "trip_memberships", "users"
-  add_foreign_key "trip_skills", "skills"
-  add_foreign_key "trip_skills", "trips"
-  add_foreign_key "trip_skills", "users"
-  add_foreign_key "trips", "users", column: "owner_id"
-  add_foreign_key "trips_locations", "locations"
-  add_foreign_key "trips_locations", "trips"
-  add_foreign_key "trips_users", "trips"
-  add_foreign_key "trips_users", "users"
-  add_foreign_key "user_gear_items", "gear_items"
-  add_foreign_key "user_gear_items", "users"
-  add_foreign_key "user_skills", "skills"
-  add_foreign_key "user_skills", "users"
+  add_foreign_key "trip_gear_items", "gear_items", deferrable: :deferred
+  add_foreign_key "trip_gear_items", "trips", deferrable: :deferred
+  add_foreign_key "trip_gear_items", "users", deferrable: :deferred
+  add_foreign_key "trip_memberships", "trips", deferrable: :deferred
+  add_foreign_key "trip_memberships", "users", deferrable: :deferred
+  add_foreign_key "trip_skills", "skills", deferrable: :deferred
+  add_foreign_key "trip_skills", "trips", deferrable: :deferred
+  add_foreign_key "trip_skills", "users", deferrable: :deferred
+  add_foreign_key "trips", "users", column: "owner_id", deferrable: :deferred
+  add_foreign_key "trips_locations", "locations", deferrable: :deferred
+  add_foreign_key "trips_locations", "trips", deferrable: :deferred
+  add_foreign_key "trips_users", "trips", deferrable: :deferred
+  add_foreign_key "trips_users", "users", deferrable: :deferred
+  add_foreign_key "user_gear_items", "gear_items", deferrable: :deferred
+  add_foreign_key "user_gear_items", "users", deferrable: :deferred
+  add_foreign_key "user_skills", "skills", deferrable: :deferred
+  add_foreign_key "user_skills", "users", deferrable: :deferred
 end

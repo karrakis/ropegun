@@ -57,4 +57,12 @@ Rails.application.configure do
 
   # Annotate rendered view with file names.
   # config.action_view.annotate_rendered_view_with_filenames = true
+
+  # The Postgres FK-fixture-check (`all_foreign_keys_valid?`) requires
+  # superuser privileges to toggle constraint validation, which the local
+  # `ropegun` DB role doesn't have. Without this, fixture loading always
+  # fails with a misleading "Foreign key violations found" error even when
+  # the data is fine. Safe to disable since real FK violations still raise
+  # normal `ActiveRecord::InvalidForeignKey` errors at insert time.
+  config.active_record.verify_foreign_keys_for_fixtures = false
 end

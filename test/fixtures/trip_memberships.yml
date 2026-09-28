@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+alice_owns_alpine_trip:
+  trip: alpine_trip
+  user: alice
+  role: owner
+  accepted: true
+  joined_at: <%= 1.day.ago %>
+
+bob_member_of_alpine_trip:
+  trip: alpine_trip
+  user: bob
+  role: member
+  accepted: true
+  joined_at: <%= 1.day.ago %>

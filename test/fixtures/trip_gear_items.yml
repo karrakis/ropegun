@@ -1,0 +1,10 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+alpine_trip_tent:
+  trip: alpine_trip
+  user: alice
+  gear_item: tent
+  quantity: 0
+  required_quantity: 2
+  extra_data:
+    commitments: []

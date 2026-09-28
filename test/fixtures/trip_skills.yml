@@ -1,0 +1,8 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+alpine_trip_first_aid:
+  trip: alpine_trip
+  user: alice
+  skill: first_aid
+  extra_data:
+    volunteers: []
