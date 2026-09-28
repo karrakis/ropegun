@@ -3,3 +3,7 @@
 tent:
   name: Tent
   category: shelter
+
+rope:
+  name: Rope
+  category: climbing

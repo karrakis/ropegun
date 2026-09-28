@@ -72,22 +72,47 @@ tests (none for the `api/v1` namespace), zero frontend tests despite
 Jest/RTL being fully configured (`jest.config.js`, `jest.setup.js`,
 `__mocks__/`).
 
-### 1.1 ⬜ Backend request/test scaffolding
+### 1.1 ✅ Backend request/test scaffolding
 
-- Add fixtures (or a factory pattern — decide `fixtures` vs. `factory_bot`;
-  recommend sticking with Rails fixtures since that's already the
-  convention in `test/fixtures`) for `User`, `Trip`, `TripMembership`,
-  `TripGearItem`, `TripSkill`, `Friendship`.
-- Add an authentication test helper that stubs `session[:userinfo]` so
-  `api/v1` controller tests don't need to fake Auth0.
-- Write a full request-spec suite for `Api::V1::TripsController` as the
-  reference example (index/show/create/update/destroy, including the
-  guest-removal and `extra_data` merge behavior we fixed earlier) —
-  this becomes the template other controllers' tests copy.
-- Backfill at least happy-path + one authorization-failure test for
-  `trip_gear_items_controller.rb` and `trip_skills_controller.rb` (this
-  is where the symbol/string key bug lived — a regression test belongs
-  here specifically).
+Also had to fix three pre-existing test-infrastructure blockers before any
+of this could run at all: a fixture (`user_linked_locations.yml`) for a
+table dropped in a past migration (deleted, along with the orphaned
+model/test); `users.yml` referencing columns removed from the `users`
+table (rewritten); and the local Postgres role lacking superuser, which
+broke both Rails' `verify_foreign_keys_for_fixtures` safety check (disabled
+via `config/environments/test.rb`) and fixture bulk-insert's ability to
+disable referential-integrity triggers for out-of-order inserts (fixed at
+the DB level via migration `20260925000003`, marking all FKs
+`DEFERRABLE INITIALLY DEFERRED`).
+
+- Added fixtures for `User`, `Trip`, `TripMembership`, `Skill`,
+  `GearItem`, `TripSkill`, `TripGearItem`, `Friendship`.
+- Added `sign_in_as(user)` to `ActiveSupport::TestCase`
+  (`test/test_helper.rb`), stubbing `session[:userinfo]` so `api/v1`
+  controller tests don't need to fake Auth0.
+- Wrote a full request-spec suite for `Api::V1::TripsController`
+  (`test/controllers/api/v1/trips_controller_test.rb`) as the reference
+  example (index/show/create/update/destroy, including the
+  guest-removal and `extra_data` merge behavior, plus ownership scoping
+  and the soft-delete/archive behavior from Phase 0.1) — this is the
+  template other `api/v1` controllers' tests copy.
+- Backfilled happy-path + authorization-failure tests for
+  `trip_gear_items_controller.rb` and `trip_skills_controller.rb`
+  (`test/controllers/api/v1/trip_gear_items_controller_test.rb`,
+  `trip_skills_controller_test.rb`), including regression tests
+  specifically for the `commitments`/`committed_quantity` and
+  `volunteers` jsonb string-key behavior (this is where the
+  symbol/string key bug lived previously).
+- Full suite (`bin/rails test`) passes with only the same 7 pre-existing,
+  unrelated failures (`FeedbacksControllerTest`, one
+  `LocationsControllerTest` case) that existed before this phase — no
+  regressions introduced.
+
+**Files:** `test/fixtures/{users,trips,trip_memberships,skills,gear_items,
+trip_skills,trip_gear_items,friendships}.yml`, `test/test_helper.rb`,
+`test/controllers/api/v1/{trips,trip_gear_items,trip_skills}_controller_test.rb`,
+`config/environments/test.rb`,
+`db/migrate/20260925000003_make_foreign_keys_deferrable.rb`
 
 ### 1.2 ⬜ Frontend component test scaffolding
 

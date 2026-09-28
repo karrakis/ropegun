@@ -3,3 +3,7 @@
 first_aid:
   name: First Aid
   category: safety
+
+navigation:
+  name: Navigation
+  category: wilderness
