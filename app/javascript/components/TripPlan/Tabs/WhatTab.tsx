@@ -26,6 +26,7 @@ const GearSubTab = ({
   const [catalogue, setCatalogue] = useState<any[]>([]);
   const [addingId, setAddingId] = useState<number | null>(null);
   const [showCatalogue, setShowCatalogue] = useState(false);
+  const [catalogueQuery, setCatalogueQuery] = useState("");
 
   useEffect(() => {
     fetch("/api/v1/gear_items", { headers: { Accept: "application/json" } })
@@ -225,29 +226,46 @@ const GearSubTab = ({
             {showCatalogue ? "Hide catalogue" : "+ Add gear from catalogue"}
           </button>
           {showCatalogue && (
-            <div className="mt-2 flex flex-col gap-1 max-h-64 overflow-y-auto bg-night rounded p-2">
-              {catalogue
-                .filter((g) => !tripGearItemIds.has(g.id))
-                .map((g) => (
-                  <div
-                    key={g.id}
-                    className="flex items-center justify-between py-1"
-                  >
-                    <div>
-                      <span className="text-cream text-sm">{g.name}</span>
-                      <span className="text-ashgray text-xs ml-2">
-                        {g.category}
-                      </span>
-                    </div>
-                    <button
-                      className="text-xs bg-auburn text-cream px-2 py-0.5 rounded disabled:opacity-50"
-                      disabled={addingId === g.id}
-                      onClick={() => addToTrip(g.id)}
+            <div className="mt-2 flex flex-col gap-2">
+              <input
+                type="text"
+                value={catalogueQuery}
+                onChange={(e) => setCatalogueQuery(e.target.value)}
+                placeholder="Search gear…"
+                className="w-full h-8 rounded bg-cream bg-opacity-10 text-cream text-sm px-2"
+              />
+              <div className="flex flex-col gap-1 max-h-64 overflow-y-auto bg-night rounded p-2">
+                {catalogue
+                  .filter((g) => !tripGearItemIds.has(g.id))
+                  .filter((g) => {
+                    const q = catalogueQuery.trim().toLowerCase();
+                    if (!q) return true;
+                    return (
+                      g.name?.toLowerCase().includes(q) ||
+                      g.category?.toLowerCase().includes(q)
+                    );
+                  })
+                  .map((g) => (
+                    <div
+                      key={g.id}
+                      className="flex items-center justify-between py-1"
                     >
-                      Add
-                    </button>
-                  </div>
-                ))}
+                      <div>
+                        <span className="text-cream text-sm">{g.name}</span>
+                        <span className="text-ashgray text-xs ml-2">
+                          {g.category}
+                        </span>
+                      </div>
+                      <button
+                        className="text-xs bg-auburn text-cream px-2 py-0.5 rounded disabled:opacity-50"
+                        disabled={addingId === g.id}
+                        onClick={() => addToTrip(g.id)}
+                      >
+                        Add
+                      </button>
+                    </div>
+                  ))}
+              </div>
             </div>
           )}
         </div>
@@ -271,6 +289,7 @@ const SkillsSubTab = ({
 }) => {
   const [catalogue, setCatalogue] = useState<any[]>([]);
   const [showCatalogue, setShowCatalogue] = useState(false);
+  const [catalogueQuery, setCatalogueQuery] = useState("");
 
   useEffect(() => {
     fetch("/api/v1/skills", { headers: { Accept: "application/json" } })
@@ -374,28 +393,45 @@ const SkillsSubTab = ({
             {showCatalogue ? "Hide catalogue" : "+ Add skill from catalogue"}
           </button>
           {showCatalogue && (
-            <div className="mt-2 flex flex-col gap-1 max-h-64 overflow-y-auto bg-night rounded p-2">
-              {catalogue
-                .filter((s) => !tripSkillIds.has(s.id))
-                .map((s) => (
-                  <div
-                    key={s.id}
-                    className="flex items-center justify-between py-1"
-                  >
-                    <div>
-                      <span className="text-cream text-sm">{s.name}</span>
-                      <span className="text-ashgray text-xs ml-2">
-                        {s.category}
-                      </span>
-                    </div>
-                    <button
-                      className="text-xs bg-auburn text-cream px-2 py-0.5 rounded"
-                      onClick={() => addSkill(s.id)}
+            <div className="mt-2 flex flex-col gap-2">
+              <input
+                type="text"
+                value={catalogueQuery}
+                onChange={(e) => setCatalogueQuery(e.target.value)}
+                placeholder="Search skills…"
+                className="w-full h-8 rounded bg-cream bg-opacity-10 text-cream text-sm px-2"
+              />
+              <div className="flex flex-col gap-1 max-h-64 overflow-y-auto bg-night rounded p-2">
+                {catalogue
+                  .filter((s) => !tripSkillIds.has(s.id))
+                  .filter((s) => {
+                    const q = catalogueQuery.trim().toLowerCase();
+                    if (!q) return true;
+                    return (
+                      s.name?.toLowerCase().includes(q) ||
+                      s.category?.toLowerCase().includes(q)
+                    );
+                  })
+                  .map((s) => (
+                    <div
+                      key={s.id}
+                      className="flex items-center justify-between py-1"
                     >
-                      Add
-                    </button>
-                  </div>
-                ))}
+                      <div>
+                        <span className="text-cream text-sm">{s.name}</span>
+                        <span className="text-ashgray text-xs ml-2">
+                          {s.category}
+                        </span>
+                      </div>
+                      <button
+                        className="text-xs bg-auburn text-cream px-2 py-0.5 rounded"
+                        onClick={() => addSkill(s.id)}
+                      >
+                        Add
+                      </button>
+                    </div>
+                  ))}
+              </div>
             </div>
           )}
         </div>

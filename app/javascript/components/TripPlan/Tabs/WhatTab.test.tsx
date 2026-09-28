@@ -204,4 +204,42 @@ describe("WhatTab (gear sub-tab)", () => {
       expect(onTripUpdated).toHaveBeenCalledWith(updatedTrip),
     );
   });
+
+  test("the catalogue can be filtered by a search query", async () => {
+    (global.fetch as jest.Mock).mockImplementation((url: string) => {
+      if (url === "/api/v1/gear_items") {
+        return Promise.resolve(
+          jsonResponse([
+            { id: 1, name: "Climbing Helmet", category: "personal" },
+            { id: 2, name: "Climbing Harness", category: "personal" },
+            { id: 3, name: "12cm Quickdraw", category: "sport" },
+          ]),
+        );
+      }
+      return Promise.resolve(jsonResponse({}));
+    });
+    render(
+      <WhatTab
+        trip={baseTrip()}
+        localUser={localUser}
+        isOrganizer={true}
+        onTripUpdated={jest.fn()}
+      />,
+    );
+    await userEvent.click(
+      screen.getByRole("button", { name: "+ Add gear from catalogue" }),
+    );
+    expect(await screen.findByText("Climbing Helmet")).toBeInTheDocument();
+    expect(screen.getByText("Climbing Harness")).toBeInTheDocument();
+    expect(screen.getByText("12cm Quickdraw")).toBeInTheDocument();
+
+    await userEvent.type(
+      screen.getByPlaceholderText("Search gear…"),
+      "helmet",
+    );
+
+    expect(screen.getByText("Climbing Helmet")).toBeInTheDocument();
+    expect(screen.queryByText("Climbing Harness")).not.toBeInTheDocument();
+    expect(screen.queryByText("12cm Quickdraw")).not.toBeInTheDocument();
+  });
 });

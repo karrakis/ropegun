@@ -1,65 +1,65 @@
 export interface UserSessionObject {
-    name: string;
-    picture: string;
-  }
+  name: string;
+  picture: string;
+}
 
 export interface Route {
   path: string;
   name: string;
-  }
+}
 
 export interface RouteList {
-    dashboard: Route;
-  }
+  dashboard: Route;
+}
 
 export interface Location {
-    id?: number;
-    name: string;
-    latitude: number;
-    longitude: number;
-    office?: string;
-    office_x?: number;
-    office_y?: number;
-  }
-  
+  id?: number;
+  name: string;
+  latitude: number;
+  longitude: number;
+  office?: string;
+  office_x?: number;
+  office_y?: number;
+}
+
 export interface LocalUser {
-    id: number;
-    name: string;
-    email: string;
-    picture: string;
-    friendships: any[];
-    trips: Trip[];
-  }
+  id: number;
+  name: string;
+  email: string;
+  picture: string;
+  friendships: any[];
+  trips: Trip[];
+}
 
 export interface AppRootProps {
-    routes: RouteList;
-    user: UserSessionObject;
-    localUser: LocalUser;
-    csrf: string;
-  }
+  routes: RouteList;
+  user: UserSessionObject;
+  localUser: LocalUser;
+  csrf: string;
+}
 
 export interface LocationsSelectorProps {
-    locationOptions: Location[];
-    updateLocations: (loc: Location) => void;
-    trip: Trip;
-    updateTrip: (trip: Trip) => void;
-  }
+  locationOptions: Location[];
+  updateLocations: (loc: Location) => void;
+  trip: Trip;
+  updateTrip: (trip: Trip) => void;
+}
 
 export interface DevblogProps {
-    user: UserSessionObject;
-  }
+  user: UserSessionObject;
+}
 
 export interface localUserType {
-    id: number;
-    name: string;
-    email: string;
-    friendships: any[];
-  }
-  
+  id: number;
+  name: string;
+  email: string;
+  friendships: any[];
+}
+
 export interface TripPlanProps {
-    localUser: localUserType;
-    tripLocations?: Location[];
-  }
+  localUser: localUserType;
+  tripLocations?: Location[];
+}
 
 export interface TripEditProps {
   trip: Trip;
@@ -81,14 +81,14 @@ export interface MapControlProps {
   trip: Trip;
   updateTrip: (trip: Trip) => void;
 }
-    
-export interface Trip {
-    id?: number;
-    name: string;
-    owner: localUserType;
-    locations: Location[];
-  }
 
-  export interface Trips {
-    trips: Trip[];
-  }
+export interface Trip {
+  id?: number;
+  name: string;
+  owner: localUserType;
+  locations: Location[];
+}
+
+export interface Trips {
+  trips: Trip[];
+}

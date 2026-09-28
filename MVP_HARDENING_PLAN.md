@@ -80,7 +80,6 @@ passing (no frontend changes were needed for this phase).
 
 ---
 
-
 ## Phase 1 — Testing foundation
 
 Do this before the bigger feature phases so that real-time sync, comments,

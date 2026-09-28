@@ -49,46 +49,81 @@ end
 puts "Seeded #{Skill.count} skills"
 
 # ── Gear catalogue ─────────────────────────────────────────────────────────────
+# Rock climbing catalogue (personal/sport/trad/anchoring/multipitch) is the
+# full assorted-gear list. Alpine/ice and safety/emergency items are a
+# separate domain the list doesn't cover, so they're kept as-is alongside it.
 
 gear = [
-  # Rope
-  { name: "Single Rope (dry)",        category: "rope",       description: "60-70m dry-treated single rope" },
-  { name: "Single Rope (standard)",   category: "rope",       description: "60-70m non-dry single rope" },
-  { name: "Half Ropes",               category: "rope",       description: "Pair of half ropes" },
-  { name: "Cordelette",               category: "rope",       description: "7mm cord loop ~5-6m" },
-  { name: "Tagline (skinny)",         category: "rope",       description: "6mm static tagline for rappels" },
+  # Core Personal Gear
+  { name: "Climbing Helmet",                        category: "personal" },
+  { name: "Climbing Harness",                       category: "personal" },
+  { name: "Climbing Shoes",                         category: "personal" },
+  { name: "Chalk Bag",                               category: "personal" },
+  { name: "60m Dynamic Single Rope",                 category: "personal" },
+  { name: "70m Dynamic Single Rope",                 category: "personal" },
+  { name: "60m Dynamic Half Rope",                   category: "personal" },
+  { name: "70m Dynamic Half Rope",                   category: "personal" },
+  { name: "Assisted Braking Belay Device",           category: "personal" },
+  { name: "Guide Mode Tubular Belay Device",         category: "personal" },
+  { name: "HMS Locking Carabiner Screw Gate",        category: "personal" },
+  { name: "HMS Locking Carabiner Auto Lock",         category: "personal" },
+  { name: "D Style Locking Carabiner Screw Gate",    category: "personal" },
+  { name: "D Style Locking Carabiner Auto Lock",     category: "personal" },
 
-  # Belay & rappel
-  { name: "Grigri",                   category: "belay",      description: "Petzl Grigri or equivalent assisted-braking device" },
-  { name: "ATC / Tube Device",        category: "belay",      description: "Reversible tube-style belay device" },
-  { name: "Ohm",                      category: "belay",      description: "Edelrid Ohm resistive belay device" },
+  # Sport Climbing Gear
+  { name: "12cm Quickdraw",                          category: "sport" },
+  { name: "16cm Quickdraw",                          category: "sport" },
+  { name: "17cm Quickdraw",                          category: "sport" },
+  { name: "25cm Quickdraw",                          category: "sport" },
+  { name: "Telescoping Stick Clip",                  category: "sport" },
 
-  # Protection
-  { name: "#0.3 Cam",                 category: "protection", description: "e.g. Black Diamond Camalot C4 0.3" },
-  { name: "#0.5 Cam",                 category: "protection", description: "e.g. Black Diamond Camalot C4 0.5" },
-  { name: "#0.75 Cam",                category: "protection", description: "e.g. Black Diamond Camalot C4 0.75" },
-  { name: "#1 Cam",                   category: "protection", description: "e.g. Black Diamond Camalot C4 1" },
-  { name: "#2 Cam",                   category: "protection", description: "e.g. Black Diamond Camalot C4 2" },
-  { name: "#3 Cam",                   category: "protection", description: "e.g. Black Diamond Camalot C4 3" },
-  { name: "#4 Cam",                   category: "protection", description: "e.g. Black Diamond Camalot C4 4" },
-  { name: "Nut Set",                  category: "protection", description: "Set of wired stoppers (e.g. DMM Alloy or BD Stoppers)" },
-  { name: "Micro Nuts",               category: "protection", description: "Small/micro nut set for thin cracks" },
-  { name: "Ball Nuts / Offset Nuts",  category: "protection", description: "Offset or ball nut set" },
-  { name: "Hex Set",                  category: "protection", description: "Hexentric nut set for wider cracks" },
-  { name: "Big Bros / Offset Cams",   category: "protection", description: "Off-width / wide crack protection" },
+  # Trad Climbing Gear
+  { name: "Small Wire Nut Size 1",                   category: "trad" },
+  { name: "Small Wire Nut Size 2",                   category: "trad" },
+  { name: "Small Wire Nut Size 3",                   category: "trad" },
+  { name: "Medium Wire Nut Size 4",                  category: "trad" },
+  { name: "Medium Wire Nut Size 5",                  category: "trad" },
+  { name: "Medium Wire Nut Size 6",                  category: "trad" },
+  { name: "Medium Wire Nut Size 7",                  category: "trad" },
+  { name: "Medium Wire Nut Size 8",                  category: "trad" },
+  { name: "Large Wire Nut Size 9",                   category: "trad" },
+  { name: "Large Wire Nut Size 10",                  category: "trad" },
+  { name: "Large Wire Nut Size 11",                  category: "trad" },
+  { name: "Large Wire Nut Size 12",                  category: "trad" },
+  { name: "Micro Camming Device Size 0.1",           category: "trad" },
+  { name: "Micro Camming Device Size 0.2",           category: "trad" },
+  { name: "Small Camming Device Size 0.3",           category: "trad" },
+  { name: "Small Camming Device Size 0.4",           category: "trad" },
+  { name: "Small Camming Device Size 0.5",           category: "trad" },
+  { name: "Medium Camming Device Size 0.75",         category: "trad" },
+  { name: "Medium Camming Device Size 1",            category: "trad" },
+  { name: "Medium Camming Device Size 2",            category: "trad" },
+  { name: "Large Camming Device Size 3",             category: "trad" },
+  { name: "Large Camming Device Size 4",             category: "trad" },
+  { name: "Large Camming Device Size 5",             category: "trad" },
+  { name: "Large Camming Device Size 6",             category: "trad" },
+  { name: "Nut Extraction Tool",                     category: "trad" },
+  { name: "60cm Alpine Draw",                        category: "trad" },
+  { name: "120cm Alpine Draw",                       category: "trad" },
+  { name: "Non Locking Wiregate Carabiner",          category: "trad" },
+  { name: "6m Cordelette Accessory Cord 7mm",        category: "trad" },
 
-  # Carabiners & slings
-  { name: "Locking Carabiner",        category: "hardware",   description: "HMS/pear locking biner" },
-  { name: "Non-locking Carabiners",   category: "hardware",   description: "Rack of non-lockers (≥10)" },
-  { name: "120cm Sling",              category: "hardware",   description: "120cm nylon or Dyneema runner" },
-  { name: "60cm Sling",               category: "hardware",   description: "60cm nylon or Dyneema runner" },
-  { name: "Personal Anchor System",   category: "hardware",   description: "Adjustable PAS or sewn daisy chain" },
+  # Top Rope Anchoring Gear
+  { name: "5m Cordelette Accessory Cord 7mm",        category: "anchoring" },
+  { name: "240cm Sewn Nylon Sling",                  category: "anchoring" },
+  { name: "120cm Sewn Nylon Sling",                  category: "anchoring" },
+  { name: "120cm Sewn Dyneema Sling",                category: "anchoring" },
 
-  # Helmets & harnesses
-  { name: "Helmet",                   category: "personal",   description: "UIAA/CE certified climbing helmet" },
-  { name: "Harness",                  category: "personal",   description: "Rock climbing harness" },
-  { name: "Approach Shoes",           category: "personal",   description: "Sticky-rubber approach shoes" },
-  { name: "Climbing Shoes",           category: "personal",   description: "Rock climbing shoes" },
+  # Multi Pitch and Specialist Gear
+  { name: "Multi Link Personal Anchor System",       category: "multipitch" },
+  { name: "120cm Sewn Webbing Tether",                category: "multipitch" },
+  { name: "Edelrid OHM First Bolt Resistor",          category: "multipitch" },
+  { name: "Mechanical Handle Ascender Left",          category: "multipitch" },
+  { name: "Mechanical Handle Ascender Right",         category: "multipitch" },
+  { name: "Emergency Ultra Light Ascender",           category: "multipitch" },
+  { name: "6mm Prusik Cord Loop",                     category: "multipitch" },
+  { name: "6mm Autoblock Cord Loop",                  category: "multipitch" },
+  { name: "Lightweight Rope Extraction Emergency Knife", category: "multipitch" },
 
   # Ice / alpine
   { name: "Ice Axe",                  category: "alpine",     description: "Straight-pick mountaineering axe" },
@@ -110,5 +145,23 @@ gear.each do |attrs|
     g.description = attrs[:description]
   end
 end
+
+# The rock-climbing catalogue above supersedes the old generic placeholder
+# names it was built from (e.g. "Helmet" -> "Climbing Helmet", "#0.3 Cam" ->
+# "Small Camming Device Size 0.3", "Nut Set" -> individual sized nuts).
+# None of these are referenced by any trip_gear_items/user_gear_items, so
+# they're safe to drop outright rather than leaving stale duplicates around.
+superseded_gear_names = [
+  "Single Rope (dry)", "Single Rope (standard)", "Half Ropes", "Cordelette",
+  "Tagline (skinny)", "Grigri", "ATC / Tube Device", "Ohm",
+  "#0.3 Cam", "#0.5 Cam", "#0.75 Cam", "#1 Cam", "#2 Cam", "#3 Cam", "#4 Cam",
+  "Nut Set", "Micro Nuts", "Ball Nuts / Offset Nuts", "Hex Set",
+  "Big Bros / Offset Cams", "Locking Carabiner", "Non-locking Carabiners",
+  "120cm Sling", "60cm Sling", "Personal Anchor System",
+  "Helmet", "Harness", "Approach Shoes",
+]
+GearItem.where(name: superseded_gear_names).destroy_all
+
 puts "Seeded #{GearItem.count} gear items"
+
 
