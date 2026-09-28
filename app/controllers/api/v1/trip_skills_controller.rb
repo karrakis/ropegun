@@ -43,6 +43,7 @@ class Api::V1::TripSkillsController < ApplicationController
   def trip_include
     [:locations, :owner, { trip_memberships: { include: :user } },
      { trip_skills: { include: :skill, methods: [:volunteers] } },
-     { trip_gear_items: { include: :gear_item, methods: [:commitments, :committed_quantity] } }]
+     { trip_gear_items: { include: :gear_item, methods: [:commitments, :committed_quantity] } },
+     { trip_comments: { include: :user } }]
   end
 end

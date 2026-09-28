@@ -21,6 +21,9 @@ class Trip < ApplicationRecord
   has_many :trip_skills, dependent: :destroy
   has_many :trip_gear_items, dependent: :destroy
 
+  # ── Comment thread ────────────────────────────────────────────────────────
+  has_many :trip_comments, dependent: :destroy
+
   # ── Legacy — keep until trip_invitations controller is refactored ─────────
   has_many :trip_invitations, dependent: :destroy
 
@@ -33,7 +36,8 @@ class Trip < ApplicationRecord
   BROADCAST_INCLUDE = [
     :locations, :owner, { trip_memberships: { include: :user } },
     { trip_skills: { include: :skill, methods: [:volunteers] } },
-    { trip_gear_items: { include: :gear_item, methods: [:commitments, :committed_quantity] } }
+    { trip_gear_items: { include: :gear_item, methods: [:commitments, :committed_quantity] } },
+    { trip_comments: { include: :user } }
   ].freeze
 
   # Called from every controller action that mutates a trip or its

@@ -286,32 +286,84 @@ dependency — it was already present transitively via
 
 Builds on Phase 2 so new comments show up live, not just on refresh.
 
-### 3.1 ⬜ Data model
+### 3.1 ✅ Data model
 
-Simple flat comment thread per trip (not per-field/per-gear-item — keep
-scope tight for MVP): `TripComment belongs_to :trip, belongs_to :user`,
-`body:text`, timestamps. New migration + model + test.
+`TripComment belongs_to :trip, belongs_to :user`, `body:text` (required),
+timestamps, per the plan. Migration
+(`db/migrate/20260928000001_create_trip_comments.rb`) uses
+`foreign_key: { deferrable: :deferred }` inline on `t.references` —
+turned out this option is silently ignored by that shorthand (confirmed
+via `schema.rb` showing plain, non-deferrable FKs after running it), so
+a follow-up migration
+(`20260928000002_make_trip_comments_foreign_keys_deferrable.rb`)
+re-applies it the same explicit `remove_foreign_key`/`add_foreign_key
+..., deferrable: :deferred` way the original
+`MakeForeignKeysDeferrable` migration does. Worth remembering for any
+future migration that creates a table needing this.
 
-### 3.2 ⬜ Backend
+### 3.2 ✅ Backend
 
-`Api::V1::TripCommentsController` — index (paginated or just "load all,
-it's a trip not a forum"), create, destroy (own comment or organizer).
-Broadcast new comments via the Phase 2 channel.
+`Api::V1::TripCommentsController#create/destroy`. `create` uses
+`current_local_user.trips.find` (any trip member, not just the
+organizer — the plan's "own comment or organizer" destroy rule implies
+posting itself isn't organizer-gated). `destroy` allows the comment's
+author or the trip's owner. No separate `index` action — comments ride
+along as part of the trip payload itself (`{ trip_comments: { include:
+:user } }` added to `Trip::BROADCAST_INCLUDE` and every controller's
+duplicated `trip_include` shape), same approach already used for
+skills/gear rather than a dedicated paginated endpoint — simpler, and
+matches the plan's "load all, it's a trip not a forum" alternative.
+Broadcasts via the existing `trip.broadcast_refresh!` from Phase 2, so
+new/removed comments show up live with no extra channel work needed.
 
-### 3.3 ⬜ Frontend
+### 3.3 ✅ Frontend
 
-New tab or section (check `TRIP_SUMMARY_PLAN.md`'s tab layout — likely
-fits best as part of an existing tab or a new "Discuss" tab) with a
-simple list + composer, consistent with existing tab patterns.
+New "Discuss" tab (`DiscussTab.tsx`) added to `TripSummary.tsx`'s tab
+bar, after What. Simple oldest-first comment list + a composer
+textarea, consistent with the existing tab visual patterns (`WhatTab`/
+`WhoTab`). Each comment shows a Remove control to its author or the
+organizer, calling `DELETE /api/v1/trip_comments/:id`. `TRIP_SUMMARY_PLAN.md`
+lists a trip "forum" as out of scope for MVP, but `MVP_HARDENING_PLAN.md`
+explicitly calls for this simple flat thread — treated the hardening
+plan as authoritative here since it's the actively-tracked doc, and kept
+scope deliberately minimal (no threading/replies/reactions) to match
+the "keep it tight" instruction in 3.1.
 
-### 3.4 ⬜ Tests
+### 3.4 ✅ Tests
 
-Controller request tests + one frontend interaction test (post a
-comment, see it appear).
+Backend: `test/models/trip_comment_test.rb` (validation, associations)
+and `test/controllers/api/v1/trip_comments_controller_test.rb` (7
+tests: create for any member, scoped to membership, rejects blank body,
+broadcasts on create, destroy by author, destroy by organizer, destroy
+forbidden for an unrelated member). Frontend:
+`DiscussTab.test.tsx` (7 tests: empty state, oldest-first ordering,
+posting applies the returned trip, Post button disabled without real
+content, author can remove their own comment, non-author/non-organizer
+sees no Remove control, organizer sees Remove on any comment) — unlike
+the Phase 2.4 decision to skip a `TripPlan.tsx`-level test, this tab is
+cheap to test in isolation the same way `WhatTab.test.tsx` already is,
+so a full interaction test was added rather than skipped.
 
-**Files:** new migration, `app/models/trip_comment.rb`,
-`app/controllers/api/v1/trip_comments_controller.rb`, `config/routes.rb`,
-new frontend component
+Full suite (`bin/rails test`): 49 runs (40 existing + 9 new), same 7
+pre-existing unrelated failures, no new ones. Frontend (`npx jest`): 6
+suites / 19 tests, all passing. `tsc --noEmit`: zero errors in any
+non-test file touched by this phase (the jest-globals noise in
+`*.test.tsx` files is pre-existing and unrelated — `tsc` isn't
+configured with Jest's type globals, but Jest itself runs these files
+fine via its own transform).
+
+**Files:** `db/migrate/20260928000001_create_trip_comments.rb` (new),
+`db/migrate/20260928000002_make_trip_comments_foreign_keys_deferrable.rb`
+(new), `app/models/trip_comment.rb` (new), `app/models/trip.rb`
+(association + `BROADCAST_INCLUDE`), `config/routes.rb`,
+`app/controllers/api/v1/trip_comments_controller.rb` (new),
+`app/controllers/api/v1/{trips,trip_skills,trip_gear_items}_controller.rb`
+(`trip_include` updated), `test/fixtures/trip_comments.yml` (new),
+`test/models/trip_comment_test.rb` (new),
+`test/controllers/api/v1/trip_comments_controller_test.rb` (new),
+`app/javascript/components/TripPlan/Tabs/DiscussTab.tsx` (new),
+`app/javascript/components/TripPlan/Tabs/DiscussTab.test.tsx` (new),
+`app/javascript/components/TripPlan/TripSummary.tsx`
 
 ---
 

@@ -3,9 +3,10 @@ import { WhereTab } from "./Tabs/WhereTab";
 import { WhenTab } from "./Tabs/WhenTab";
 import { WhoTab } from "./Tabs/WhoTab";
 import { WhatTab } from "./Tabs/WhatTab";
+import { DiscussTab } from "./Tabs/DiscussTab";
 import { csrfToken } from "../../utilities/csrfToken";
 
-type Tab = "where" | "when" | "who" | "what";
+type Tab = "where" | "when" | "who" | "what" | "discuss";
 
 interface TripSummaryProps {
   trip: any;
@@ -18,6 +19,7 @@ const TAB_LABELS: { id: Tab; label: string }[] = [
   { id: "when", label: "When" },
   { id: "who", label: "Who" },
   { id: "what", label: "What" },
+  { id: "discuss", label: "Discuss" },
 ];
 
 export const TripSummary: React.FC<TripSummaryProps> = ({
@@ -76,7 +78,7 @@ export const TripSummary: React.FC<TripSummaryProps> = ({
       </div>
 
       {/* Tab content */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 min-h-0 overflow-y-auto">
         {activeTab === "where" && (
           <WhereTab
             trip={trip}
@@ -103,6 +105,14 @@ export const TripSummary: React.FC<TripSummaryProps> = ({
         )}
         {activeTab === "what" && (
           <WhatTab
+            trip={trip}
+            localUser={localUser}
+            isOrganizer={isOrganizer}
+            onTripUpdated={onTripUpdated}
+          />
+        )}
+        {activeTab === "discuss" && (
+          <DiscussTab
             trip={trip}
             localUser={localUser}
             isOrganizer={isOrganizer}

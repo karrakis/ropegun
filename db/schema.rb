@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_09_25_000003) do
+ActiveRecord::Schema[7.0].define(version: 2026_09_28_000002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -76,6 +76,17 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_25_000003) do
     t.datetime "updated_at", null: false
     t.index ["category"], name: "index_skills_on_category"
     t.index ["name"], name: "index_skills_on_name", unique: true
+  end
+
+  create_table "trip_comments", force: :cascade do |t|
+    t.bigint "trip_id", null: false
+    t.bigint "user_id", null: false
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["trip_id", "created_at"], name: "index_trip_comments_on_trip_id_and_created_at"
+    t.index ["trip_id"], name: "index_trip_comments_on_trip_id"
+    t.index ["user_id"], name: "index_trip_comments_on_user_id"
   end
 
   create_table "trip_gear_items", force: :cascade do |t|
@@ -198,6 +209,8 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_25_000003) do
     t.index ["uuid"], name: "index_users_on_uuid", unique: true
   end
 
+  add_foreign_key "trip_comments", "trips", deferrable: :deferred
+  add_foreign_key "trip_comments", "users", deferrable: :deferred
   add_foreign_key "trip_gear_items", "gear_items", deferrable: :deferred
   add_foreign_key "trip_gear_items", "trips", deferrable: :deferred
   add_foreign_key "trip_gear_items", "users", deferrable: :deferred

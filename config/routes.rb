@@ -61,7 +61,10 @@ Rails.application.routes.draw do
       patch  '/trip_gear_items/:id/commit'        => 'trip_gear_items#commit'
       patch  '/trip_gear_items/:id'                => 'trip_gear_items#update'
       delete '/trip_gear_items/:id'                => 'trip_gear_items#destroy'
-      
+
+      post   '/trips/:id/comments' => 'trip_comments#create'
+      delete '/trip_comments/:id'  => 'trip_comments#destroy'
+
     end
   end
 end
