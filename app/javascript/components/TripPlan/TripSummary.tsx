@@ -4,6 +4,7 @@ import { WhenTab } from "./Tabs/WhenTab";
 import { WhoTab } from "./Tabs/WhoTab";
 import { WhatTab } from "./Tabs/WhatTab";
 import { DiscussTab } from "./Tabs/DiscussTab";
+import { BackCaret } from "./BackCaret";
 import { csrfToken } from "../../utilities/csrfToken";
 
 type Tab = "where" | "when" | "who" | "what" | "discuss";
@@ -12,6 +13,7 @@ interface TripSummaryProps {
   trip: any;
   localUser: any;
   onTripUpdated: (trip: any) => void;
+  onBack: () => void;
 }
 
 const TAB_LABELS: { id: Tab; label: string }[] = [
@@ -26,6 +28,7 @@ export const TripSummary: React.FC<TripSummaryProps> = ({
   trip,
   localUser,
   onTripUpdated,
+  onBack,
 }) => {
   const [activeTab, setActiveTab] = useState<Tab>("where");
 
@@ -49,8 +52,11 @@ export const TripSummary: React.FC<TripSummaryProps> = ({
   return (
     <div className="w-full flex flex-col h-full">
       {/* Trip title bar */}
-      <div className="bg-auburn text-cream px-4 py-3 flex items-center justify-between">
-        <h1 className="text-xl font-bold truncate">{trip.name}</h1>
+      <div className="bg-auburn text-cream px-2 py-2 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 min-w-0">
+          <BackCaret onClick={onBack} />
+          <h1 className="text-xl font-bold truncate">{trip.name}</h1>
+        </div>
         <span className="text-xs text-cream opacity-70 ml-2 shrink-0">
           {trip.route_mode
             ? "Route"

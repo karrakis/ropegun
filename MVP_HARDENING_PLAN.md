@@ -677,6 +677,60 @@ passing.
 `app/javascript/components/Dashboard/ProfileForm.test.tsx`,
 `test/controllers/components_controller_test.rb`
 
+### 4.7 ✅ Trip-plan flow: thumb-friendly "back" navigation
+
+Getting back to the "new trip or existing trip" landing screen
+(`/trip_plan`) was awkward — the existing-trips list and the
+destination-picker map each had a small text `← Back` link buried in
+the flow, and the trip-review screen (an existing trip opened from the
+list) had no way back to the list at all short of the browser's own
+back button.
+
+Added a single reusable `BackCaret` component (`TripPlan/BackCaret.tsx`)
+— a fixed, `w-12 h-12` circular button pinned to the same upper-left
+spot on every screen that has it, so the back gesture is always in the
+same place regardless of which trip-plan screen is showing. Wired to
+one level up per screen, per the reported hierarchy:
+
+- **Existing-trips list** (`/trip_plan/trips`) and **destination-picker
+  map** (`/trip_plan/new`) → back to the new/existing landing page
+  (`/trip_plan`), replacing their old inline `← Back` text links.
+- **Trip review** (`/trip_plan/:id`, an already-created trip opened
+  either from the list or freshly created) → back to the existing-trips
+  list (`/trip_plan/trips`), not the landing page — reviewing a trip is
+  one level below trip *selection*, not below the top-level landing
+  screen.
+
+The landing page itself (`/trip_plan`) and the trip-setup screen
+(`/trip_plan/new/setup`, which already has its own contextual `onBack`
+wired to the destination picker) were left as-is — neither was reported
+as a problem and the landing page is the top of this flow.
+
+**Tests:** `BackCaret.test.tsx` (new — renders with an accessible label
+and fires `onClick`, and accepts a custom label). Full `TripPlan.tsx`
+screen-switch behavior wasn't given its own integration test — it composes
+`DestinationSelector` (Google Maps) and an ActionCable subscription that
+would need substantial mocking disproportionate to this change; verified
+the three wiring points by direct code review instead.
+
+Frontend (`npx jest`): 9 suites / 31 tests, all passing. No new `tsc`
+errors introduced by `TripPlan.tsx` or `BackCaret.tsx` (the new test
+file has the same pre-existing global-jest-types gap present in every
+other `.test.tsx` file in this codebase, not something new).
+
+**Files:** `app/javascript/components/TripPlan/BackCaret.tsx` (new),
+`app/javascript/components/TripPlan/BackCaret.test.tsx` (new),
+`app/javascript/components/TripPlan/TripPlan.tsx`
+
+**Follow-up:** initial version rendered `BackCaret` as a fixed, floating
+round button in the viewport corner; per feedback, changed it to a
+plain inline square button placed directly to the left of each screen's
+title text inside its own title bar (no more `fixed`/`z-index` overlay),
+matching the reviewed trip screen's actual title bar rather than
+floating over it. `TripSummary.tsx` now takes an `onBack` prop and
+renders the caret next to the trip name itself, rather than `TripPlan.tsx`
+overlaying a floating button on top of it.
+
 ---
 
 

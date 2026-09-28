@@ -6,6 +6,7 @@ import {
 import { TripSetup } from "./TripSetup";
 import { TripSummary } from "./TripSummary";
 import { ExistingTrips } from "./ExistingTrips";
+import { BackCaret } from "./BackCaret";
 import { TripPlanProps } from "../types";
 import { csrfToken } from "../../utilities/csrfToken";
 import { getConsumer } from "../../utilities/cable";
@@ -152,9 +153,12 @@ export const TripPlan = ({ localUser }: TripPlanProps) => {
           {/* ── Existing trips ── */}
           {screen === "existing" && (
             <>
-              <h1 className="text-cream text-2xl font-bold bg-auburn p-2 w-full text-center z-10">
-                Your Trips
-              </h1>
+              <div className="w-full flex items-center gap-2 bg-auburn p-2 z-10">
+                <BackCaret onClick={() => navigate("/trip_plan")} />
+                <h1 className="text-cream text-2xl font-bold truncate">
+                  Your Trips
+                </h1>
+              </div>
               <div className="w-full mt-2">
                 <ExistingTrips
                   localUser={localUser}
@@ -164,27 +168,18 @@ export const TripPlan = ({ localUser }: TripPlanProps) => {
                   }}
                 />
               </div>
-              <button
-                className="mt-4 text-night text-sm underline"
-                onClick={() => navigate("/trip_plan")}
-              >
-                ← Back
-              </button>
             </>
           )}
 
           {/* ── Pick destinations ── */}
           {screen === "destinations" && (
             <>
-              <h1 className="text-cream text-2xl font-bold bg-auburn p-2 w-full text-center z-10">
-                Where to?
-              </h1>
-              <button
-                className="self-start text-night text-sm underline mt-2 ml-1"
-                onClick={() => navigate("/trip_plan")}
-              >
-                ← Back
-              </button>
+              <div className="w-full flex items-center gap-2 bg-auburn p-2 z-10">
+                <BackCaret onClick={() => navigate("/trip_plan")} />
+                <h1 className="text-cream text-2xl font-bold truncate">
+                  Where to?
+                </h1>
+              </div>
 
               <DestinationSelector
                 onDestinationAdded={handleDestinationAdded}
@@ -258,6 +253,7 @@ export const TripPlan = ({ localUser }: TripPlanProps) => {
               trip={createdTrip}
               localUser={localUser}
               onTripUpdated={setCreatedTrip}
+              onBack={() => navigate("/trip_plan/trips")}
             />
           )}
           <button
