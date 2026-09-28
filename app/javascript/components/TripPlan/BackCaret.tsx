@@ -29,4 +29,3 @@ export const BackCaret = ({ onClick, label = "Back" }: BackCaretProps) => (
 );
 
 export default BackCaret;
-

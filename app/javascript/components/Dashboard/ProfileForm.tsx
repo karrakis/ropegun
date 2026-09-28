@@ -21,12 +21,12 @@ export const ProfileForm = ({ user, localUser, onSaved }: ProfileFormProps) => {
   const [editing, setEditing] = useState(false);
   const [aboutMe, setAboutMe] = useState(localUser.about_me || "");
   const [additionalInformation, setAdditionalInformation] = useState(
-    localUser.additional_information || ""
+    localUser.additional_information || "",
   );
   const [homeAddress, setHomeAddress] = useState(localUser.home_address || "");
-  const [profileVisibility, setProfileVisibility] = useState<Record<string, string>>(
-    localUser.profile_visibility || {}
-  );
+  const [profileVisibility, setProfileVisibility] = useState<
+    Record<string, string>
+  >(localUser.profile_visibility || {});
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -100,7 +100,9 @@ export const ProfileForm = ({ user, localUser, onSaved }: ProfileFormProps) => {
             <h2 className="text-2xl font-semibold">
               {user?.given_name} {user?.family_name}
             </h2>
-            <p className="text-ashgray text-xs">Friendship key: {localUser.uuid}</p>
+            <p className="text-ashgray text-xs">
+              Friendship key: {localUser.uuid}
+            </p>
           </div>
         </div>
         {!editing && (
@@ -143,7 +145,10 @@ export const ProfileForm = ({ user, localUser, onSaved }: ProfileFormProps) => {
           <ProfileField
             label="Additional Information"
             field="additional_information"
-            visibility={visibilityFor(profileVisibility, "additional_information")}
+            visibility={visibilityFor(
+              profileVisibility,
+              "additional_information",
+            )}
             onVisibilityChange={setFieldVisibility}
           >
             <textarea
@@ -227,7 +232,11 @@ const ProfileField = ({
   <div className="flex flex-col gap-1">
     <div className="flex items-center justify-between">
       <span className="text-khaki text-lg">{label}</span>
-      <VisibilityToggle field={field} value={visibility} onChange={onVisibilityChange} />
+      <VisibilityToggle
+        field={field}
+        value={visibility}
+        onChange={onVisibilityChange}
+      />
     </div>
     {children}
   </div>
@@ -241,4 +250,3 @@ const ReadOnlyField = ({ label, value }: { label: string; value?: string }) => (
 );
 
 export default ProfileForm;
-

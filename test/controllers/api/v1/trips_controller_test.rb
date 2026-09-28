@@ -52,6 +52,27 @@ class Api::V1::TripsControllerTest < ActionController::TestCase
     assert_equal @bob.id, Trip.order(:created_at).last.owner_id
   end
 
+  test "create response includes a real share_token, not the pre-insert nil" do
+    # share_token defaults to gen_random_uuid() at the DB level — the
+    # in-memory record from Trip.new/.save doesn't pick that up without a
+    # reload, which previously meant the JSON (and the frontend's share
+    # link built from it) rendered a literal "null" token.
+    sign_in_as(@bob)
+    post :create, params: {
+      trip: {
+        name: "Multi-destination Trip", route_mode: "false",
+        locations: [
+          { name: "Crag A", latitude: "1.0", longitude: "2.0" },
+          { name: "Crag B", latitude: "3.0", longitude: "4.0" }
+        ]
+      }
+    }
+    assert_response :created
+    body = JSON.parse(response.body)
+    assert body["share_token"].present?
+    assert_equal Trip.find(body["id"]).share_token, body["share_token"]
+  end
+
   test "update merges extra_data instead of overwriting it" do
     sign_in_as(@alice)
     @trip.update!(extra_data: { "notes" => "bring sunscreen" })

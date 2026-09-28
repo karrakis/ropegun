@@ -17,6 +17,8 @@ describe("BackCaret", () => {
 
   test("accepts a custom aria-label", () => {
     render(<BackCaret onClick={jest.fn()} label="Back to your trips" />);
-    expect(screen.getByRole("button", { name: "Back to your trips" })).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "Back to your trips" }),
+    ).toBeInTheDocument();
   });
 });

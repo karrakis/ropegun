@@ -31,7 +31,7 @@ describe("ProfileForm", () => {
         user={user}
         localUser={baseLocalUser({ about_me: "I climb" })}
         onSaved={jest.fn()}
-      />
+      />,
     );
     expect(screen.getByText("Edit")).toBeInTheDocument();
     expect(screen.queryByLabelText("About Me")).not.toBeInTheDocument();
@@ -39,27 +39,47 @@ describe("ProfileForm", () => {
   });
 
   test("defaults visibility selects to the field defaults when unset", async () => {
-    render(<ProfileForm user={user} localUser={baseLocalUser()} onSaved={jest.fn()} />);
+    render(
+      <ProfileForm
+        user={user}
+        localUser={baseLocalUser()}
+        onSaved={jest.fn()}
+      />,
+    );
     await userEvent.click(screen.getByText("Edit"));
     expect(screen.getByLabelText("email visibility")).toHaveValue("friends");
-    expect(screen.getByLabelText("home_address visibility")).toHaveValue("app_only");
+    expect(screen.getByLabelText("home_address visibility")).toHaveValue(
+      "app_only",
+    );
     expect(screen.getByLabelText("about_me visibility")).toHaveValue("public");
-    expect(screen.getByLabelText("additional_information visibility")).toHaveValue("friends");
+    expect(
+      screen.getByLabelText("additional_information visibility"),
+    ).toHaveValue("friends");
   });
 
   test("saving PATCHes edited fields and the updated visibility map, calls onSaved, and exits edit mode", async () => {
     global.fetch = jest.fn(() =>
-      Promise.resolve({ ok: true, json: async () => ({ about_me: "I climb" }) })
+      Promise.resolve({
+        ok: true,
+        json: async () => ({ about_me: "I climb" }),
+      }),
     ) as jest.Mock;
     const onSaved = jest.fn();
-    render(<ProfileForm user={user} localUser={baseLocalUser()} onSaved={onSaved} />);
+    render(
+      <ProfileForm user={user} localUser={baseLocalUser()} onSaved={onSaved} />,
+    );
 
     await userEvent.click(screen.getByText("Edit"));
     await userEvent.type(screen.getByLabelText("About Me"), "I climb");
-    await userEvent.selectOptions(screen.getByLabelText("home_address visibility"), "friends");
+    await userEvent.selectOptions(
+      screen.getByLabelText("home_address visibility"),
+      "friends",
+    );
     await userEvent.click(screen.getByText("Save"));
 
-    await waitFor(() => expect(onSaved).toHaveBeenCalledWith({ about_me: "I climb" }));
+    await waitFor(() =>
+      expect(onSaved).toHaveBeenCalledWith({ about_me: "I climb" }),
+    );
     const [url, options] = (global.fetch as jest.Mock).mock.calls[0];
     expect(url).toBe("/users/1");
     expect(options.method).toBe("PATCH");
@@ -79,7 +99,7 @@ describe("ProfileForm", () => {
         user={user}
         localUser={baseLocalUser({ about_me: "original" })}
         onSaved={jest.fn()}
-      />
+      />,
     );
 
     await userEvent.click(screen.getByText("Edit"));
@@ -94,28 +114,45 @@ describe("ProfileForm", () => {
 
   test("shows an error, does not call onSaved, and stays in edit mode when the server rejects the update", async () => {
     global.fetch = jest.fn(() =>
-      Promise.resolve({ ok: false, json: async () => ({ about_me: ["is too long"] }) })
+      Promise.resolve({
+        ok: false,
+        json: async () => ({ about_me: ["is too long"] }),
+      }),
     ) as jest.Mock;
     const onSaved = jest.fn();
-    render(<ProfileForm user={user} localUser={baseLocalUser()} onSaved={onSaved} />);
-
-    await userEvent.click(screen.getByText("Edit"));
-    await userEvent.click(screen.getByText("Save"));
-
-    await waitFor(() => expect(screen.getByRole("alert")).toHaveTextContent("is too long"));
-    expect(onSaved).not.toHaveBeenCalled();
-    expect(screen.getByLabelText("About Me")).toBeInTheDocument();
-  });
-
-  test("shows an error when the request itself fails", async () => {
-    global.fetch = jest.fn(() => Promise.reject(new Error("network down"))) as jest.Mock;
-    render(<ProfileForm user={user} localUser={baseLocalUser()} onSaved={jest.fn()} />);
+    render(
+      <ProfileForm user={user} localUser={baseLocalUser()} onSaved={onSaved} />,
+    );
 
     await userEvent.click(screen.getByText("Edit"));
     await userEvent.click(screen.getByText("Save"));
 
     await waitFor(() =>
-      expect(screen.getByRole("alert")).toHaveTextContent("Could not reach the server")
+      expect(screen.getByRole("alert")).toHaveTextContent("is too long"),
+    );
+    expect(onSaved).not.toHaveBeenCalled();
+    expect(screen.getByLabelText("About Me")).toBeInTheDocument();
+  });
+
+  test("shows an error when the request itself fails", async () => {
+    global.fetch = jest.fn(() =>
+      Promise.reject(new Error("network down")),
+    ) as jest.Mock;
+    render(
+      <ProfileForm
+        user={user}
+        localUser={baseLocalUser()}
+        onSaved={jest.fn()}
+      />,
+    );
+
+    await userEvent.click(screen.getByText("Edit"));
+    await userEvent.click(screen.getByText("Save"));
+
+    await waitFor(() =>
+      expect(screen.getByRole("alert")).toHaveTextContent(
+        "Could not reach the server",
+      ),
     );
   });
 });

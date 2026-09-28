@@ -656,7 +656,7 @@ Two issues reported after 4.5 landed:
    which in practice reads as "stuck in edit mode with no way out."
    Restored a view/edit toggle, but — unlike the original pre-4.5
    `Edit.tsx` — the transition back to read-only view now only happens
-   *after* a successful save (`res.ok` and no thrown error), via the
+   _after_ a successful save (`res.ok` and no thrown error), via the
    same `onSaved`/`res.ok` check added in 4.5. Added a Cancel button to
    leave edit mode without saving, discarding any in-progress edits.
 
@@ -698,7 +698,7 @@ one level up per screen, per the reported hierarchy:
 - **Trip review** (`/trip_plan/:id`, an already-created trip opened
   either from the list or freshly created) → back to the existing-trips
   list (`/trip_plan/trips`), not the landing page — reviewing a trip is
-  one level below trip *selection*, not below the top-level landing
+  one level below trip _selection_, not below the top-level landing
   screen.
 
 The landing page itself (`/trip_plan`) and the trip-setup screen
@@ -731,8 +731,43 @@ floating over it. `TripSummary.tsx` now takes an `onBack` prop and
 renders the caret next to the trip name itself, rather than `TripPlan.tsx`
 overlaying a floating button on top of it.
 
----
+### 4.8 ✅ Fix: new trip's share link rendered as `/trips/null`
 
+Reported: a freshly created multi-destination trip's share link
+(`WhoTab.tsx`'s `${window.location.origin}/trips/${trip.share_token}`)
+came out as `http://localhost:3000/trips/null`.
+
+Root cause: `trips.share_token` defaults to `gen_random_uuid()` at the
+**database** level (`db/schema.rb`: `default: -> { "gen_random_uuid()" }`),
+not in Ruby. `Api::V1::TripsController#create` built the trip with
+`Trip.new(...)`, called `.save`, and then serialized that same in-memory
+object directly — but ActiveRecord doesn't populate SQL-function column
+defaults back onto the object after `INSERT` the way it does the primary
+key. Confirmed directly (`bin/rails runner`): immediately after
+`.save`, `trip.share_token` is `nil` in memory while the row in the
+database already has a real UUID; only `trip.reload` picks it up. So
+every `create` response — and therefore every share link the frontend
+ever builds from a freshly created trip, before the next full
+reload/re-fetch — carried a `nil` token.
+
+Fix: added `@trip.reload` immediately after a successful `@trip.save`
+in `create`, before serializing the response. (`users.uuid` has the
+same DB-level-default shape, but was checked and confirmed not to have
+this problem — no controller action serializes a freshly-created user
+in the same request; the profile UUID is always read back from the DB
+on a later request.)
+
+**Tests:** `test/controllers/api/v1/trips_controller_test.rb` (+1 — a
+multi-destination `create` response's `share_token` is present and
+matches what's actually persisted, rather than nil).
+
+Full suite (`bin/rails test`): 77 runs, same 7 pre-existing unrelated
+failures, no new ones.
+
+**Files:** `app/controllers/api/v1/trips_controller.rb`,
+`test/controllers/api/v1/trips_controller_test.rb`
+
+---
 
 ## Phase 5 — Discoverable user search (by name or email)
 

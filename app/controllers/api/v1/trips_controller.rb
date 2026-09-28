@@ -18,6 +18,12 @@ class Api::V1::TripsController < ApplicationController
         ends_on: trip_params[:ends_on]
       )
       if @trip.save
+        # share_token is a DB-generated default (gen_random_uuid()), so the
+        # in-memory @trip from `.new`/`.save` still has it as nil — Rails
+        # doesn't populate SQL-function column defaults onto the object
+        # after INSERT. Without this reload, the JSON below (and the share
+        # link the frontend builds from it) would render "/trips/null".
+        @trip.reload
         location_data = params[:trip][:locations] || []
         location_data.each_with_index do |attrs, index|
           location = Location.find_or_create_by!(
