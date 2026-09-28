@@ -144,15 +144,39 @@ existing suites green) before adding anything new.
 
 **Files:** `app/javascript/components/TripPlan/Tabs/WhatTab.test.tsx`
 
-### 1.3 ⬜ Wire tests into a lightweight CI check
+### 1.3 ✅ Wire tests into a lightweight CI check
 
-No CI currently exists (no `.github/workflows`). Add a minimal GitHub
-Actions workflow that runs `bin/rails test` and `npm test` on push/PR.
-Keep it minimal — this isn't the place to add linting/coverage
-thresholds unless you want them.
+Added `.github/workflows/ci.yml` with two jobs, both running on every
+push/PR:
 
-**Files:** `test/fixtures/*`, `test/api/v1/*` (new), `app/javascript/**/*.test.tsx` (new),
-`.github/workflows/ci.yml` (new)
+- **backend**: spins up a `postgres:16` service container with the same
+  `ropegun`/`gargoyle` role and `ropegun_test` database that
+  `config/database.yml` hardcodes (so no code/config changes needed for
+  CI), loads the schema via `bin/rails db:schema:load`, then runs
+  `bin/rails test`. Pins `ruby-version: 3.2.3` explicitly for
+  `ruby/setup-ruby`, since the repo's `.ruby-version` (3.0.3) is stale
+  relative to the Gemfile's pinned `3.2.3`.
+- **frontend**: `actions/setup-node@v4` (Node 22, matching local dev),
+  `yarn install --immutable`, then `yarn test` (i.e. `jest`).
+
+Kept intentionally minimal per the plan — no linting or coverage
+thresholds added. Verified locally that `bin/rails db:schema:load
+RAILS_ENV=test` followed by `bin/rails test` reproduces the same 7
+pre-existing (unrelated) failures and no new ones, matching what CI
+should report.
+
+**Files:** `.github/workflows/ci.yml`
+
+---
+
+## Phase 1 wrap-up
+
+Phase 1 (testing foundation) is complete: backend fixtures/helpers/reference
+suites (1.1), a frontend reference suite + coverage convention (1.2), and a
+CI workflow running both on every push/PR (1.3). 34 backend tests + 12
+frontend tests passing, plus the 7 pre-existing unrelated failures now
+visible (not newly introduced) instead of the test suite being 100% blocked
+by environment issues as it was at the start of this phase.
 
 ---
 
