@@ -38,6 +38,18 @@ describe("ProfileForm", () => {
     expect(screen.getByText("I climb")).toBeInTheDocument();
   });
 
+  test("read-only mode shows whether the profile is discoverable by search", () => {
+    render(
+      <ProfileForm
+        user={user}
+        localUser={baseLocalUser({ discoverable_by_search: true })}
+        onSaved={jest.fn()}
+      />,
+    );
+    expect(screen.getByText("Discoverable by search")).toBeInTheDocument();
+    expect(screen.getByText("Yes")).toBeInTheDocument();
+  });
+
   test("defaults visibility selects to the field defaults when unset", async () => {
     render(
       <ProfileForm
@@ -91,6 +103,31 @@ describe("ProfileForm", () => {
     // Edit button is back.
     await waitFor(() => expect(screen.getByText("Edit")).toBeInTheDocument());
     expect(screen.queryByLabelText("About Me")).not.toBeInTheDocument();
+  });
+
+  test("toggling the discoverable-by-search checkbox includes it in the save payload", async () => {
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: async () => ({ discoverable_by_search: true }),
+      }),
+    ) as jest.Mock;
+    render(
+      <ProfileForm user={user} localUser={baseLocalUser()} onSaved={jest.fn()} />,
+    );
+
+    await userEvent.click(screen.getByText("Edit"));
+    await userEvent.click(
+      screen.getByLabelText(
+        "Let other users find me by name or email in friend search",
+      ),
+    );
+    await userEvent.click(screen.getByText("Save"));
+
+    await waitFor(() => expect(global.fetch).toHaveBeenCalled());
+    const [, options] = (global.fetch as jest.Mock).mock.calls[0];
+    const body = JSON.parse(options.body);
+    expect(body.user.discoverable_by_search).toBe(true);
   });
 
   test("cancel exits edit mode without saving", async () => {

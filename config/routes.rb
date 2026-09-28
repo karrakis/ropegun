@@ -54,6 +54,7 @@ Rails.application.routes.draw do
       get  '/gear_items' => 'gear_items#index'
       get  '/locations/:location_id/weather' => 'location_weather#show'
 
+      get '/users/search' => 'users#search'
       get '/users/:id' => 'users#show'
 
       post   '/trips/:id/skills'            => 'trip_skills#create'

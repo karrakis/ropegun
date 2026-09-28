@@ -27,6 +27,9 @@ export const ProfileForm = ({ user, localUser, onSaved }: ProfileFormProps) => {
   const [profileVisibility, setProfileVisibility] = useState<
     Record<string, string>
   >(localUser.profile_visibility || {});
+  const [discoverableBySearch, setDiscoverableBySearch] = useState(
+    !!localUser.discoverable_by_search,
+  );
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -40,6 +43,7 @@ export const ProfileForm = ({ user, localUser, onSaved }: ProfileFormProps) => {
     setAdditionalInformation(localUser.additional_information || "");
     setHomeAddress(localUser.home_address || "");
     setProfileVisibility(localUser.profile_visibility || {});
+    setDiscoverableBySearch(!!localUser.discoverable_by_search);
     setEditing(true);
   };
 
@@ -66,6 +70,7 @@ export const ProfileForm = ({ user, localUser, onSaved }: ProfileFormProps) => {
             additional_information: additionalInformation,
             home_address: homeAddress,
             profile_visibility: profileVisibility,
+            discoverable_by_search: discoverableBySearch,
           },
         }),
       });
@@ -181,6 +186,15 @@ export const ProfileForm = ({ user, localUser, onSaved }: ProfileFormProps) => {
             </p>
           )}
 
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={discoverableBySearch}
+              onChange={(e) => setDiscoverableBySearch(e.target.checked)}
+            />
+            Let other users find me by name or email in friend search
+          </label>
+
           <div className="flex items-center gap-3">
             <button
               type="submit"
@@ -208,6 +222,10 @@ export const ProfileForm = ({ user, localUser, onSaved }: ProfileFormProps) => {
             value={localUser.additional_information}
           />
           <ReadOnlyField label="Home Address" value={localUser.home_address} />
+          <ReadOnlyField
+            label="Discoverable by search"
+            value={localUser.discoverable_by_search ? "Yes" : "No"}
+          />
         </div>
       )}
     </div>

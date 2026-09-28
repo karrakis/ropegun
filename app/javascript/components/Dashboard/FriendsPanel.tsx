@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { csrfToken } from "../../utilities/csrfToken";
 
 interface FriendsPanelProps {
@@ -28,6 +28,37 @@ export const FriendsPanel = ({ localUser }: FriendsPanelProps) => {
   const [tripInvitations, setTripInvitations] = useState<any[]>(
     localUser.pending_trip_invitations || []
   );
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searching, setSearching] = useState(false);
+  const [sentToUuids, setSentToUuids] = useState<Set<string>>(new Set());
+
+  // Debounced — fires ~350ms after the user stops typing, and ignores any
+  // response that comes back after a newer query has already started
+  // (cheaper than an AbortController for this low-stakes GET).
+  useEffect(() => {
+    const query = searchQuery.trim();
+    if (query.length < 2) {
+      setSearchResults([]);
+      return;
+    }
+    let cancelled = false;
+    setSearching(true);
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/v1/users/search?q=${encodeURIComponent(query)}`);
+        if (!cancelled && res.ok) {
+          setSearchResults(await res.json());
+        }
+      } finally {
+        if (!cancelled) setSearching(false);
+      }
+    }, 350);
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
+  }, [searchQuery]);
 
   const friendshipRequest = (body: object, method: string) =>
     fetch("/friendships", {
@@ -52,6 +83,17 @@ export const FriendsPanel = ({ localUser }: FriendsPanelProps) => {
       setFriendUuidInput("");
     } else {
       setInviteError("Couldn't send that invite — check the key and try again.");
+    }
+  };
+
+  const sendRequestToSearchResult = async (result: any) => {
+    const res = await friendshipRequest(
+      { user_id: localUser.id, friend_uuid: result.uuid },
+      "POST"
+    );
+    if (res.ok) {
+      setSentRequests((prev) => [...prev, { uuid: result.uuid }]);
+      setSentToUuids((prev) => new Set(prev).add(result.uuid));
     }
   };
 
@@ -112,6 +154,36 @@ export const FriendsPanel = ({ localUser }: FriendsPanelProps) => {
 
   return (
     <div className="w-full flex flex-col gap-5 bg-khaki p-6 rounded-lg">
+      <Section title="Find People">
+        <input
+          type="text"
+          className="w-full h-9 bg-cream text-night p-2 rounded-md"
+          placeholder="Search by name or email…"
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        {searching && <p className="text-night text-sm italic opacity-70 mt-1">Searching…</p>}
+        {!searching && searchQuery.trim().length >= 2 && searchResults.length === 0 && (
+          <EmptyState text="No matching discoverable users found." />
+        )}
+        {searchResults.length > 0 && (
+          <ul className="flex flex-col gap-2 mt-2">
+            {searchResults.map((result) => (
+              <li key={result.uuid} className="flex items-center justify-between">
+                <span>{result.name}</span>
+                <button
+                  className="text-cream bg-auburn px-2 py-1 rounded-md text-sm disabled:opacity-50"
+                  disabled={sentToUuids.has(result.uuid)}
+                  onClick={() => sendRequestToSearchResult(result)}
+                >
+                  {sentToUuids.has(result.uuid) ? "Sent" : "Send Request"}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </Section>
+
       <Section title="Send a Friend Invite">
         <div className="flex gap-2">
           <input

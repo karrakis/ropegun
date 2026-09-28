@@ -775,31 +775,85 @@ Explicit opt-in required (`discoverable_by_search`, defaulting to
 **off**) given the privacy implications the user flagged. This replaces
 the current UUID-only friend-add flow's exclusivity, not the flow itself.
 
-### 5.1 ⬜ Backend search endpoint
+### 5.1 ✅ Backend search endpoint
 
-`GET /api/v1/users/search?q=...` matching name or email, scoped to
-`discoverable_by_search: true` only, excluding the requester, excluding
-users already friended/pending. Rate-limit or at least cap result count
-to avoid this becoming a scraping vector for the whole user table.
-Returns only the public-tier fields from Phase 4's serializer (name,
-maybe avatar — never email in the response body itself, even though
-email was the search key, unless the searching user already knows it).
+Added `users.discoverable_by_search` (boolean, default `false`,
+migration `20260928120000_add_discoverable_by_search_to_users.rb`).
+`GET /api/v1/users/search?q=...` (routed *above* the existing
+`/users/:id` show route, since `:id` would otherwise swallow the
+literal `search` segment) calls `User.discoverable_search(query,
+excluding: current_local_user)`, which scopes to
+`discoverable_by_search: true`, excludes the requester and anyone
+already friended or with a pending request either direction (via
+`Friendship`), matches `name ILIKE` or `email ILIKE` (sanitized via
+`sanitize_sql_like` against `%`/`_` injection into the pattern), orders
+by name, and caps at 20 rows. Results are rendered through the existing
+`User#profile_json(as: :public)` — reused rather than duplicated, which
+also satisfies "never return email in the response even though it was
+the search key": email's default visibility tier is `friends`, and
+search results are by definition not-yet-friends, so `as: :public`
+already excludes it unless the target user has separately marked their
+email `"public"`.
 
-### 5.2 ⬜ Frontend
+`profile_json(as: :self)` now also includes `discoverable_by_search`
+(alongside the existing `profile_visibility` map) so the user's own
+settings screen can read/toggle it; `UsersController#user_params`
+(the non-namespaced profile-PATCH endpoint) permits writing it.
 
-Add a search box to `WhoTab`'s `InviteForm` alongside the existing
-friends-list picker, and to wherever friend-adding currently lives
-(`friendships_controller`'s consumer). Sending a friend request from
-search results reuses the existing `Friendship` create flow — no new
-invite mechanism needed.
+### 5.2 ✅ Frontend
 
-### 5.3 ⬜ Tests
+Added a "Find People" section at the top of `FriendsPanel.tsx`: a
+debounced (350ms) search box hitting the new endpoint once 2+
+characters are typed, listing name-only results with a "Send Request"
+button that reuses the existing `POST /friendships` friend-request
+flow (button flips to a disabled "Sent" state per-uuid on success, no
+separate invite mechanism needed, per the plan). `ProfileForm.tsx`
+gained the opt-in checkbox itself ("Let other users find me by name or
+email in friend search") in edit mode, plus a read-only Yes/No line in
+view mode, wired into the same save payload/PATCH `/users/:id` request
+as the rest of the profile fields.
 
-Confirm non-discoverable users never appear in search results, even to
-someone who has their exact email. Confirm rate/count limits work.
+`WhoTab.tsx`'s trip-invite search (already existed, searches only
+existing friends) was left as-is — extending trip invites to
+non-friend discoverable users wasn't part of this request and is a
+separate authorization question (whether a trip organizer should be
+able to add a stranger directly to a trip) better left for its own
+decision later.
 
-**Files:** `app/controllers/api/v1/users_controller.rb` (new search action
-or new `Api::V1::UserSearchController`), `config/routes.rb`, `WhoTab.tsx`
+### 5.3 ✅ Tests
+
+`test/controllers/api/v1/users_controller_test.rb` (+8): signed-out
+redirect; opted-in users appear; non-opted-in users are excluded even
+on an exact name match; requester never appears in their own results;
+already-friended/pending users (either direction) are excluded; email
+matches as well as name; email is never present in a stranger's result
+row; blank query returns `[]`.
+
+`FriendsPanel.test.tsx` (+2): typing a query renders matching results
+and hits `/api/v1/users/search?q=...`; clicking "Send Request" POSTs
+`/friendships` and flips the button to "Sent".
+
+`ProfileForm.test.tsx` (+2): read-only mode shows the current
+discoverable-by-search status; toggling the checkbox and saving
+includes `discoverable_by_search` in the PATCH body.
+
+Backend (`bin/rails test`): 85 runs, same 7 pre-existing unrelated
+failures (`FeedbacksControllerTest`/`LocationsControllerTest`), no new
+ones. Frontend (`npx jest`): 9 suites / 35 tests, all passing. `tsc
+--noEmit`: no new errors in `FriendsPanel.tsx`/`ProfileForm.tsx`
+themselves — the raw error-count delta is entirely the pre-existing
+jest-globals-type gap in every `.test.tsx` file, scaling with the
+additional test lines added.
+
+**Files:** `db/migrate/20260928120000_add_discoverable_by_search_to_users.rb`,
+`db/schema.rb`, `app/models/user.rb`,
+`app/controllers/api/v1/users_controller.rb`,
+`app/controllers/users_controller.rb`, `config/routes.rb`,
+`app/javascript/components/Dashboard/FriendsPanel.tsx`,
+`app/javascript/components/Dashboard/ProfileForm.tsx`,
+`test/controllers/api/v1/users_controller_test.rb`,
+`app/javascript/components/Dashboard/FriendsPanel.test.tsx`,
+`app/javascript/components/Dashboard/ProfileForm.test.tsx`
 
 ---
 

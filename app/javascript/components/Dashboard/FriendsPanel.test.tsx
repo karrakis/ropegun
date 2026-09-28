@@ -76,4 +76,55 @@ describe("FriendsPanel", () => {
     ));
     await waitFor(() => expect(screen.getByText("No pending trip invitations.")).toBeInTheDocument());
   });
+
+  test("typing a search query finds discoverable users", async () => {
+    global.fetch = jest.fn((url: string) => {
+      if (url.startsWith("/api/v1/users/search")) {
+        return Promise.resolve(
+          jsonResponse(true, [{ uuid: "carol-uuid", name: "Carol", id: 3 }])
+        );
+      }
+      return Promise.resolve(jsonResponse(true));
+    }) as jest.Mock;
+    render(<FriendsPanel localUser={baseLocalUser()} />);
+
+    await userEvent.type(
+      screen.getByPlaceholderText("Search by name or email…"),
+      "carol"
+    );
+
+    await waitFor(
+      () => expect(screen.getByText("Carol")).toBeInTheDocument(),
+      { timeout: 2000 }
+    );
+    expect(global.fetch).toHaveBeenCalledWith("/api/v1/users/search?q=carol");
+  });
+
+  test("sending a request from search results POSTs a friendship and marks it sent", async () => {
+    global.fetch = jest.fn((url: string) => {
+      if (url.startsWith("/api/v1/users/search")) {
+        return Promise.resolve(
+          jsonResponse(true, [{ uuid: "carol-uuid", name: "Carol", id: 3 }])
+        );
+      }
+      return Promise.resolve(jsonResponse(true));
+    }) as jest.Mock;
+    render(<FriendsPanel localUser={baseLocalUser()} />);
+
+    await userEvent.type(
+      screen.getByPlaceholderText("Search by name or email…"),
+      "carol"
+    );
+    await waitFor(() => expect(screen.getByText("Carol")).toBeInTheDocument(), {
+      timeout: 2000,
+    });
+
+    await userEvent.click(screen.getByText("Send Request"));
+
+    await waitFor(() => expect(global.fetch).toHaveBeenCalledWith(
+      "/friendships",
+      expect.objectContaining({ method: "POST" })
+    ));
+    await waitFor(() => expect(screen.getByText("Sent")).toBeInTheDocument());
+  });
 });

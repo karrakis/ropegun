@@ -48,4 +48,69 @@ class Api::V1::UsersControllerTest < ActionController::TestCase
     refute body.key?("home_address")
     assert_equal @alice.name, body["name"]
   end
+
+  test "search requires a signed-in user" do
+    get :search, params: { q: "Carol" }
+    assert_response :redirect
+  end
+
+  test "search only returns users who opted in via discoverable_by_search" do
+    @carol.update!(discoverable_by_search: true)
+    sign_in_as(@alice)
+    get :search, params: { q: "Carol" }
+    names = JSON.parse(response.body).map { |u| u["name"] }
+    assert_includes names, "Carol"
+  end
+
+  test "search excludes non-discoverable users even with an exact name match" do
+    # @carol left at the default (discoverable_by_search: false)
+    sign_in_as(@alice)
+    get :search, params: { q: "Carol" }
+    names = JSON.parse(response.body).map { |u| u["name"] }
+    refute_includes names, "Carol"
+  end
+
+  test "search excludes the requester themselves" do
+    @alice.update!(discoverable_by_search: true)
+    sign_in_as(@alice)
+    get :search, params: { q: "Alice" }
+    ids = JSON.parse(response.body).map { |u| u["id"] }
+    refute_includes ids, @alice.id
+  end
+
+  test "search excludes users already friended (either direction) or pending" do
+    @carol.update!(discoverable_by_search: true)
+    Friendship.create!(user_id: @alice.id, friend_id: @carol.id, accepted: false) # pending, alice -> carol
+    sign_in_as(@alice)
+    get :search, params: { q: "Carol" }
+    assert_empty JSON.parse(response.body)
+
+    # bob and alice are already accepted friends (fixtures/friendships.yml)
+    @bob.update!(discoverable_by_search: true)
+    get :search, params: { q: "Bob" }
+    assert_empty JSON.parse(response.body)
+  end
+
+  test "search matches by email as well as name" do
+    @carol.update!(discoverable_by_search: true)
+    sign_in_as(@alice)
+    get :search, params: { q: "carol@example" }
+    names = JSON.parse(response.body).map { |u| u["name"] }
+    assert_includes names, "Carol"
+  end
+
+  test "search never returns email for a stranger, even though it was the search key" do
+    @carol.update!(discoverable_by_search: true) # default email visibility is "friends"
+    sign_in_as(@alice)
+    get :search, params: { q: "carol@example" }
+    body = JSON.parse(response.body)
+    refute body.first.key?("email")
+  end
+
+  test "search returns an empty list for a blank query" do
+    sign_in_as(@alice)
+    get :search, params: { q: "" }
+    assert_equal [], JSON.parse(response.body)
+  end
 end
+

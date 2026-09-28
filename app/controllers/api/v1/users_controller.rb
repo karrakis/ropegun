@@ -20,6 +20,19 @@ class Api::V1::UsersController < ApplicationController
     render json: target.profile_json(as: as)
   end
 
+  # Phase 5 — discoverable user search (by name or email). Only surfaces
+  # users who've explicitly opted in (`discoverable_by_search: true`),
+  # never the requester, and never anyone already friended or with a
+  # pending request either direction. Capped to 20 results (see
+  # User.discoverable_search) since this is a full-table ILIKE scan.
+  def search
+    query = params[:q].to_s.strip
+    return render json: [] if query.blank?
+
+    matches = User.discoverable_search(query, excluding: current_local_user)
+    render json: matches.map { |u| u.profile_json(as: :public) }
+  end
+
   private
 
   def current_local_user

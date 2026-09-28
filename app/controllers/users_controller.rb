@@ -34,6 +34,7 @@ class UsersController < ApplicationController
             :about_me,
             :additional_information,
             :home_address,
+            :discoverable_by_search,
             profile_visibility: {},
         )
     end

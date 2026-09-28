@@ -61,6 +61,20 @@ class User < ApplicationRecord
       Friendship.accepted.exists?(user_id: other.id, friend_id: id)
   end
 
+  # Users who've opted in (Phase 5), excluding this user and anyone already
+  # connected (or pending) with them, matching name or email.
+  def self.discoverable_search(query, excluding:)
+    excluded_ids = Friendship.where(user_id: excluding.id).pluck(:friend_id) +
+                   Friendship.where(friend_id: excluding.id).pluck(:user_id) +
+                   [excluding.id]
+    like = "%#{sanitize_sql_like(query)}%"
+    where(discoverable_by_search: true)
+      .where.not(id: excluded_ids)
+      .where("name ILIKE :like OR email ILIKE :like", like: like)
+      .order(:name)
+      .limit(20)
+  end
+
   # Viewer-scoped serialization, reused everywhere another user's profile
   # is rendered (trip payloads via Trip#serialize_for, the profile show
   # endpoint, and eventually Phase 5 search results).
@@ -83,6 +97,7 @@ class User < ApplicationRecord
       data[field] = public_send(field) if visible
     end
     data["profile_visibility"] = (profile_visibility || {}) if as == :self
+    data["discoverable_by_search"] = discoverable_by_search if as == :self
     data
   end
 end
