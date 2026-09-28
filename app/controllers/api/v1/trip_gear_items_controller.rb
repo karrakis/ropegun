@@ -12,6 +12,7 @@ class Api::V1::TripGearItemsController < ApplicationController
         "commitments" => tgi.extra_data&.fetch("commitments", []) || []
       )
     )
+    trip.broadcast_refresh!
     render json: trip.reload.as_json(include: trip_include)
   end
 
@@ -30,6 +31,7 @@ class Api::V1::TripGearItemsController < ApplicationController
         "committed_quantity" => committed_total
       )
     )
+    tgi.trip.broadcast_refresh!
     render json: tgi.trip.reload.as_json(include: trip_include)
   end
 
@@ -37,6 +39,7 @@ class Api::V1::TripGearItemsController < ApplicationController
     tgi = TripGearItem.find(params[:id])
     return unless authorize_organizer!(tgi.trip)
     tgi.update!(required_quantity: params[:required_quantity].to_i)
+    tgi.trip.broadcast_refresh!
     render json: tgi.trip.reload.as_json(include: trip_include)
   end
 
@@ -45,6 +48,7 @@ class Api::V1::TripGearItemsController < ApplicationController
     trip = tgi.trip
     return unless authorize_organizer!(trip)
     tgi.destroy!
+    trip.broadcast_refresh!
     render json: trip.reload.as_json(include: trip_include)
   end
 

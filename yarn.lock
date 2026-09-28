@@ -2855,6 +2855,7 @@ __metadata:
     "@headlessui/react": "npm:^2.0.4"
     "@hotwired/stimulus": "npm:^3.2.1"
     "@hotwired/turbo-rails": "npm:^7.3.0"
+    "@rails/actioncable": "npm:^7.0"
     "@testing-library/dom": "npm:^10.4.0"
     "@testing-library/jest-dom": "npm:^6.4.8"
     "@testing-library/react": "npm:^16.0.0"

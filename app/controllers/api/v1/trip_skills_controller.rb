@@ -8,6 +8,7 @@ class Api::V1::TripSkillsController < ApplicationController
     trip_skill = trip.trip_skills.find_or_create_by!(skill: skill) do |ts|
       ts.user = current_local_user
     end
+    trip.broadcast_refresh!
     render json: trip.reload.as_json(include: trip_include)
   end
 
@@ -19,6 +20,7 @@ class Api::V1::TripSkillsController < ApplicationController
       volunteers << { "user_id" => user.id, "user_name" => user.name }
       trip_skill.update!(extra_data: (trip_skill.extra_data || {}).merge("volunteers" => volunteers))
     end
+    trip_skill.trip.broadcast_refresh!
     render json: trip_skill.trip.reload.as_json(include: trip_include)
   end
 
@@ -28,6 +30,7 @@ class Api::V1::TripSkillsController < ApplicationController
     volunteers = (trip_skill.extra_data&.fetch("volunteers", []) || [])
                    .reject { |v| v["user_id"] == user.id }
     trip_skill.update!(extra_data: (trip_skill.extra_data || {}).merge("volunteers" => volunteers))
+    trip_skill.trip.broadcast_refresh!
     render json: trip_skill.trip.reload.as_json(include: trip_include)
   end
 

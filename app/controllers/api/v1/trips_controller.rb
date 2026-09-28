@@ -65,6 +65,7 @@ class Api::V1::TripsController < ApplicationController
       end
     end
     if @trip.update(trip_params)
+      @trip.broadcast_refresh!
       render json: @trip.as_json(include: trip_include)
     else
       render json: @trip.errors, status: :unprocessable_entity

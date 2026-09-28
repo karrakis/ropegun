@@ -15,6 +15,7 @@ class Api::V1::TripMembershipsController < ApplicationController
     membership.invited_at = Time.current
 
     if membership.save
+      trip.broadcast_refresh!
       render json: trip.as_json(include: [:locations, :owner, { trip_memberships: { include: :user } }])
     else
       render json: membership.errors, status: :unprocessable_entity
@@ -29,10 +30,13 @@ class Api::V1::TripMembershipsController < ApplicationController
     when "accept"
       membership.update!(accepted: true, role: :member, joined_at: Time.current)
     when "decline"
+      trip = membership.trip
       membership.destroy!
+      trip.broadcast_refresh!
       return render json: { removed: true }
     end
 
+    membership.trip.broadcast_refresh!
     render json: membership.trip.as_json(include: [:locations, :owner, { trip_memberships: { include: :user } }])
   end
 
@@ -44,6 +48,7 @@ class Api::V1::TripMembershipsController < ApplicationController
     end
     trip = membership.trip
     membership.destroy!
+    trip.broadcast_refresh!
     render json: trip.as_json(include: [:locations, :owner, { trip_memberships: { include: :user } }])
   end
 

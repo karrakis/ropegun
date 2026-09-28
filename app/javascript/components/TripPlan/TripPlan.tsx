@@ -8,6 +8,7 @@ import { TripSummary } from "./TripSummary";
 import { ExistingTrips } from "./ExistingTrips";
 import { TripPlanProps } from "../types";
 import { csrfToken } from "../../utilities/csrfToken";
+import { getConsumer } from "../../utilities/cable";
 
 // ─── URL-based navigation ─────────────────────────────────────────────────────
 
@@ -70,6 +71,24 @@ export const TripPlan = ({ localUser }: TripPlanProps) => {
           navigate("/trip_plan");
         });
     }
+  }, [screen, tripId]);
+
+  // While a trip is open, subscribe to its channel so changes made by other
+  // members (gear/skills commitments, membership changes, trip edits) show
+  // up here live. The server broadcasts the full updated trip JSON (same
+  // shape as the `show` fetch above), so we can apply it directly instead
+  // of re-fetching.
+  useEffect(() => {
+    if (screen !== "created" || !tripId) return;
+
+    const subscription = getConsumer().subscriptions.create(
+      { channel: "TripChannel", trip_id: tripId },
+      {
+        received: (data: any) => setCreatedTrip(data),
+      },
+    );
+
+    return () => subscription.unsubscribe();
   }, [screen, tripId]);
 
   const handleDestinationAdded = (location: PendingDestination) => {

@@ -26,6 +26,23 @@ class Trip < ApplicationRecord
 
   before_create :ensure_owner_membership
 
+  # ── Real-time sync ────────────────────────────────────────────────────────
+  # Same include shape as Api::V1::TripsController#trip_include, kept as a
+  # shared constant so every broadcast (and the initial `show` response the
+  # frontend renders from) carries the same JSON shape.
+  BROADCAST_INCLUDE = [
+    :locations, :owner, { trip_memberships: { include: :user } },
+    { trip_skills: { include: :skill, methods: [:volunteers] } },
+    { trip_gear_items: { include: :gear_item, methods: [:commitments, :committed_quantity] } }
+  ].freeze
+
+  # Called from every controller action that mutates a trip or its
+  # associated records (gear, skills, memberships) so everyone currently
+  # viewing the trip gets the update without a manual reload.
+  def broadcast_refresh!
+    TripChannel.broadcast_to(self, reload.as_json(include: self.class::BROADCAST_INCLUDE))
+  end
+
   def archived?
     archived_at.present?
   end

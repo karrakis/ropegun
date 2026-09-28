@@ -186,39 +186,99 @@ Addresses the "keep everyone on the same page" gap: right now two people
 viewing the same trip won't see each other's changes without a manual
 reload.
 
-### 2.1 ⬜ Decide transport
+### 2.1 ✅ Decide transport
 
-Recommendation: **ActionCable**, one channel per trip
-(`TripChannel`, stream identified by trip id), broadcasting a lightweight
-"trip changed, re-fetch" event (or the full updated trip JSON if small
-enough) on every mutation. Rationale in-thread above — reuses installed
-infra, avoids tying realtime capacity to Puma's request thread pool the
-way `ActionController::Live` (SSE) would. Revisit only if ActionCable
-setup proves painful in practice.
+Went with **ActionCable** as recommended: one channel per trip
+(`TripChannel`, stream identified by the `Trip` record itself via
+`stream_for`/`broadcast_to`), broadcasting the full updated trip JSON on
+every mutation (small enough payload — same shape as the `show` endpoint
+— so the frontend can apply it directly without an extra round-trip).
+Auth reuses the existing session-cookie approach: `ApplicationCable::Connection`
+now identifies the connection by looking up `request.session[:userinfo]`,
+the same way `ApplicationController#current_user` does for HTTP requests,
+so no separate cable-specific auth token was needed. `TripChannel#subscribed`
+rejects unless the connecting user has a `TripMembership` on the trip
+(owners get one automatically via `Trip#ensure_owner_membership`).
 
-### 2.2 ⬜ Backend: broadcast on mutation
+### 2.2 ✅ Backend: broadcast on mutation
 
-Add broadcasts to the existing mutation points: `trips_controller#update`,
-`trip_gear_items_controller#commit/update/destroy`,
-`trip_skills_controller#volunteer`, membership add/remove, and (once built)
-the comment endpoints from Phase 3. Keep this DRY — a single
-`trip.broadcast_refresh!` model method (or a controller concern) called
-from each action, rather than duplicating broadcast calls.
+Added `Trip#broadcast_refresh!` (reloads the record, broadcasts
+`as_json(include: Trip::BROADCAST_INCLUDE)` to its channel stream) and
+called it from every mutating action across the relevant controllers,
+which ended up being a bit broader than this section's original bullet
+list (that list omitted `trip_gear_items#create`, `trip_skills#create`,
+and `trip_skills#unvolunteer`, which looked like an oversight given the
+stated goal of "everyone stays in sync" — left out, those actions
+wouldn't show up live either):
 
-### 2.3 ⬜ Frontend: subscribe + refetch
+- `Api::V1::TripsController#update`
+- `Api::V1::TripGearItemsController#create/commit/update/destroy`
+- `Api::V1::TripSkillsController#create/volunteer/unvolunteer`
+- `Api::V1::TripMembershipsController#create/update/destroy`
 
-Subscribe to the trip's channel when a trip is open (`TripPlan.tsx` or
-wherever the trip is loaded), refetch on message, unsubscribe on unmount.
-Add a small visual indicator (e.g. "someone else is updating this trip…")
-optional — not required for MVP but cheap and nice.
+`trips_controller#destroy` (archive) was deliberately left out — out of
+scope for this pass, revisit if archiving a trip out from under active
+viewers turns out to matter in practice.
 
-### 2.4 ⬜ Tests
+Also caught and fixed a gap in the same spirit: the share-link self-join
+and anonymous-guest flows (`TripsController#join` and `#add_guest`, the
+server-rendered `public_show` page — a separate code path from the SPA's
+invite/accept flow above) weren't broadcasting at all, so an organizer
+with a trip open in the SPA wouldn't see someone join via the share link
+or add themselves as a guest without a manual reload. Added
+`@trip.broadcast_refresh!` to both, only on the branch where a new
+membership/guest is actually created (not on the idempotent no-op path).
 
-Channel test (subscribes correctly, broadcasts fire on mutation) using
-the Phase 1 scaffolding as the pattern.
+### 2.3 ✅ Frontend: subscribe + refetch
 
-**Files:** `app/channels/trip_channel.rb` (new), mutation points in
-`app/controllers/api/v1/*`, `app/models/trip.rb`, frontend trip-loading code
+`TripPlan.tsx` (where the open trip already lives in state) subscribes
+to `TripChannel` for the current `tripId` whenever the "created" screen
+is showing, and unsubscribes on unmount/trip change. Deviated slightly
+from "refetch on message": since the broadcast payload is already the
+full trip JSON in the same shape the initial `show` fetch uses, the
+handler applies it directly via `setCreatedTrip(data)` instead of
+triggering a second network round-trip — same end result, one less
+request. Added `app/javascript/utilities/cable.ts` (lazy shared
+`Consumer` via `createConsumer()`) and a minimal ambient module
+declaration for `@rails/actioncable` in `custom.d.ts` (the package ships
+no TypeScript types; not worth adding a `@types/` package for two
+functions' worth of surface area). Skipped the optional "someone else is
+updating this trip…" indicator — cheap but not required for MVP, not
+added.
+
+### 2.4 ✅ Tests
+
+Added `test/channels/trip_channel_test.rb` (`ActionCable::Channel::TestCase`):
+confirms a trip member subscribes and streams for the trip, rejects a
+non-member, rejects subscribing to a nonexistent trip, and confirms
+`Trip#broadcast_refresh!` broadcasts exactly once to the trip's stream.
+Didn't add a frontend test for the `TripPlan.tsx` subscription wiring
+itself — exercising it meaningfully would mean rendering through
+`TripSummary`'s full tab tree (including the Google-Maps-backed
+`WhereTab`), which is disproportionate for what's a few lines of
+subscribe/unsubscribe glue; relying on the channel test above plus
+`tsc --noEmit` staying clean for that file.
+
+Also added `test/controllers/trips_controller_test.rb` (4 tests) for the
+`join`/`add_guest` broadcast fix above: broadcasts once on a genuinely
+new join, no broadcast when already a member, broadcasts once on a new
+guest name, no broadcast for a duplicate guest name.
+
+Full suite (`bin/rails test`): 40 runs (32 existing + 4 channel tests +
+4 new `TripsController` tests), same 7 pre-existing unrelated failures,
+no new ones. Frontend (`npx jest`): unchanged, 5 suites / 12 tests
+passing.
+
+**Files:** `app/channels/trip_channel.rb` (new),
+`app/channels/application_cable/connection.rb`,
+`test/channels/trip_channel_test.rb` (new), `config/routes.rb` (mounted
+`ActionCable.server`), `app/models/trip.rb` (`broadcast_refresh!`),
+`app/controllers/api/v1/{trips,trip_gear_items,trip_skills,trip_memberships}_controller.rb`,
+`app/javascript/utilities/cable.ts` (new),
+`app/javascript/components/TripPlan/TripPlan.tsx`, `custom.d.ts`,
+`package.json`/`yarn.lock` (added `@rails/actioncable` as a direct
+dependency — it was already present transitively via
+`@hotwired/turbo-rails`, but we import it directly now)
 
 ---
 

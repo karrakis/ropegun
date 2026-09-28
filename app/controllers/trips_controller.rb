@@ -18,6 +18,7 @@ class TripsController < ApplicationController
         accepted: true,
         joined_at: Time.current
       )
+      @trip.broadcast_refresh!
     end
     redirect_to "/trips/#{params[:share_token]}", notice: "You've joined the trip!"
   end
@@ -52,6 +53,7 @@ class TripsController < ApplicationController
     unless guest_list.any? { |g| g["name"]&.downcase == name.downcase }
       guest_list << { "name" => name, "added_at" => Time.current.iso8601 }
       @trip.update!(guest_list: guest_list)
+      @trip.broadcast_refresh!
     end
     redirect_to "/trips/#{params[:share_token]}", notice: "You've been added to the trip."
   end
