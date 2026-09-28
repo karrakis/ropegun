@@ -113,7 +113,11 @@ describe("ProfileForm", () => {
       }),
     ) as jest.Mock;
     render(
-      <ProfileForm user={user} localUser={baseLocalUser()} onSaved={jest.fn()} />,
+      <ProfileForm
+        user={user}
+        localUser={baseLocalUser()}
+        onSaved={jest.fn()}
+      />,
     );
 
     await userEvent.click(screen.getByText("Edit"));

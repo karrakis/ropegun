@@ -20,13 +20,13 @@ export const FriendsPanel = ({ localUser }: FriendsPanelProps) => {
   const [inviteError, setInviteError] = useState<string | null>(null);
   const [friends, setFriends] = useState<any[]>(localUser.friendships || []);
   const [incomingInvites, setIncomingInvites] = useState<any[]>(
-    localUser.pending_friendship_invitations || []
+    localUser.pending_friendship_invitations || [],
   );
   const [sentRequests, setSentRequests] = useState<any[]>(
-    localUser.pending_friend_requests || []
+    localUser.pending_friend_requests || [],
   );
   const [tripInvitations, setTripInvitations] = useState<any[]>(
-    localUser.pending_trip_invitations || []
+    localUser.pending_trip_invitations || [],
   );
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -46,7 +46,9 @@ export const FriendsPanel = ({ localUser }: FriendsPanelProps) => {
     setSearching(true);
     const timer = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/v1/users/search?q=${encodeURIComponent(query)}`);
+        const res = await fetch(
+          `/api/v1/users/search?q=${encodeURIComponent(query)}`,
+        );
         if (!cancelled && res.ok) {
           setSearchResults(await res.json());
         }
@@ -76,20 +78,22 @@ export const FriendsPanel = ({ localUser }: FriendsPanelProps) => {
     setInviteError(null);
     const res = await friendshipRequest(
       { user_id: localUser.id, friend_uuid: uuid },
-      "POST"
+      "POST",
     );
     if (res.ok) {
       setSentRequests((prev) => [...prev, { uuid }]);
       setFriendUuidInput("");
     } else {
-      setInviteError("Couldn't send that invite — check the key and try again.");
+      setInviteError(
+        "Couldn't send that invite — check the key and try again.",
+      );
     }
   };
 
   const sendRequestToSearchResult = async (result: any) => {
     const res = await friendshipRequest(
       { user_id: localUser.id, friend_uuid: result.uuid },
-      "POST"
+      "POST",
     );
     if (res.ok) {
       setSentRequests((prev) => [...prev, { uuid: result.uuid }]);
@@ -100,7 +104,7 @@ export const FriendsPanel = ({ localUser }: FriendsPanelProps) => {
   const acceptInvite = async (invite: any) => {
     const res = await friendshipRequest(
       { user_id: localUser.id, friend_uuid: invite.uuid },
-      "PATCH"
+      "PATCH",
     );
     if (res.ok) {
       setIncomingInvites((prev) => prev.filter((i) => i.uuid !== invite.uuid));
@@ -111,7 +115,7 @@ export const FriendsPanel = ({ localUser }: FriendsPanelProps) => {
   const rejectInvite = async (uuid: string) => {
     const res = await friendshipRequest(
       { user_id: localUser.id, friend_uuid: uuid },
-      "DELETE"
+      "DELETE",
     );
     if (res.ok) {
       setIncomingInvites((prev) => prev.filter((i) => i.uuid !== uuid));
@@ -121,7 +125,7 @@ export const FriendsPanel = ({ localUser }: FriendsPanelProps) => {
   const cancelRequest = async (uuid: string) => {
     const res = await friendshipRequest(
       { user_id: localUser.id, friend_uuid: uuid },
-      "DELETE"
+      "DELETE",
     );
     if (res.ok) {
       setSentRequests((prev) => prev.filter((r) => r.uuid !== uuid));
@@ -162,14 +166,23 @@ export const FriendsPanel = ({ localUser }: FriendsPanelProps) => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        {searching && <p className="text-night text-sm italic opacity-70 mt-1">Searching…</p>}
-        {!searching && searchQuery.trim().length >= 2 && searchResults.length === 0 && (
-          <EmptyState text="No matching discoverable users found." />
+        {searching && (
+          <p className="text-night text-sm italic opacity-70 mt-1">
+            Searching…
+          </p>
         )}
+        {!searching &&
+          searchQuery.trim().length >= 2 &&
+          searchResults.length === 0 && (
+            <EmptyState text="No matching discoverable users found." />
+          )}
         {searchResults.length > 0 && (
           <ul className="flex flex-col gap-2 mt-2">
             {searchResults.map((result) => (
-              <li key={result.uuid} className="flex items-center justify-between">
+              <li
+                key={result.uuid}
+                className="flex items-center justify-between"
+              >
                 <span>{result.name}</span>
                 <button
                   className="text-cream bg-auburn px-2 py-1 rounded-md text-sm disabled:opacity-50"
@@ -200,7 +213,9 @@ export const FriendsPanel = ({ localUser }: FriendsPanelProps) => {
             Send
           </button>
         </div>
-        {inviteError && <p className="text-auburn text-sm mt-1">{inviteError}</p>}
+        {inviteError && (
+          <p className="text-auburn text-sm mt-1">{inviteError}</p>
+        )}
       </Section>
 
       <Section title="Invites From Others">
@@ -209,7 +224,10 @@ export const FriendsPanel = ({ localUser }: FriendsPanelProps) => {
         ) : (
           <ul className="flex flex-col gap-2">
             {incomingInvites.map((invite) => (
-              <li key={invite.uuid} className="flex items-center justify-between">
+              <li
+                key={invite.uuid}
+                className="flex items-center justify-between"
+              >
                 <span>
                   {invite.name} ({invite.email})
                 </span>
@@ -239,7 +257,10 @@ export const FriendsPanel = ({ localUser }: FriendsPanelProps) => {
         ) : (
           <ul className="flex flex-col gap-2">
             {sentRequests.map((request) => (
-              <li key={request.uuid} className="flex items-center justify-between">
+              <li
+                key={request.uuid}
+                className="flex items-center justify-between"
+              >
                 <span className="text-sm">{request.uuid}</span>
                 <button
                   className="text-cream bg-night px-2 py-1 rounded-md text-sm"
@@ -274,10 +295,15 @@ export const FriendsPanel = ({ localUser }: FriendsPanelProps) => {
         ) : (
           <ul className="flex flex-col gap-2">
             {tripInvitations.map((invitation) => (
-              <li key={invitation.id} className="flex items-center justify-between">
+              <li
+                key={invitation.id}
+                className="flex items-center justify-between"
+              >
                 <span>
                   {invitation.trip.name}
-                  {invitation.issuer?.name ? ` (from ${invitation.issuer.name})` : ""}
+                  {invitation.issuer?.name
+                    ? ` (from ${invitation.issuer.name})`
+                    : ""}
                 </span>
                 <div className="flex gap-2">
                   <button
@@ -302,7 +328,13 @@ export const FriendsPanel = ({ localUser }: FriendsPanelProps) => {
   );
 };
 
-const Section = ({ title, children }: { title: string; children: React.ReactNode }) => (
+const Section = ({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) => (
   <div className="flex flex-col gap-2">
     <h3 className="text-night text-xl font-semibold">{title}</h3>
     {children}

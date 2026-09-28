@@ -779,7 +779,7 @@ the current UUID-only friend-add flow's exclusivity, not the flow itself.
 
 Added `users.discoverable_by_search` (boolean, default `false`,
 migration `20260928120000_add_discoverable_by_search_to_users.rb`).
-`GET /api/v1/users/search?q=...` (routed *above* the existing
+`GET /api/v1/users/search?q=...` (routed _above_ the existing
 `/users/:id` show route, since `:id` would otherwise swallow the
 literal `search` segment) calls `User.discoverable_search(query,
 excluding: current_local_user)`, which scopes to
