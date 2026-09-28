@@ -13,7 +13,7 @@ class Api::V1::TripGearItemsController < ApplicationController
       )
     )
     trip.broadcast_refresh!
-    render json: trip.reload.as_json(include: trip_include)
+    render json: trip.reload.serialize_for
   end
 
   def commit
@@ -32,7 +32,7 @@ class Api::V1::TripGearItemsController < ApplicationController
       )
     )
     tgi.trip.broadcast_refresh!
-    render json: tgi.trip.reload.as_json(include: trip_include)
+    render json: tgi.trip.reload.serialize_for
   end
 
   def update
@@ -40,7 +40,7 @@ class Api::V1::TripGearItemsController < ApplicationController
     return unless authorize_organizer!(tgi.trip)
     tgi.update!(required_quantity: params[:required_quantity].to_i)
     tgi.trip.broadcast_refresh!
-    render json: tgi.trip.reload.as_json(include: trip_include)
+    render json: tgi.trip.reload.serialize_for
   end
 
   def destroy
@@ -49,7 +49,7 @@ class Api::V1::TripGearItemsController < ApplicationController
     return unless authorize_organizer!(trip)
     tgi.destroy!
     trip.broadcast_refresh!
-    render json: trip.reload.as_json(include: trip_include)
+    render json: trip.reload.serialize_for
   end
 
   private
@@ -62,12 +62,5 @@ class Api::V1::TripGearItemsController < ApplicationController
 
   def current_local_user
     @current_local_user ||= User.find_by(auth0_sub: session[:userinfo]["sub"])
-  end
-
-  def trip_include
-    [:locations, :owner, { trip_memberships: { include: :user } },
-     { trip_skills: { include: :skill, methods: [:volunteers] } },
-     { trip_gear_items: { include: :gear_item, methods: [:commitments, :committed_quantity] } },
-     { trip_comments: { include: :user } }]
   end
 end

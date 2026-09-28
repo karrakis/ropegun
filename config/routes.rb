@@ -19,6 +19,7 @@ Rails.application.routes.draw do
   get '/trip_plan/new/setup' => 'components#index'
   get '/trip_plan/:id'      => 'components#index'
   get '/development' => 'components#index'
+  get '/dashboard' => 'components#index'
   
   patch '/users/:id' => 'users#update'
   post '/locations' => 'locations#create'
@@ -52,6 +53,8 @@ Rails.application.routes.draw do
       get  '/skills'    => 'skills#index'
       get  '/gear_items' => 'gear_items#index'
       get  '/locations/:location_id/weather' => 'location_weather#show'
+
+      get '/users/:id' => 'users#show'
 
       post   '/trips/:id/skills'            => 'trip_skills#create'
       patch  '/trip_skills/:id/volunteer'   => 'trip_skills#volunteer'

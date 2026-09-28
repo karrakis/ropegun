@@ -16,7 +16,7 @@ class Api::V1::TripMembershipsController < ApplicationController
 
     if membership.save
       trip.broadcast_refresh!
-      render json: trip.as_json(include: [:locations, :owner, { trip_memberships: { include: :user } }])
+      render json: trip.serialize_for
     else
       render json: membership.errors, status: :unprocessable_entity
     end
@@ -37,7 +37,7 @@ class Api::V1::TripMembershipsController < ApplicationController
     end
 
     membership.trip.broadcast_refresh!
-    render json: membership.trip.as_json(include: [:locations, :owner, { trip_memberships: { include: :user } }])
+    render json: membership.trip.serialize_for
   end
 
   def destroy
@@ -49,7 +49,7 @@ class Api::V1::TripMembershipsController < ApplicationController
     trip = membership.trip
     membership.destroy!
     trip.broadcast_refresh!
-    render json: trip.as_json(include: [:locations, :owner, { trip_memberships: { include: :user } }])
+    render json: trip.serialize_for
   end
 
   private

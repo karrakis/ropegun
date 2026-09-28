@@ -61,6 +61,11 @@ as a fast follow. Not attempting a standalone removal before that.
 `app/models/trip_invitation.rb`, `app/models/trip.rb` (drop the
 `has_many :trip_invitations` line), new migration for both tables
 
+**Update:** the `/dashboard` rebuild landed in 4.5 — the "Accept" button
+now uses the real `TripMembership` flow. The legacy `TripInvitation`
+model/controller/routes/tables removal described above is still not done
+and remains the fast-follow to pick up next.
+
 ---
 
 ## Phase 1 — Testing foundation
@@ -373,61 +378,307 @@ Do this before Phase 5 (search) since search's "discoverable" toggle is
 naturally one of these visibility settings, not a one-off boolean —
 building the general visibility model first avoids retrofitting.
 
-### 4.1 ⬜ Design the visibility model
+### 4.1 ✅ Design the visibility model
 
-Proposed three tiers per relevant profile field:
+Three tiers per relevant profile field, matching the original proposal:
 
-- **Public** — visible to anyone (including on a public trip share link)
-- **Friends-only** — visible only to accepted friends
-- **App-only** — never shown to other users, but usable by the app itself
-  (e.g. address used for distance calculations, never rendered to
-  another user's screen)
+- **Public** — visible to anyone
+- **Friends-only** — visible only to accepted friends (and, in one
+  specific context described in 4.2, to fellow trip members)
+- **App-only** — never shown to other users, but usable by the app
+  itself (e.g. `home_address` for distance calculations)
 
-Needs a decision on shape: a single `profile_visibility` jsonb column on
-`User` mapping field name → tier (consistent with the app's existing
-jsonb-for-flexible-metadata pattern), vs. dedicated columns. Recommend
-jsonb for consistency with `extra_data`/`guest_list`, but note the
-symbol/string-key bug class this codebase has hit twice already — if we
-go jsonb here, use string keys everywhere and add a model-level accessor
-(`User#visibility_for(field)`) rather than reading the hash directly in
-multiple places, precisely to avoid a third occurrence of that bug.
+Went with a `profile_visibility` jsonb column on `User` (default `{}`),
+consistent with the existing `extra_data`/`guest_list` jsonb pattern.
+Given the symbol/string-key bug this codebase has hit twice before, the
+column has a custom `profile_visibility=` writer that sanitizes on
+assignment — unknown field names and invalid tiers are silently
+dropped, and everything is normalized to string keys/values before it
+ever reaches the database. Nothing reads the hash directly anywhere;
+`User#visibility_for(field)` is the only accessor, falling back to
+`User::DEFAULT_VISIBILITY` when a field hasn't been explicitly set:
 
-The "discoverable via search" setting from Phase 5 fits here as its own
-boolean (`discoverable_by_search`) or as a pseudo-field in the same
-visibility map — decide during implementation, but keep it in the same
-settings UI regardless.
+```ruby
+PROFILE_FIELDS = %w[email about_me additional_information home_address].freeze
+DEFAULT_VISIBILITY = {
+  "email" => "friends",             # matches existing friend-list behavior
+  "about_me" => "public",           # bio field, useful for a partner-finding app
+  "additional_information" => "friends",
+  "home_address" => "app_only"      # matches the existing "never shown" comment
+}.freeze
+```
 
-### 4.2 ⬜ Backend
+`name` is intentionally excluded from `PROFILE_FIELDS` — it's always
+public, no toggle needed. The `discoverable_by_search` setting from
+Phase 5 was deliberately left out of this column; it isn't a
+visibility _tier_ for an existing field, it's a separate opt-in
+boolean, and conflating the two would complicate `visibility_for`'s
+fallback logic for no real benefit. It can still live in the same
+settings UI when Phase 5 lands.
 
-Update `UsersController` (or add a `ProfilesController`) with an update
-action that accepts the field values + visibility map together. Add a
-serializer/`as_json` mode that filters fields by requester relationship
-(self / friend / stranger) — this will also be reused by Phase 5's search
-results and by anywhere else another user's profile is rendered
-(`WhoTab`, friend lists, etc.). Audit existing places user profiles are
-serialized/rendered to apply this filter — this is the main risk area,
-since leaking a field that should've been friends-only or app-only is a
-real privacy bug, not just a UX one.
+### 4.2 ✅ Backend
 
-### 4.3 ⬜ Frontend
+**The real bug this phase fixes:** `UsersController#update` had no
+authorization check at all (`@user = User.find(params[:id])` — any
+signed-in user could edit _any_ user's profile by guessing an id), and
+permitted/coerced columns (`:top_rope_belay`, `:lead_belay`,
+`:tr_indoor_climb_grade`, etc.) that no longer exist on `users` (removed
+by the skills-catalogue migration, replaced by `user_skills`) — meaning
+the endpoint would raise `ActiveRecord::UnknownAttributeError` the
+moment it was actually exercised. Both are fixed: `UsersController` now
+loads `current_user` directly (ignoring `params[:id]` for anything but
+a match check, returning 401/403 otherwise) and only permits real
+columns (`name`, `email`, `about_me`, `additional_information`,
+`home_address`, `profile_visibility`).
 
-New profile edit page (replacing the current one) with per-field
-visibility controls — probably a simple three-way toggle next to each
-field rather than a separate settings screen, so the privacy choice
-stays next to the data it protects.
+**Serializer**, added to `User` and reused everywhere else:
 
-### 4.4 ⬜ Tests
+```ruby
+def profile_json(as: :public)
+  # as: :self   -> everything, plus the raw profile_visibility map
+  # as: :friend -> "public" + "friends" tier fields, never "app_only"
+  # as: :public -> "public" tier fields only (default)
+end
+```
 
-This is the phase most worth over-testing: request tests asserting a
-stranger genuinely cannot see friends-only or app-only fields via any
-endpoint, not just the intended one. Add a test that specifically hits
-every endpoint known to serialize a `User` and checks field leakage.
+`User#friends_with?(other)` is a new helper (checked no equivalent
+existed) backing the `:friend` decision for a real one-on-one viewer, in
+the new `GET /api/v1/users/:id` profile endpoint (`Api::V1::UsersController#show`,
+looked up by `uuid`).
 
-**Files:** migration for visibility storage, `app/models/user.rb`,
-`app/controllers/users_controller.rb` (or new `profiles_controller.rb`),
-new frontend profile page, audit of existing `as_json(include: ...)` call sites
+**Trip-membership leak audit** — this was the biggest concrete risk
+found: `Trip::BROADCAST_INCLUDE` (and every controller's duplicated
+`trip_include` shape) embedded `owner`/`trip_memberships.user`/
+`trip_comments.user` as raw, unfiltered `User` records, meaning every
+trip member's email/bio/address was sent to every other member and
+broadcast over ActionCable regardless of friendship. Fixed by giving
+`Trip` a single `serialize_for` method — replacing every
+`trip.as_json(include: trip_include)` call site (and the now-redundant
+duplicated `trip_include` private methods, deleted) — that builds the
+existing include shape and then swaps in each embedded user's
+`profile_json(as: :friend)` instead of the raw record:
+
+```ruby
+def serialize_for
+  data = as_json(include: self.class::BROADCAST_INCLUDE)
+  users_by_id = ([owner] + trip_memberships.map(&:user) + trip_comments.map(&:user))
+                .compact.uniq(&:id).index_by(&:id)
+  # ...replace data["owner"], each trip_membership's "user", each
+  # trip_comment's "user" with users_by_id[id].profile_json(as: :friend)
+end
+```
+
+Being on a trip together is treated as **friend-level trust for that
+trip's data only** — a deliberate, simple product decision (not a
+per-viewer one) rather than attempting per-connection ActionCable
+filtering, which the single-payload `broadcast_to` API doesn't support
+anyway. This keeps `WhoTab`'s existing "show tripmate email" behavior
+working (email defaults to `"friends"` tier) while guaranteeing
+`app_only` fields (home address) never leak to a tripmate regardless of
+actual friendship status — a strictly safer default than before, where
+there was no filtering at all.
+
+### 4.3 ✅ Frontend
+
+Replaced the broken half of the Dashboard profile pages — `Display.tsx`
+and `Edit.tsx` both referenced climbing-grade columns
+(`top_rope_belay`, `tr_indoor_climb_grade`, `multipitch`, etc.) removed
+from the schema in an earlier migration; `Edit.tsx`'s save button would
+have raised `ActiveRecord::UnknownAttributeError` the first time anyone
+used it. Replaced that dead grid with real fields (`about_me`,
+`additional_information`, `home_address`, plus a read-only display of
+`email`), each paired with a `VisibilityToggle` (`Dashboard/Wrappers/VisibilityToggle.tsx`)
+— a plain three-way `<select>` (Public / Friends only / Only me) right
+next to the field it protects, per the original plan's own suggestion.
+Defaults for an unset field are shared with the backend via
+`app/javascript/utilities/profileVisibility.ts` (mirrors
+`User::DEFAULT_VISIBILITY` — manually kept in sync, documented in a
+comment). `Edit.tsx` PATCHes `/users/:id` with the edited fields plus
+the full `profile_visibility` map; `Display.tsx`'s self-view just shows
+the current values (no toggles needed there, since a user always sees
+their own full profile). The friends-list/trip-invitations sections
+were left untouched — out of scope for this phase.
+
+### 4.4 ✅ Tests
+
+Backend: `test/models/user_test.rb` (10 tests — `visibility_for`
+defaults/overrides, `profile_visibility=` sanitization including
+symbol-key normalization, `friends_with?` both directions, `profile_json`
+at all three `as:` levels), `test/models/trip_test.rb` (5 tests —
+`serialize_for` treats co-membership as friend-tier, never exposes
+`home_address` or the raw `profile_visibility` map for _any_ embedded
+user, filters the comment-author embed the same way, and respects a
+member who explicitly locks a normally-friends-tier field down further),
+`test/controllers/users_controller_test.rb` (5 tests — signed-out
+rejected, cannot update another user's record, real fields persist,
+`profile_visibility` sanitized on write, response is the filtered
+`profile_json` not a raw dump), `test/controllers/api/v1/users_controller_test.rb`
+(4 tests — self/friend/stranger see progressively less, confirming the
+core "does the tier system actually keep a stranger out" property this
+phase exists for).
+
+Frontend: `Dashboard/Edit.test.tsx` (2 tests — visibility selects default
+correctly when unset, saving PATCHes both edited field values and the
+updated visibility map, and closes edit mode).
+
+Full suite (`bin/rails test`): 73 runs (49 existing + 24 new — 10 model +
+5 model(trip) + 5 + 4 controller), same 7 pre-existing unrelated
+failures, no new ones. Frontend (`npx jest`): 7 suites / 21 tests, all
+passing. `tsc --noEmit`: 220 errors after this phase vs. 235 before —
+net _fewer_ errors (removing the dead climbing-grade code removed more
+implicit-`any`/prop-typing noise than the new files added), and no new
+errors were introduced by anything touched in this phase specifically
+(remaining errors are the same pre-existing `React.FC<Props>`-misused-
+as-destructuring-type / implicit-`any` pattern already present
+throughout the codebase, e.g. `UserInfoItem`/`SectionWrapper`/
+`AverageDistances.tsx`, untouched by this phase).
+
+**Files:** `db/migrate/20260928000003_add_profile_visibility_to_users.rb`
+(new), `app/models/user.rb` (`PROFILE_FIELDS`, `DEFAULT_VISIBILITY`,
+`profile_visibility=`, `visibility_for`, `friends_with?`, `profile_json`),
+`app/models/trip.rb` (`serialize_for`, `broadcast_refresh!` updated),
+`app/controllers/users_controller.rb` (rewritten — auth fix + real
+columns), `app/controllers/api/v1/users_controller.rb` (new — profile
+show endpoint), `app/controllers/api/v1/{trips,trip_skills,trip_gear_items,trip_memberships,trip_comments}_controller.rb`
+(all switched to `trip.serialize_for`, duplicated `trip_include`
+helpers deleted), `config/routes.rb`, `test/models/user_test.rb`,
+`test/models/trip_test.rb` (new), `test/controllers/users_controller_test.rb`
+(new), `test/controllers/api/v1/users_controller_test.rb` (new),
+`app/javascript/components/Dashboard/{Display,Edit}.tsx`,
+`app/javascript/components/Dashboard/Wrappers/VisibilityToggle.tsx` (new),
+`app/javascript/utilities/profileVisibility.ts` (new),
+`app/javascript/components/Dashboard/Edit.test.tsx` (new)
+
+### 4.5 ✅ Dashboard rebuild (friends list + trip invitations, ground-up)
+
+Phase 4.3 deliberately left the friends-list/trip-invitations half of
+the Dashboard page untouched ("out of scope for this phase"), and 0.2
+deferred the actual `/dashboard` page rebuild to land here. Prompted by
+a direct report that the profile page's Save button "doesn't even
+work" — root cause: `Edit.tsx`'s `updateUser` never checked `res.ok`,
+so a failed save silently merged an error payload into local state, and
+the Save button called `setEditing(false)` synchronously, flipping back
+to Display mode _before_ the async fetch even resolved. Rather than
+patch that one handler, rebuilt the whole page per the user's explicit
+request to not preserve the existing structure.
+
+**Frontend**, replacing `Display.tsx`/`Edit.tsx`/`Dashboard.tsx` and the
+now-orphaned `Wrappers/{UserInfoItem,SectionWrapper}.tsx` (deleted —
+confirmed via grep to have no other consumers) with two focused
+components composed by a much thinner `Dashboard.tsx`:
+
+- `ProfileForm.tsx` — single always-editable form, no more Display/Edit
+  toggle. Fixes the Save bug directly: checks `res.ok`, only calls
+  `onSaved` (which updates local state) on success, shows a visible
+  error message otherwise, and only flips to a "Saved." state after the
+  fetch actually resolves. Reuses `VisibilityToggle` and
+  `profileVisibility.ts` unchanged. Also dropped the dead "Linked
+  Locations" section from the old `Display.tsx` — `User` has no
+  `locations` association, so it never rendered anything real.
+- `FriendsPanel.tsx` — friend invites (send/accept/reject/cancel) and
+  trip invitations. The old code's trip-invitation "Accept" button
+  PATCHed the legacy, permanently-broken `/trip_invitations` endpoint
+  (see 0.2); it now uses the real `TripMembership` flow instead —
+  `PATCH /api/v1/trip_memberships/:id` with `{trip_membership: {action:
+"accept"}}` to accept, `DELETE /api/v1/trip_memberships/:id` to
+  decline — both endpoints already existed and needed no backend
+  changes. Also fixed: the old component's friend/invite lists were
+  never actually wired to component state (actions fired a fetch and
+  `console.log`'d the response, nothing more) — every list here now
+  updates optimistically on a successful response.
+
+**Backend**, two bugs found in `components_controller.rb` while wiring
+the above up, both fixed:
+
+1. **Crash**: `pending_trip_invitations` called
+   `as_json(include: [:issuer, :trip])` on `TripMembership` records, but
+   `TripMembership` has no `:issuer` association (that only exists on
+   the legacy `TripInvitation` model) — this raised
+   `ActiveRecord::AssociationNotFoundError` for any user with a real
+   pending invite, crashing the whole SPA page load. Rebuilt by hand as
+   `{id:, trip: {id:, name:}, issuer: membership.trip.owner.profile_json(as: :friend)}`
+   — the trip owner is the de facto issuer (only owners create
+   `trip_memberships`), embedded through the same `profile_json`
+   filtering used everywhere else rather than a raw record dump.
+2. **Visibility bypass**: the `friendships:` list serialization
+   hand-built `{uuid:, email:, name:}` for each friend, unconditionally
+   including email regardless of that friend's own Phase 4 visibility
+   choice. Replaced with `friend.profile_json(as: :friend)`, so a
+   friend who has explicitly hidden their email even from friends now
+   has that respected here too.
+
+**Tests:** `test/controllers/components_controller_test.rb` (+2 —
+a pending trip invitation no longer crashes `index` and the issuer is
+embedded via `profile_json` with no `app_only` fields present; a
+friend's `app_only` email override is respected in the `friendships`
+list instead of always leaking), `ProfileForm.test.tsx` (new — 4 tests:
+visibility defaults, a successful save PATCHes the edited fields and
+calls `onSaved`, a failed save shows an error and does not call
+`onSaved`, a network failure shows an error), `FriendsPanel.test.tsx`
+(new — 4 tests: empty states, sending an invite, accepting an incoming
+friend invite, accepting a trip invitation via the new
+`TripMembership` endpoint). `Edit.test.tsx` deleted along with `Edit.tsx`.
+
+Full suite (`bin/rails test`): 75 runs, same 7 pre-existing unrelated
+failures (`LocationsControllerTest`, `FeedbacksControllerTest`), no new
+ones. Frontend (`npx jest`): 8 suites / 27 tests, all passing.
+`tsc --noEmit`: deleting the two old components (which had accumulated
+their own implicit-`any`/prop-typing errors) more than offset the new
+files' errors — non-test-file error count went from 167 to 131.
+
+**Files:** `app/controllers/components_controller.rb`,
+`app/javascript/components/Dashboard/ProfileForm.tsx` (new),
+`app/javascript/components/Dashboard/FriendsPanel.tsx` (new),
+`app/javascript/components/Dashboard/Dashboard.tsx` (rewritten),
+`app/javascript/components/Dashboard/{Display,Edit,Edit.test}.tsx`
+(deleted), `app/javascript/components/Dashboard/Wrappers/{UserInfoItem,SectionWrapper}.tsx`
+(deleted), `test/controllers/components_controller_test.rb`,
+`app/javascript/components/Dashboard/ProfileForm.test.tsx` (new),
+`app/javascript/components/Dashboard/FriendsPanel.test.tsx` (new)
+
+### 4.6 ✅ Dashboard follow-up fixes (routing + edit-mode UX)
+
+Two issues reported after 4.5 landed:
+
+1. **`/dashboard` had no server-side route.** `AppRoot.tsx`'s
+   client-side switch has a `/dashboard` case, but `config/routes.rb`
+   never had a matching `get '/dashboard'`, unlike every other
+   client-routed page (`/trip_plan`, `/development`, etc.) — a direct
+   link or a page refresh on `/dashboard` hit Rails' "no route matches"
+   page instead of booting the SPA. Fixed by adding
+   `get '/dashboard' => 'components#index'` alongside the other
+   SPA-entry routes. Confirmed via a request test that the URL now
+   resolves (redirecting to login when signed out, as every other
+   `redirect_if_not_logged_in`-protected page does, instead of a
+   routing error).
+2. **Save didn't exit edit mode.** 4.5's `ProfileForm` was built as a
+   single always-editable form with no view/edit distinction at all,
+   which in practice reads as "stuck in edit mode with no way out."
+   Restored a view/edit toggle, but — unlike the original pre-4.5
+   `Edit.tsx` — the transition back to read-only view now only happens
+   *after* a successful save (`res.ok` and no thrown error), via the
+   same `onSaved`/`res.ok` check added in 4.5. Added a Cancel button to
+   leave edit mode without saving, discarding any in-progress edits.
+
+**Tests:** `test/controllers/components_controller_test.rb` (+1 — a
+signed-out request to `/dashboard` redirects to login instead of
+hitting a routing error), `ProfileForm.test.tsx` rewritten for the
+view/edit split (7 tests: starts read-only with an Edit button,
+visibility defaults once editing, a successful save exits back to
+read-only and calls `onSaved`, Cancel discards edits and exits without
+saving, a rejected save stays in edit mode and shows an error, a
+network failure shows an error).
+
+Full suite (`bin/rails test`): 76 runs, same 7 pre-existing unrelated
+failures, no new ones. Frontend (`npx jest`): 8 suites / 29 tests, all
+passing.
+
+**Files:** `config/routes.rb`, `app/javascript/components/Dashboard/ProfileForm.tsx`,
+`app/javascript/components/Dashboard/ProfileForm.test.tsx`,
+`test/controllers/components_controller_test.rb`
 
 ---
+
 
 ## Phase 5 — Discoverable user search (by name or email)
 

@@ -30,9 +30,10 @@ class Trip < ApplicationRecord
   before_create :ensure_owner_membership
 
   # ── Real-time sync ────────────────────────────────────────────────────────
-  # Same include shape as Api::V1::TripsController#trip_include, kept as a
-  # shared constant so every broadcast (and the initial `show` response the
-  # frontend renders from) carries the same JSON shape.
+  # Shared shape for every trip-mutating controller action and the
+  # broadcast_refresh! payload below, so they can't drift out of sync — see
+  # serialize_for, which builds on this and filters embedded users through
+  # User#profile_json.
   BROADCAST_INCLUDE = [
     :locations, :owner, { trip_memberships: { include: :user } },
     { trip_skills: { include: :skill, methods: [:volunteers] } },
@@ -44,7 +45,41 @@ class Trip < ApplicationRecord
   # associated records (gear, skills, memberships) so everyone currently
   # viewing the trip gets the update without a manual reload.
   def broadcast_refresh!
-    TripChannel.broadcast_to(self, reload.as_json(include: self.class::BROADCAST_INCLUDE))
+    TripChannel.broadcast_to(self, reload.serialize_for)
+  end
+
+  # The one place a Trip is turned into JSON — used by every controller
+  # action that renders a trip and by broadcast_refresh! above, so the
+  # shape (and the profile-visibility filtering below) can't drift between
+  # call sites.
+  #
+  # Every embedded User (owner, trip_memberships.user, trip_comments.user)
+  # is filtered through User#profile_json(as: :friend) rather than raw
+  # as_json: being on a trip together is treated as friend-level trust for
+  # that trip's own data, but a member's "app_only" fields (e.g. home
+  # address) still never appear here regardless. This is the same
+  # filtering for every viewer (not per-viewer), which is what makes it
+  # safe to reuse for the single broadcast payload ActionCable sends to
+  # every subscriber.
+  def serialize_for
+    data = as_json(include: self.class::BROADCAST_INCLUDE)
+
+    users_by_id = ([owner] + trip_memberships.map(&:user) + trip_comments.map(&:user))
+                  .compact.uniq(&:id).index_by(&:id)
+
+    if data["owner"]
+      data["owner"] = users_by_id[data["owner"]["id"]]&.profile_json(as: :friend)
+    end
+    data["trip_memberships"]&.each do |m|
+      user = m["user"] && users_by_id[m["user"]["id"]]
+      m["user"] = user.profile_json(as: :friend) if user
+    end
+    data["trip_comments"]&.each do |c|
+      user = c["user"] && users_by_id[c["user"]["id"]]
+      c["user"] = user.profile_json(as: :friend) if user
+    end
+
+    data
   end
 
   def archived?

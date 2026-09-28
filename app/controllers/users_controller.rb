@@ -1,41 +1,40 @@
 class UsersController < ApplicationController
+    before_action :set_user
+
     def update
-        @user = User.find(params[:id])
-        
-        #copilot: ArgumentError ('1' is not a valid top_rope_belay):
-        
-        
-        
-        puts "user_params: #{sanitized_params}"
-        @user.update(sanitized_params)
-        render json: @user
+        if @user.update(user_params)
+            render json: @user.profile_json(as: :self)
+        else
+            render json: @user.errors, status: :unprocessable_entity
+        end
     end
 
     private
 
-    def sanitized_params
-        params = user_params
-        params[:top_rope_belay] = params[:top_rope_belay].to_i
-        params[:lead_belay] = params[:lead_belay].to_i
-        params[:trad_lead] = params[:trad_lead].to_i
-        params[:multipitch] = params[:multipitch].to_i
-        params
+    # Only the signed-in user may update their own record — params[:id] used
+    # to be trusted blindly here, letting any caller edit any user's profile.
+    def set_user
+        unless current_user
+            return render json: { error: "Not authorized" }, status: :unauthorized
+        end
+        unless current_user.id == params[:id].to_i
+            return render json: { error: "Not authorized" }, status: :forbidden
+        end
+        @user = current_user
     end
 
+    # Only real columns on the users table — the climbing-grade fields this
+    # used to permit (:top_rope_belay, :lead_belay, :tr_indoor_climb_grade,
+    # etc.) were removed from the schema when skills moved to the
+    # user_skills join table and would raise ActiveRecord::UnknownAttributeError.
     def user_params
         params.require(:user).permit(
-            :name, 
-            :email, 
-            :lead_belay, 
-            :top_rope_belay, 
-            :tr_indoor_climb_grade,
-            :tr_outdoor_climb_grade,
-            :lead_climb_indoor_grade,
-            :lead_climb_outdoor_grade,
-            :trad_lead,
-            :trad_climb_outdoor_grade,
-            :multipitch,
+            :name,
+            :email,
+            :about_me,
+            :additional_information,
             :home_address,
-            )
+            profile_visibility: {},
+        )
     end
 end

@@ -5,7 +5,7 @@ class Api::V1::TripsController < ApplicationController
 
   def index
     trips = @local_user.trips.includes(:locations, :owner, :trip_memberships)
-    render json: trips.as_json(include: trip_include)
+    render json: trips.map(&:serialize_for)
   end
 
   def create
@@ -34,7 +34,7 @@ class Api::V1::TripsController < ApplicationController
             "UPDATE trips_locations SET position = #{index} WHERE trip_id = #{@trip.id} AND location_id = #{location.id}"
           )
         end
-        render json: @trip.as_json(include: trip_include),
+        render json: @trip.serialize_for,
                status: :created
       else
         render json: @trip.errors, status: :unprocessable_entity
@@ -46,7 +46,7 @@ class Api::V1::TripsController < ApplicationController
 
   def show
     @trip = @local_user.trips.find(params[:id])
-    render json: @trip.as_json(include: trip_include)
+    render json: @trip.serialize_for
   end
 
   def update
@@ -66,7 +66,7 @@ class Api::V1::TripsController < ApplicationController
     end
     if @trip.update(trip_params)
       @trip.broadcast_refresh!
-      render json: @trip.as_json(include: trip_include)
+      render json: @trip.serialize_for
     else
       render json: @trip.errors, status: :unprocessable_entity
     end
@@ -113,7 +113,7 @@ class Api::V1::TripsController < ApplicationController
     chosen = @trip.locations.find(params[:location_id])
     @trip.locations.where.not(id: chosen.id).each { |l| @trip.locations.delete(l) }
     @trip.update!(route_mode: true)
-    render json: @trip.as_json(include: trip_include)
+    render json: @trip.serialize_for
   end
 
   def destroy
@@ -123,13 +123,6 @@ class Api::V1::TripsController < ApplicationController
   end
 
   private
-
-  def trip_include
-    [:locations, :owner, { trip_memberships: { include: :user } },
-     { trip_skills: { include: :skill, methods: [:volunteers] } },
-     { trip_gear_items: { include: :gear_item, methods: [:commitments, :committed_quantity] } },
-     { trip_comments: { include: :user } }]
-  end
 
   def handle_locations
     location_data = params[:trip][:locations] || []

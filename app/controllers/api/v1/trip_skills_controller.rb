@@ -9,7 +9,7 @@ class Api::V1::TripSkillsController < ApplicationController
       ts.user = current_local_user
     end
     trip.broadcast_refresh!
-    render json: trip.reload.as_json(include: trip_include)
+    render json: trip.reload.serialize_for
   end
 
   def volunteer
@@ -21,7 +21,7 @@ class Api::V1::TripSkillsController < ApplicationController
       trip_skill.update!(extra_data: (trip_skill.extra_data || {}).merge("volunteers" => volunteers))
     end
     trip_skill.trip.broadcast_refresh!
-    render json: trip_skill.trip.reload.as_json(include: trip_include)
+    render json: trip_skill.trip.reload.serialize_for
   end
 
   def unvolunteer
@@ -31,19 +31,12 @@ class Api::V1::TripSkillsController < ApplicationController
                    .reject { |v| v["user_id"] == user.id }
     trip_skill.update!(extra_data: (trip_skill.extra_data || {}).merge("volunteers" => volunteers))
     trip_skill.trip.broadcast_refresh!
-    render json: trip_skill.trip.reload.as_json(include: trip_include)
+    render json: trip_skill.trip.reload.serialize_for
   end
 
   private
 
   def current_local_user
     @current_local_user ||= User.find_by(auth0_sub: session[:userinfo]["sub"])
-  end
-
-  def trip_include
-    [:locations, :owner, { trip_memberships: { include: :user } },
-     { trip_skills: { include: :skill, methods: [:volunteers] } },
-     { trip_gear_items: { include: :gear_item, methods: [:commitments, :committed_quantity] } },
-     { trip_comments: { include: :user } }]
   end
 end

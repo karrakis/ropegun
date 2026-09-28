@@ -2,9 +2,9 @@ class Api::V1::TripCommentsController < ApplicationController
   skip_before_action :verify_authenticity_token
   before_action :redirect_if_not_logged_in
 
-  # Comments load as part of the trip payload itself (see `trip_include` in
-  # the sibling trip-mutation controllers and `Trip::BROADCAST_INCLUDE`) —
-  # no separate index endpoint, same approach as skills/gear.
+  # Comments load as part of the trip payload itself (see
+  # `Trip::BROADCAST_INCLUDE`/`Trip#serialize_for`) — no separate index
+  # endpoint, same approach as skills/gear.
   def create
     trip = current_local_user.trips.find(params[:id])
     body = params[:body].to_s.strip
@@ -12,7 +12,7 @@ class Api::V1::TripCommentsController < ApplicationController
 
     comment = trip.trip_comments.create!(user: current_local_user, body: body)
     trip.broadcast_refresh!
-    render json: trip.reload.as_json(include: trip_include), status: :created
+    render json: trip.reload.serialize_for, status: :created
   end
 
   def destroy
@@ -23,19 +23,12 @@ class Api::V1::TripCommentsController < ApplicationController
     end
     comment.destroy!
     trip.broadcast_refresh!
-    render json: trip.reload.as_json(include: trip_include)
+    render json: trip.reload.serialize_for
   end
 
   private
 
   def current_local_user
     @current_local_user ||= User.find_by(auth0_sub: session[:userinfo]["sub"])
-  end
-
-  def trip_include
-    [:locations, :owner, { trip_memberships: { include: :user } },
-     { trip_skills: { include: :skill, methods: [:volunteers] } },
-     { trip_gear_items: { include: :gear_item, methods: [:commitments, :committed_quantity] } },
-     { trip_comments: { include: :user } }]
   end
 end
