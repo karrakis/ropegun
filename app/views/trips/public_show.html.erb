@@ -36,7 +36,7 @@
       <% if @trip.locations.any? %>
         <div class="bg-night rounded p-4">
           <h2 class="text-cream font-semibold text-sm mb-3">Destinations</h2>
-          <ul class="flex flex-row gap-3">
+          <ul class="flex flex-col gap-3">
             <% @trip.locations.each do |loc| %>
               <li class="flex flex-row justify-between w-full">
                 <div class="flex flex-col">
