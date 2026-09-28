@@ -24,7 +24,7 @@ class Api::V1::TripMembershipsController < ApplicationController
 
   def update
     membership = TripMembership.find(params[:id])
-    authorize_member!(membership)
+    return unless authorize_member!(membership)
 
     case params[:trip_membership][:action]
     when "accept"
@@ -62,6 +62,8 @@ class Api::V1::TripMembershipsController < ApplicationController
   def authorize_member!(membership)
     unless membership.user_id == @local_user.id
       render json: { error: "Unauthorized" }, status: :forbidden
+      return false
     end
+    true
   end
 end

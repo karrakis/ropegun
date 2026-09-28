@@ -9,6 +9,25 @@ class TripsControllerTest < ActionController::TestCase
     @trip = trips(:alpine_trip)
   end
 
+  test "public_show renders for a valid share token, signed out" do
+    get :public_show, params: { share_token: @trip.share_token }
+    assert_response :success
+  end
+
+  test "public_show renders for a valid share token, signed in" do
+    sign_in_as(@bob)
+    get :public_show, params: { share_token: @trip.share_token }
+    assert_response :success
+  end
+
+  # Regression test: share links must 404 on a bogus/missing token rather
+  # than resolving to `nil` and blowing up downstream (the /trips/null bug).
+  test "public_show raises not found for an unknown share token" do
+    assert_raises(ActiveRecord::RecordNotFound) do
+      get :public_show, params: { share_token: "not-a-real-token" }
+    end
+  end
+
   test "join creates a membership and broadcasts a refresh for a new member" do
     carol = User.create!(name: "Carol Crampon", email: "carol@example.com", auth0_sub: "auth0|test-carol")
     sign_in_as(carol)
