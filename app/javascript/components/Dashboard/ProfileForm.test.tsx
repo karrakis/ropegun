@@ -59,14 +59,18 @@ describe("ProfileForm", () => {
       />,
     );
     await userEvent.click(screen.getByText("Edit"));
-    expect(screen.getByLabelText("email visibility")).toHaveValue("friends");
-    expect(screen.getByLabelText("home_address visibility")).toHaveValue(
-      "app_only",
+    expect(screen.getByLabelText("email visibility")).toHaveTextContent(
+      "Friends only",
     );
-    expect(screen.getByLabelText("about_me visibility")).toHaveValue("public");
+    expect(screen.getByLabelText("home_address visibility")).toHaveTextContent(
+      "Only me",
+    );
+    expect(screen.getByLabelText("about_me visibility")).toHaveTextContent(
+      "Public",
+    );
     expect(
       screen.getByLabelText("additional_information visibility"),
-    ).toHaveValue("friends");
+    ).toHaveTextContent("Friends only");
   });
 
   test("saving PATCHes edited fields and the updated visibility map, calls onSaved, and exits edit mode", async () => {
@@ -83,10 +87,8 @@ describe("ProfileForm", () => {
 
     await userEvent.click(screen.getByText("Edit"));
     await userEvent.type(screen.getByLabelText("About Me"), "I climb");
-    await userEvent.selectOptions(
-      screen.getByLabelText("home_address visibility"),
-      "friends",
-    );
+    await userEvent.click(screen.getByLabelText("home_address visibility"));
+    await userEvent.click(screen.getByRole("option", { name: "Friends only" }));
     await userEvent.click(screen.getByText("Save"));
 
     await waitFor(() =>
