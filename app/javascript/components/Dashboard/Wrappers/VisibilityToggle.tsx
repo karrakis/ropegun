@@ -48,9 +48,7 @@ const VisibilityToggle = ({
             ▾
           </span>
         </ListboxButton>
-        <ListboxOptions
-          className="absolute right-0 z-50 mt-1 w-full min-w-[9rem] rounded-md bg-night border border-ashgray border-opacity-30 shadow-lg py-1"
-        >
+        <ListboxOptions className="absolute right-0 z-50 mt-1 w-full min-w-[9rem] rounded-md bg-night border border-ashgray border-opacity-30 shadow-lg py-1">
           {VISIBILITY_TIERS.map((tier) => (
             <ListboxOption
               key={tier}
