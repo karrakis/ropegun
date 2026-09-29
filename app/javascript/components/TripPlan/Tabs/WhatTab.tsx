@@ -425,7 +425,7 @@ const SkillsSubTab = ({
                 value={catalogueQuery}
                 onChange={(e) => setCatalogueQuery(e.target.value)}
                 placeholder="Search skills…"
-                className="w-full h-8 rounded bg-cream bg-opacity-10 text-cream text-sm px-2"
+                className="w-full h-8 rounded bg-cream bg-opacity-10 text-night text-sm px-2"
               />
               <div className="flex flex-col gap-1 max-h-64 overflow-y-auto bg-night rounded p-2">
                 {catalogue

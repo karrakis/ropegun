@@ -13,6 +13,7 @@ skills = [
   { name: "Sport Lead",      category: "lead",    description: "Leading on bolted sport routes" },
   { name: "Trad Lead",       category: "lead",    description: "Placing and leading on traditional protection" },
   { name: "Aid Lead",        category: "lead",    description: "Leading on aid routes" },
+  { name: "Cleaning",        category: "lead",    description: "Removing quickdraws/protection while following a pitch" },
 
   # Anchor building
   { name: "Sport Anchor",    category: "anchor",  description: "Building anchors at bolted stations" },
