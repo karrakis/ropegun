@@ -138,6 +138,23 @@ class Api::V1::TripsController < ApplicationController
     render json: { error: e.message }, status: :unprocessable_entity
   end
 
+  # When-is-good availability: any accepted member can submit their own
+  # availability (unlike #update, which is scoped to the organizer), but can
+  # only ever write their own entry in extra_data.availability - never the
+  # rest of the trip.
+  def availability
+    membership = @local_user.trip_memberships.accepted.find_by(trip_id: params[:id])
+    return render json: { error: "Not found" }, status: :not_found unless membership
+
+    trip = membership.trip
+    dates = Array(params[:dates]).map(&:to_s).select { |d| d.match?(/\A\d{4}-\d{2}-\d{2}\z/) }
+    availability = (trip.extra_data&.dig("availability") || {}).dup
+    availability[@local_user.id.to_s] = dates
+    trip.update!(extra_data: (trip.extra_data || {}).merge("availability" => availability))
+    trip.broadcast_refresh!
+    render json: trip.serialize_for
+  end
+
   private
 
   def handle_locations

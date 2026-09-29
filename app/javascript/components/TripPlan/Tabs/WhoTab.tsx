@@ -198,8 +198,15 @@ export const WhoTab: React.FC<WhoTabProps> = ({
     if (res.ok) onTripUpdated(await res.json());
   };
 
-  const transferOwnership = async (newOwnerUserId: number, newOwnerName: string) => {
-    if (!confirm(`Make ${newOwnerName} the organizer of this trip? You will become a regular member.`))
+  const transferOwnership = async (
+    newOwnerUserId: number,
+    newOwnerName: string,
+  ) => {
+    if (
+      !confirm(
+        `Make ${newOwnerName} the organizer of this trip? You will become a regular member.`,
+      )
+    )
       return;
     setTransferring(newOwnerUserId);
     setActionError(null);
@@ -226,7 +233,8 @@ export const WhoTab: React.FC<WhoTabProps> = ({
 
   const leaveTrip = async () => {
     if (!myMembership) return;
-    if (!confirm("Leave this trip? You'll need a new invite to rejoin.")) return;
+    if (!confirm("Leave this trip? You'll need a new invite to rejoin."))
+      return;
     setLeaving(true);
     setActionError(null);
     try {
@@ -304,7 +312,12 @@ export const WhoTab: React.FC<WhoTabProps> = ({
                   <button
                     className="text-ashgray text-xs underline disabled:opacity-50"
                     disabled={transferring === m.user?.id}
-                    onClick={() => transferOwnership(m.user.id, m.user?.name ?? "this member")}
+                    onClick={() =>
+                      transferOwnership(
+                        m.user.id,
+                        m.user?.name ?? "this member",
+                      )
+                    }
                   >
                     Make organizer
                   </button>
@@ -343,7 +356,9 @@ export const WhoTab: React.FC<WhoTabProps> = ({
           <p className="text-ashgray text-sm">No other members yet.</p>
         )}
 
-        {actionError && <p className="text-red-400 text-xs mt-1">{actionError}</p>}
+        {actionError && (
+          <p className="text-red-400 text-xs mt-1">{actionError}</p>
+        )}
       </div>
 
       {isOrganizer && (

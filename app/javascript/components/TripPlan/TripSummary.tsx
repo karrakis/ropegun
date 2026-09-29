@@ -99,6 +99,7 @@ export const TripSummary: React.FC<TripSummaryProps> = ({
             localUser={localUser}
             isOrganizer={isOrganizer}
             updateTrip={updateTrip}
+            onTripUpdated={onTripUpdated}
           />
         )}
         {activeTab === "who" && (

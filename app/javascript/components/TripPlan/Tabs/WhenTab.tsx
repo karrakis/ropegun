@@ -6,19 +6,20 @@ interface WhenTabProps {
   localUser: any;
   isOrganizer: boolean;
   updateTrip: (changes: Record<string, any>) => Promise<any>;
+  onTripUpdated: (trip: any) => void;
 }
 
-// ─── When-is-good calendar ────────────────────────────────────────────────────
+// ─── When-is-good calendar ──────────────────────────────────────────────────────────
 
 const WhenIsGood = ({
   trip,
   localUser,
-  updateTrip,
+  onTripUpdated,
   locked,
 }: {
   trip: any;
   localUser: any;
-  updateTrip: (changes: Record<string, any>) => Promise<any>;
+  onTripUpdated: (trip: any) => void;
   locked: boolean;
 }) => {
   const availability: Record<string, string[]> =
@@ -91,12 +92,15 @@ const WhenIsGood = ({
     const next = myDates.includes(key)
       ? myDates.filter((x) => x !== key)
       : [...myDates, key];
-    await updateTrip({
-      extra_data: {
-        ...trip.extra_data,
-        availability: { ...availability, [localUser.id]: next },
+    const res = await fetch(`/api/v1/trips/${trip.id}/availability`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": csrfToken(),
       },
+      body: JSON.stringify({ dates: next }),
     });
+    if (res.ok) onTripUpdated(await res.json());
   };
 
   const DAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
@@ -257,6 +261,7 @@ export const WhenTab: React.FC<WhenTabProps> = ({
   localUser,
   isOrganizer,
   updateTrip,
+  onTripUpdated,
 }) => {
   const datesSet = !!(trip.starts_on && trip.ends_on);
 
@@ -295,7 +300,7 @@ export const WhenTab: React.FC<WhenTabProps> = ({
         <WhenIsGood
           trip={trip}
           localUser={localUser}
-          updateTrip={updateTrip}
+          onTripUpdated={onTripUpdated}
           locked={datesSet}
         />
       </div>

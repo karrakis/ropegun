@@ -149,4 +149,38 @@ class Api::V1::TripsControllerTest < ActionController::TestCase
     assert_response :unprocessable_entity
     assert_equal @alice.id, @trip.reload.owner_id
   end
+
+  test "availability lets a non-organizer accepted member submit their own dates" do
+    sign_in_as(@bob) # bob is only a member, not the owner
+    assert_broadcasts(TripChannel.broadcasting_for(@trip), 1) do
+      patch :availability, params: { id: @trip.id, dates: ["2026-01-01", "2026-01-02"] }
+    end
+    assert_response :success
+    @trip.reload
+    assert_equal ["2026-01-01", "2026-01-02"], @trip.extra_data["availability"][@bob.id.to_s]
+  end
+
+  test "availability only ever writes the current user's own entry" do
+    sign_in_as(@alice)
+    patch :availability, params: { id: @trip.id, dates: ["2026-01-01"] }
+    sign_in_as(@bob)
+    patch :availability, params: { id: @trip.id, dates: ["2026-02-02"] }
+    @trip.reload
+    assert_equal ["2026-01-01"], @trip.extra_data["availability"][@alice.id.to_s]
+    assert_equal ["2026-02-02"], @trip.extra_data["availability"][@bob.id.to_s]
+  end
+
+  test "availability ignores malformed date strings" do
+    sign_in_as(@bob)
+    patch :availability, params: { id: @trip.id, dates: ["2026-01-01", "not-a-date"] }
+    assert_response :success
+    assert_equal ["2026-01-01"], @trip.reload.extra_data["availability"][@bob.id.to_s]
+  end
+
+  test "availability is not found for a user with no membership on the trip" do
+    stranger = User.create!(name: "Stranger", email: "stranger@example.com", auth0_sub: "auth0|stranger")
+    sign_in_as(stranger)
+    patch :availability, params: { id: @trip.id, dates: ["2026-01-01"] }
+    assert_response :not_found
+  end
 end

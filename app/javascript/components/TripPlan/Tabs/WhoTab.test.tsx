@@ -15,13 +15,23 @@ describe("WhoTab", () => {
         id: 10,
         role: "owner",
         accepted: true,
-        user: { id: 1, name: "Alice", email: "alice@example.com", uuid: "alice-uuid" },
+        user: {
+          id: 1,
+          name: "Alice",
+          email: "alice@example.com",
+          uuid: "alice-uuid",
+        },
       },
       {
         id: 11,
         role: "member",
         accepted: true,
-        user: { id: 2, name: "Bob", email: "bob@example.com", uuid: "bob-uuid" },
+        user: {
+          id: 2,
+          name: "Bob",
+          email: "bob@example.com",
+          uuid: "bob-uuid",
+        },
       },
     ],
     ...overrides,
@@ -137,7 +147,9 @@ describe("WhoTab", () => {
 
     await userEvent.click(screen.getByText("Make organizer"));
 
-    await waitFor(() => expect(onTripUpdated).toHaveBeenCalledWith(updatedTrip));
+    await waitFor(() =>
+      expect(onTripUpdated).toHaveBeenCalledWith(updatedTrip),
+    );
     const [url, options] = (global.fetch as jest.Mock).mock.calls[0];
     expect(url).toBe("/api/v1/trips/1/transfer_owner");
     expect(options.method).toBe("PATCH");
@@ -161,7 +173,9 @@ describe("WhoTab", () => {
 
     await userEvent.click(screen.getByText("Leave trip"));
 
-    await waitFor(() => expect(screen.getByText("Unauthorized")).toBeInTheDocument());
+    await waitFor(() =>
+      expect(screen.getByText("Unauthorized")).toBeInTheDocument(),
+    );
     expect(onBack).not.toHaveBeenCalled();
   });
 });
