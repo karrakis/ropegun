@@ -274,3 +274,104 @@ describe("WhatTab (gear sub-tab)", () => {
     expect(screen.queryByText("12cm Quickdraw")).not.toBeInTheDocument();
   });
 });
+
+describe("WhatTab (skills sub-tab)", () => {
+  const localUser = { id: 1, name: "Alice" };
+
+  const baseTrip = (overrides: Partial<any> = {}) => ({
+    id: 42,
+    trip_skills: [],
+    ...overrides,
+  });
+
+  const jsonResponse = (body: any) => ({
+    ok: true,
+    json: async () => body,
+  });
+
+  beforeEach(() => {
+    global.fetch = jest.fn((url: string) => {
+      if (url === "/api/v1/skills") {
+        return Promise.resolve(jsonResponse([]));
+      }
+      return Promise.resolve(jsonResponse({}));
+    }) as jest.Mock;
+  });
+
+  afterEach(() => {
+    jest.resetAllMocks();
+  });
+
+  const switchToSkillsTab = async () => {
+    await userEvent.click(screen.getByRole("button", { name: "Skills" }));
+  };
+
+  test("organizers can remove a skill, issuing a DELETE", async () => {
+    const trip = baseTrip({
+      trip_skills: [
+        {
+          id: 200,
+          skill_id: 7,
+          skill: { name: "First Aid" },
+          volunteers: [],
+        },
+      ],
+    });
+    const updatedTrip = { ...trip, trip_skills: [] };
+    (global.fetch as jest.Mock).mockImplementation((url: string) => {
+      if (url === "/api/v1/skills") return Promise.resolve(jsonResponse([]));
+      if (url === "/api/v1/trip_skills/200") {
+        return Promise.resolve(jsonResponse(updatedTrip));
+      }
+      return Promise.resolve(jsonResponse({}));
+    });
+    const onTripUpdated = jest.fn();
+    render(
+      <WhatTab
+        trip={trip}
+        localUser={localUser}
+        isOrganizer={true}
+        onTripUpdated={onTripUpdated}
+      />,
+    );
+    await switchToSkillsTab();
+    await screen.findByText("First Aid");
+    await userEvent.click(screen.getByRole("button", { name: "Remove" }));
+
+    await waitFor(() =>
+      expect(global.fetch).toHaveBeenCalledWith(
+        "/api/v1/trip_skills/200",
+        expect.objectContaining({ method: "DELETE" }),
+      ),
+    );
+    await waitFor(() =>
+      expect(onTripUpdated).toHaveBeenCalledWith(updatedTrip),
+    );
+  });
+
+  test("non-organizers cannot see a remove control for skills", async () => {
+    const trip = baseTrip({
+      trip_skills: [
+        {
+          id: 200,
+          skill_id: 7,
+          skill: { name: "First Aid" },
+          volunteers: [],
+        },
+      ],
+    });
+    render(
+      <WhatTab
+        trip={trip}
+        localUser={localUser}
+        isOrganizer={false}
+        onTripUpdated={jest.fn()}
+      />,
+    );
+    await switchToSkillsTab();
+    await screen.findByText("First Aid");
+    expect(
+      screen.queryByRole("button", { name: "Remove" }),
+    ).not.toBeInTheDocument();
+  });
+});

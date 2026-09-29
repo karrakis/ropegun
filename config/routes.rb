@@ -56,6 +56,7 @@ Rails.application.routes.draw do
       post   '/trips/:id/skills'            => 'trip_skills#create'
       patch  '/trip_skills/:id/volunteer'   => 'trip_skills#volunteer'
       patch  '/trip_skills/:id/unvolunteer' => 'trip_skills#unvolunteer'
+      delete '/trip_skills/:id'              => 'trip_skills#destroy'
 
       post   '/trips/:id/gear_items'              => 'trip_gear_items#create'
       patch  '/trip_gear_items/:id/commit'        => 'trip_gear_items#commit'

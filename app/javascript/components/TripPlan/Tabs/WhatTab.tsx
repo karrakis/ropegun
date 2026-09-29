@@ -347,6 +347,14 @@ const SkillsSubTab = ({
     if (res.ok) onTripUpdated(await res.json());
   };
 
+  const removeSkill = async (tripSkillId: number) => {
+    const res = await fetch(`/api/v1/trip_skills/${tripSkillId}`, {
+      method: "DELETE",
+      headers: { "X-CSRF-Token": csrfToken() },
+    });
+    if (res.ok) onTripUpdated(await res.json());
+  };
+
   return (
     <div className="p-4 flex flex-col gap-3">
       {tripSkills.length === 0 && (
@@ -386,6 +394,16 @@ const SkillsSubTab = ({
             {volunteers.length > 0 && (
               <div className="text-ashgray text-xs">
                 {volunteers.map((v: any) => v.user_name).join(", ")}
+              </div>
+            )}
+            {isOrganizer && (
+              <div className="mt-2 pt-2 border-t border-ashgray border-opacity-20 flex justify-end">
+                <button
+                  className="text-xs text-auburn underline"
+                  onClick={() => removeSkill(item.id)}
+                >
+                  Remove
+                </button>
               </div>
             )}
           </div>

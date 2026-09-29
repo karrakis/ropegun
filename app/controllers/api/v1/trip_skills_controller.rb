@@ -34,7 +34,22 @@ class Api::V1::TripSkillsController < ApplicationController
     render json: trip_skill.trip.reload.serialize_for
   end
 
+  def destroy
+    trip_skill = TripSkill.find(params[:id])
+    trip = trip_skill.trip
+    return unless authorize_organizer!(trip)
+    trip_skill.destroy!
+    trip.broadcast_refresh!
+    render json: trip.reload.serialize_for
+  end
+
   private
+
+  def authorize_organizer!(trip)
+    return true if trip.owner_id == current_local_user.id
+    render json: { error: "Not authorized" }, status: :forbidden
+    false
+  end
 
   def current_local_user
     @current_local_user ||= User.find_by(auth0_sub: session[:userinfo]["sub"])

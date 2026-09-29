@@ -49,4 +49,20 @@ class Api::V1::TripSkillsControllerTest < ActionController::TestCase
     @trip_skill.reload
     assert_empty @trip_skill.volunteers.select { |v| v["user_id"] == @bob.id }
   end
+
+  test "destroy is scoped to the trip owner" do
+    sign_in_as(@bob)
+    assert_no_difference("TripSkill.count") do
+      delete :destroy, params: { id: @trip_skill.id }
+    end
+    assert_response :forbidden
+  end
+
+  test "destroy succeeds for the trip owner" do
+    sign_in_as(@alice)
+    assert_difference("TripSkill.count", -1) do
+      delete :destroy, params: { id: @trip_skill.id }
+    end
+    assert_response :success
+  end
 end
