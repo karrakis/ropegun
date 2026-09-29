@@ -5,6 +5,8 @@ require "test_helper"
 # `sign_in_as`, exercising ownership scoping, and covering the
 # guest-removal / extra_data-merge behavior in `update`).
 class Api::V1::TripsControllerTest < ActionController::TestCase
+  include ActionCable::TestHelper
+
   setup do
     @alice = users(:alice)
     @bob = users(:bob)
@@ -108,10 +110,43 @@ class Api::V1::TripsControllerTest < ActionController::TestCase
     assert Trip.archived.exists?(trip_id)
   end
 
+  test "destroy broadcasts so other members find out the trip was canceled" do
+    sign_in_as(@alice)
+    assert_broadcasts(TripChannel.broadcasting_for(@trip), 1) do
+      delete :destroy, params: { id: @trip.id }
+    end
+  end
+
   test "destroy is scoped to the trip owner" do
     sign_in_as(@bob)
     assert_raises(ActiveRecord::RecordNotFound) do
       delete :destroy, params: { id: @trip.id }
     end
+  end
+
+  test "transfer_owner reassigns the trip to another accepted member" do
+    sign_in_as(@alice)
+    assert_broadcasts(TripChannel.broadcasting_for(@trip), 1) do
+      patch :transfer_owner, params: { id: @trip.id, new_owner_id: @bob.id }
+    end
+    assert_response :success
+    body = JSON.parse(response.body)
+    assert_equal @bob.id, body["owner"]["id"]
+    assert_equal @bob.id, @trip.reload.owner_id
+  end
+
+  test "transfer_owner is scoped to the trip owner" do
+    sign_in_as(@bob)
+    assert_raises(ActiveRecord::RecordNotFound) do
+      patch :transfer_owner, params: { id: @trip.id, new_owner_id: @bob.id }
+    end
+  end
+
+  test "transfer_owner rejects a user who isn't a member of the trip" do
+    stranger = User.create!(name: "Stranger", email: "stranger@example.com", auth0_sub: "auth0|stranger")
+    sign_in_as(@alice)
+    patch :transfer_owner, params: { id: @trip.id, new_owner_id: stranger.id }
+    assert_response :unprocessable_entity
+    assert_equal @alice.id, @trip.reload.owner_id
   end
 end

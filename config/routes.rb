@@ -41,6 +41,7 @@ Rails.application.routes.draw do
       delete '/trips/:id' => 'trips#destroy'
       get '/trips/:id/distances' => 'trips#distances'
       patch '/trips/:id/choose_destination' => 'trips#choose_destination'
+      patch '/trips/:id/transfer_owner' => 'trips#transfer_owner'
 
       post '/trip_memberships' => 'trip_memberships#create'
       patch '/trip_memberships/:id' => 'trip_memberships#update'

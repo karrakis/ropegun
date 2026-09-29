@@ -1,6 +1,8 @@
 require "test_helper"
 
 class TripTest < ActiveSupport::TestCase
+  include ActionCable::TestHelper
+
   setup do
     @trip = trips(:alpine_trip)
     @alice = users(:alice) # owner
@@ -60,5 +62,25 @@ class TripTest < ActiveSupport::TestCase
     data = @trip.serialize_for
     carol_membership = data["trip_memberships"].find { |m| m["user"]["id"] == @carol.id }
     refute carol_membership["user"].key?("about_me")
+  end
+
+  test "transfer_owner! reassigns owner_id and swaps the owner/member roles" do
+    assert_broadcasts(TripChannel.broadcasting_for(@trip), 1) do
+      @trip.transfer_owner!(@bob)
+    end
+    @trip.reload
+    assert_equal @bob.id, @trip.owner_id
+    assert @trip.trip_memberships.find_by(user: @bob).owner?
+    assert @trip.trip_memberships.find_by(user: @alice).member?
+  end
+
+  test "transfer_owner! raises if the target isn't an accepted member of the trip" do
+    stranger = User.create!(name: "Stranger", email: "stranger@example.com", auth0_sub: "auth0|stranger")
+    assert_raises(ArgumentError) { @trip.transfer_owner!(stranger) }
+    assert_equal @alice.id, @trip.reload.owner_id
+  end
+
+  test "transfer_owner! raises if the target is already the organizer" do
+    assert_raises(ArgumentError) { @trip.transfer_owner!(@alice) }
   end
 end

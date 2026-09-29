@@ -46,6 +46,14 @@ class Api::V1::TripMembershipsController < ApplicationController
     unless membership.trip.owner_id == @local_user.id || membership.user_id == @local_user.id
       return render json: { error: "Unauthorized" }, status: :forbidden
     end
+    # The organizer can't just remove their own membership here - that would
+    # leave the trip ownerless while trip.owner_id still points at them. They
+    # need to transfer ownership to someone else or cancel the trip instead.
+    if membership.owner?
+      return render json: {
+        error: "The organizer can't leave the trip directly \u2014 transfer ownership to another member or cancel the trip instead."
+      }, status: :unprocessable_entity
+    end
     trip = membership.trip
     membership.destroy!
     trip.broadcast_refresh!

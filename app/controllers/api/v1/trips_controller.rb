@@ -125,7 +125,17 @@ class Api::V1::TripsController < ApplicationController
   def destroy
     @trip = @local_user.owned_trips.find(params[:id])
     @trip.archive!
+    @trip.broadcast_refresh!
     head :no_content
+  end
+
+  def transfer_owner
+    @trip = @local_user.owned_trips.find(params[:id])
+    new_owner = User.find(params[:new_owner_id])
+    @trip.transfer_owner!(new_owner)
+    render json: @trip.serialize_for
+  rescue ArgumentError => e
+    render json: { error: e.message }, status: :unprocessable_entity
   end
 
   private

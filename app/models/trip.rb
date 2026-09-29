@@ -87,6 +87,24 @@ class Trip < ApplicationRecord
     update!(archived_at: Time.current)
   end
 
+  # Hands organizer status to another accepted member of the trip. The
+  # outgoing owner's membership is demoted to :member (they stay on the
+  # trip) rather than removed — see TripMembership destroy's guard in
+  # TripMembershipsController, which refuses to let an owner leave without
+  # transferring ownership or canceling the trip first.
+  def transfer_owner!(new_owner)
+    new_membership = trip_memberships.accepted.find_by(user_id: new_owner.id)
+    raise ArgumentError, "#{new_owner.name} must already be a member of the trip" unless new_membership
+    raise ArgumentError, "#{new_owner.name} is already the organizer" if new_owner.id == owner_id
+
+    transaction do
+      trip_memberships.find_by(user_id: owner_id)&.update!(role: :member)
+      new_membership.update!(role: :owner)
+      update!(owner_id: new_owner.id)
+    end
+    broadcast_refresh!
+  end
+
   private
 
   def ensure_owner_membership

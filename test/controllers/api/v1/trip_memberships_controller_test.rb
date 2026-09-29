@@ -112,4 +112,15 @@ class Api::V1::TripMembershipsControllerTest < ActionController::TestCase
     end
     assert_response :forbidden
   end
+
+  test "destroy refuses to let the organizer remove their own membership" do
+    membership = trip_memberships(:alice_owns_alpine_trip)
+    sign_in_as(@alice)
+
+    assert_no_difference("TripMembership.count") do
+      delete :destroy, params: { id: membership.id }
+    end
+    assert_response :unprocessable_entity
+    assert_equal @alice.id, @trip.reload.owner_id
+  end
 end

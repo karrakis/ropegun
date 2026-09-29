@@ -6,6 +6,7 @@ interface WhoTabProps {
   localUser: any;
   isOrganizer: boolean;
   onTripUpdated: (trip: any) => void;
+  onBack: () => void;
 }
 
 // ─── Invite form ──────────────────────────────────────────────────────────────
@@ -138,8 +139,13 @@ export const WhoTab: React.FC<WhoTabProps> = ({
   localUser,
   isOrganizer,
   onTripUpdated,
+  onBack,
 }) => {
   const [removing, setRemoving] = useState<number | null>(null);
+  const [transferring, setTransferring] = useState<number | null>(null);
+  const [leaving, setLeaving] = useState(false);
+  const [canceling, setCanceling] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
 
   const memberships: any[] = trip.trip_memberships ?? [];
   const guestList: any[] = trip.guest_list ?? [];
@@ -151,6 +157,9 @@ export const WhoTab: React.FC<WhoTabProps> = ({
     .sort((a: any, b: any) =>
       (a.user?.name ?? "").localeCompare(b.user?.name ?? ""),
     );
+  const myMembership = memberships.find(
+    (m: any) => m.user?.id === localUser.id,
+  );
 
   // Anonymous guests sorted alphabetically
   const sortedGuests = [...guestList].sort((a: any, b: any) =>
@@ -189,6 +198,73 @@ export const WhoTab: React.FC<WhoTabProps> = ({
     if (res.ok) onTripUpdated(await res.json());
   };
 
+  const transferOwnership = async (newOwnerUserId: number, newOwnerName: string) => {
+    if (!confirm(`Make ${newOwnerName} the organizer of this trip? You will become a regular member.`))
+      return;
+    setTransferring(newOwnerUserId);
+    setActionError(null);
+    try {
+      const res = await fetch(`/api/v1/trips/${trip.id}/transfer_owner`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          "X-CSRF-Token": csrfToken(),
+        },
+        body: JSON.stringify({ new_owner_id: newOwnerUserId }),
+      });
+      if (!res.ok) {
+        const body = await res.json();
+        throw new Error(body.error ?? `Server error ${res.status}`);
+      }
+      onTripUpdated(await res.json());
+    } catch (e: any) {
+      setActionError(e.message);
+    } finally {
+      setTransferring(null);
+    }
+  };
+
+  const leaveTrip = async () => {
+    if (!myMembership) return;
+    if (!confirm("Leave this trip? You'll need a new invite to rejoin.")) return;
+    setLeaving(true);
+    setActionError(null);
+    try {
+      const res = await fetch(`/api/v1/trip_memberships/${myMembership.id}`, {
+        method: "DELETE",
+        headers: { "X-CSRF-Token": csrfToken() },
+      });
+      if (!res.ok) {
+        const body = await res.json();
+        throw new Error(body.error ?? `Server error ${res.status}`);
+      }
+      onBack();
+    } catch (e: any) {
+      setActionError(e.message);
+      setLeaving(false);
+    }
+  };
+
+  const cancelTrip = async () => {
+    if (!confirm("Cancel this trip? This can't be undone.")) return;
+    setCanceling(true);
+    setActionError(null);
+    try {
+      const res = await fetch(`/api/v1/trips/${trip.id}`, {
+        method: "DELETE",
+        headers: { "X-CSRF-Token": csrfToken() },
+      });
+      if (!res.ok) {
+        const body = await res.json();
+        throw new Error(body?.error ?? `Server error ${res.status}`);
+      }
+      onBack();
+    } catch (e: any) {
+      setActionError(e.message);
+      setCanceling(false);
+    }
+  };
+
   return (
     <div className="flex flex-col">
       <div className="p-4 flex flex-col gap-2">
@@ -223,13 +299,24 @@ export const WhoTab: React.FC<WhoTabProps> = ({
               )}
             </div>
             {isOrganizer && (
-              <button
-                className="text-auburn text-xs underline disabled:opacity-50"
-                disabled={removing === m.id}
-                onClick={() => removeMembership(m.id)}
-              >
-                Remove
-              </button>
+              <div className="flex items-center gap-3 shrink-0">
+                {m.accepted && (
+                  <button
+                    className="text-ashgray text-xs underline disabled:opacity-50"
+                    disabled={transferring === m.user?.id}
+                    onClick={() => transferOwnership(m.user.id, m.user?.name ?? "this member")}
+                  >
+                    Make organizer
+                  </button>
+                )}
+                <button
+                  className="text-auburn text-xs underline disabled:opacity-50"
+                  disabled={removing === m.id}
+                  onClick={() => removeMembership(m.id)}
+                >
+                  Remove
+                </button>
+              </div>
             )}
           </div>
         ))}
@@ -255,6 +342,8 @@ export const WhoTab: React.FC<WhoTabProps> = ({
         {otherMemberships.length === 0 && sortedGuests.length === 0 && (
           <p className="text-ashgray text-sm">No other members yet.</p>
         )}
+
+        {actionError && <p className="text-red-400 text-xs mt-1">{actionError}</p>}
       </div>
 
       {isOrganizer && (
@@ -266,6 +355,34 @@ export const WhoTab: React.FC<WhoTabProps> = ({
       )}
 
       <ShareLink trip={trip} />
+
+      {/* Leave / cancel — mutually exclusive: an organizer must transfer
+          ownership or cancel the trip outright rather than leaving directly
+          (see TripMembershipsController#destroy's guard on owner memberships). */}
+      {!isOrganizer && myMembership && (
+        <div className="p-4 border-t border-ashgray border-opacity-20">
+          <button
+            className="text-auburn text-sm underline disabled:opacity-50"
+            disabled={leaving}
+            onClick={leaveTrip}
+          >
+            Leave trip
+          </button>
+        </div>
+      )}
+
+      {isOrganizer && (
+        <div className="p-4 border-t border-ashgray border-opacity-20">
+          <h3 className="text-night font-semibold text-sm mb-2">Danger zone</h3>
+          <button
+            className="text-auburn text-sm underline disabled:opacity-50"
+            disabled={canceling}
+            onClick={cancelTrip}
+          >
+            Cancel trip
+          </button>
+        </div>
+      )}
     </div>
   );
 };

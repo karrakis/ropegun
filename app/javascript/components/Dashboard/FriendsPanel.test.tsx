@@ -171,7 +171,9 @@ describe("FriendsPanel", () => {
     rerender(
       <FriendsPanel
         localUser={baseLocalUser({
-          friendships: [{ uuid: "dave-uuid", name: "Dave", email: "dave@example.com" }],
+          friendships: [
+            { uuid: "dave-uuid", name: "Dave", email: "dave@example.com" },
+          ],
         })}
       />,
     );
