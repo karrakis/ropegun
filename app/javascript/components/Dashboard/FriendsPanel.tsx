@@ -15,6 +15,13 @@ interface FriendsPanelProps {
 // version called these endpoints and just console.log'd the response
 // without ever touching component state, so the lists never visibly
 // changed after clicking a button.
+//
+// AppRoot also subscribes to FriendshipsChannel and pushes fresh
+// friendship data into the localUser prop whenever *either* party in a
+// friendship makes a change (e.g. the other person accepts your invite,
+// somewhere else entirely) — the effects below resync this component's own
+// state whenever that happens, so it doesn't just reflect this component's
+// own optimistic updates.
 export const FriendsPanel = ({ localUser }: FriendsPanelProps) => {
   const [friendUuidInput, setFriendUuidInput] = useState("");
   const [inviteError, setInviteError] = useState<string | null>(null);
@@ -28,6 +35,22 @@ export const FriendsPanel = ({ localUser }: FriendsPanelProps) => {
   const [tripInvitations, setTripInvitations] = useState<any[]>(
     localUser.pending_trip_invitations || [],
   );
+
+  useEffect(() => {
+    setFriends(localUser.friendships || []);
+  }, [localUser.friendships]);
+
+  useEffect(() => {
+    setIncomingInvites(localUser.pending_friendship_invitations || []);
+  }, [localUser.pending_friendship_invitations]);
+
+  useEffect(() => {
+    setSentRequests(localUser.pending_friend_requests || []);
+  }, [localUser.pending_friend_requests]);
+
+  useEffect(() => {
+    setTripInvitations(localUser.pending_trip_invitations || []);
+  }, [localUser.pending_trip_invitations]);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<any[]>([]);
   const [searching, setSearching] = useState(false);

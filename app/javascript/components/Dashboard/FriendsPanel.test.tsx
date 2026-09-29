@@ -157,4 +157,26 @@ describe("FriendsPanel", () => {
     );
     await waitFor(() => expect(screen.getByText("Sent")).toBeInTheDocument());
   });
+
+  // Regression test: friendship acceptance made by the *other* party (e.g.
+  // your invite gets accepted while you're on this page) doesn't arrive
+  // through any action this component takes itself — it comes in via a
+  // parent-level ActionCable subscription (see AppRoot.tsx) that updates
+  // the localUser prop out-of-band. This component must react to that prop
+  // change rather than only reflecting its own optimistic updates.
+  test("resyncs its lists when the localUser prop changes out-of-band (e.g. a push update)", () => {
+    const { rerender } = render(<FriendsPanel localUser={baseLocalUser()} />);
+    expect(screen.getByText("No friends yet.")).toBeInTheDocument();
+
+    rerender(
+      <FriendsPanel
+        localUser={baseLocalUser({
+          friendships: [{ uuid: "dave-uuid", name: "Dave", email: "dave@example.com" }],
+        })}
+      />,
+    );
+
+    expect(screen.getByText(/Dave \(dave@example.com\)/)).toBeInTheDocument();
+    expect(screen.queryByText("No friends yet.")).not.toBeInTheDocument();
+  });
 });

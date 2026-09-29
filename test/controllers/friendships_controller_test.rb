@@ -1,6 +1,8 @@
 require "test_helper"
 
 class FriendshipsControllerTest < ActionController::TestCase
+  include ActionCable::TestHelper
+
   setup do
     @alice = users(:alice)
     @bob = users(:bob) # already friends with alice, see fixtures/friendships.yml
@@ -16,6 +18,14 @@ class FriendshipsControllerTest < ActionController::TestCase
     friendship = Friendship.find_by(user_id: @alice.id, friend_id: @carol.id)
     assert friendship
     refute friendship.accepted
+  end
+
+  test "create broadcasts a friendships refresh to both the requester and the recipient" do
+    assert_broadcasts(FriendshipsChannel.broadcasting_for(@alice), 1) do
+      assert_broadcasts(FriendshipsChannel.broadcasting_for(@carol), 1) do
+        post :create, params: { friendship: { user_id: @alice.id, friend_uuid: @carol.uuid } }
+      end
+    end
   end
 
   test "create rejects a duplicate friend request" do
@@ -40,6 +50,16 @@ class FriendshipsControllerTest < ActionController::TestCase
     assert friendship.reload.accepted
   end
 
+  test "update broadcasts a friendships refresh to both parties" do
+    Friendship.create!(user: @alice, friend: @carol, accepted: false)
+
+    assert_broadcasts(FriendshipsChannel.broadcasting_for(@alice), 1) do
+      assert_broadcasts(FriendshipsChannel.broadcasting_for(@carol), 1) do
+        patch :update, params: { friendship: { user_id: @carol.id, friend_uuid: @alice.uuid } }
+      end
+    end
+  end
+
   test "destroy declines a pending request received by the current user" do
     friendship = Friendship.create!(user: @carol, friend: @alice, accepted: false)
 
@@ -60,5 +80,15 @@ class FriendshipsControllerTest < ActionController::TestCase
     end
     assert_response :success
     refute Friendship.exists?(friendship.id)
+  end
+
+  test "destroy broadcasts a friendships refresh to both parties" do
+    Friendship.create!(user: @carol, friend: @alice, accepted: false)
+
+    assert_broadcasts(FriendshipsChannel.broadcasting_for(@alice), 1) do
+      assert_broadcasts(FriendshipsChannel.broadcasting_for(@carol), 1) do
+        delete :destroy, params: { friendship: { user_id: @alice.id, friend_uuid: @carol.uuid } }
+      end
+    end
   end
 end

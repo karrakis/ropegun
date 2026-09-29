@@ -61,6 +61,33 @@ class User < ApplicationRecord
       Friendship.accepted.exists?(user_id: other.id, friend_id: id)
   end
 
+  # Shared shape for this user's friendship-related data — used both by
+  # ComponentsController on page load and by broadcast_friendships_refresh!
+  # below, so they can't drift out of sync (same reasoning as
+  # Trip#serialize_for/BROADCAST_INCLUDE).
+  def friendships_payload
+    {
+      friendships: friendships.accepted.as_json.concat(inverse_friendships.accepted.as_json).map { |friendship|
+        friend_id = friendship["friend_id"] == id ? friendship["user_id"] : friendship["friend_id"]
+        User.find(friend_id).profile_json(as: :friend)
+      },
+      pending_friendship_invitations: inverse_friendships.pending.map { |friendship|
+        { uuid: friendship.user.uuid, email: friendship.user.email, name: friendship.user.name }
+      }.as_json,
+      pending_friend_requests: friendships.pending.map { |friendship|
+        { uuid: friendship.friend.uuid }
+      }.as_json
+    }
+  end
+
+  # Called from FriendshipsController after any friendship mutation (sent,
+  # accepted, declined, canceled) so everyone with a friendship page open
+  # gets the update without a manual reload — mirrors
+  # Trip#broadcast_refresh!.
+  def broadcast_friendships_refresh!
+    FriendshipsChannel.broadcast_to(self, friendships_payload)
+  end
+
   # Users who've opted in (Phase 5), excluding this user and anyone already
   # connected (or pending) with them, matching name or email.
   def self.discoverable_search(query, excluding:)

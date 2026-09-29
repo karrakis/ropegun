@@ -2,6 +2,19 @@ import React from "react";
 import { render, screen } from "@testing-library/react";
 import { AppRoot } from "./AppRoot";
 
+// AppRoot subscribes to FriendshipsChannel (via getConsumer) whenever a
+// logged-in localUser is present, so it can push friendship updates into
+// state without a page reload. Mock it out here — jsdom has no real
+// ActionCable server to connect to, and the tests below don't exercise
+// live updates (see FriendsPanel.test.tsx for that).
+jest.mock("../utilities/cable", () => ({
+  getConsumer: () => ({
+    subscriptions: {
+      create: () => ({ unsubscribe: () => {} }),
+    },
+  }),
+}));
+
 describe("AppRoot", () => {
   const routes = {
     dashboard: {
