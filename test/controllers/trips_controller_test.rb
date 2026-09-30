@@ -52,6 +52,27 @@ class TripsControllerTest < ActionController::TestCase
     end
   end
 
+  # Regression test: someone directly invited (role: invited, accepted:
+  # false) who then clicks the share link to join, instead of using the
+  # Dashboard's Accept button, was silently left as still "invited" because
+  # `join` only ever handled the "no membership yet" case.
+  test "join accepts an existing pending invitation instead of leaving it stuck as invited" do
+    dana = User.create!(name: "Dana Descender", email: "dana@example.com", auth0_sub: "auth0|test-dana")
+    membership = @trip.trip_memberships.create!(user: dana, role: :invited, accepted: false, invited_at: Time.current)
+    sign_in_as(dana)
+
+    assert_no_difference("@trip.trip_memberships.count") do
+      assert_broadcasts(TripChannel.broadcasting_for(@trip), 1) do
+        post :join, params: { share_token: @trip.share_token }
+      end
+    end
+
+    membership.reload
+    assert membership.accepted?
+    assert membership.member?
+    assert_redirected_to "/trips/#{@trip.share_token}"
+  end
+
   test "add_guest appends to guest_list and broadcasts a refresh" do
     assert_broadcasts(TripChannel.broadcasting_for(@trip), 1) do
       post :add_guest, params: { share_token: @trip.share_token, name: "Dana" }

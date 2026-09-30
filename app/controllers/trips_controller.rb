@@ -11,13 +11,22 @@ class TripsController < ApplicationController
     local_user = current_user ? User.find_by(auth0_sub: session[:userinfo]["sub"]) : nil
     return redirect_to login_path(return_to: "/trips/#{params[:share_token]}") unless local_user
 
-    unless @trip.trip_memberships.exists?(user_id: local_user.id)
+    membership = @trip.trip_memberships.find_by(user_id: local_user.id)
+    if membership.nil?
       @trip.trip_memberships.create!(
         user: local_user,
         role: :member,
         accepted: true,
         joined_at: Time.current
       )
+      @trip.broadcast_refresh!
+    elsif !membership.accepted?
+      # They were already invited directly (e.g. by the organizer) and are
+      # now accepting via the share link instead of the Dashboard's Accept
+      # button - without this branch the pre-existing :invited membership
+      # was left untouched, so they'd keep showing up as "invited" in the
+      # Who tab even though they'd clicked "join".
+      membership.update!(accepted: true, role: :member, joined_at: Time.current)
       @trip.broadcast_refresh!
     end
     redirect_to "/trips/#{params[:share_token]}", notice: "You've joined the trip!"
