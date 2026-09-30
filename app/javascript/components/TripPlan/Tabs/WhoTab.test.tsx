@@ -178,4 +178,60 @@ describe("WhoTab", () => {
     );
     expect(onBack).not.toHaveBeenCalled();
   });
+
+  test("clicking a member's name opens a read-only profile view fetched by uuid", async () => {
+    global.fetch = jest.fn(() =>
+      Promise.resolve(
+        jsonResponse(true, {
+          id: 2,
+          uuid: "bob-uuid",
+          name: "Bob",
+          about_me: "I like long belays",
+        }),
+      ),
+    ) as jest.Mock;
+    render(
+      <WhoTab
+        trip={baseTrip()}
+        localUser={localUser(1)}
+        isOrganizer={true}
+        onTripUpdated={jest.fn()}
+        onBack={jest.fn()}
+      />,
+    );
+
+    await userEvent.click(screen.getByText("Bob"));
+
+    await waitFor(() =>
+      expect(screen.getByText("I like long belays")).toBeInTheDocument(),
+    );
+    expect((global.fetch as jest.Mock).mock.calls[0][0]).toBe(
+      "/api/v1/users/bob-uuid",
+    );
+  });
+
+  test("clicking the organizer's name opens their profile too", async () => {
+    global.fetch = jest.fn(() =>
+      Promise.resolve(
+        jsonResponse(true, { id: 1, uuid: "alice-uuid", name: "Alice" }),
+      ),
+    ) as jest.Mock;
+    render(
+      <WhoTab
+        trip={baseTrip()}
+        localUser={localUser(2)}
+        isOrganizer={false}
+        onTripUpdated={jest.fn()}
+        onBack={jest.fn()}
+      />,
+    );
+
+    await userEvent.click(screen.getByText("Alice"));
+
+    await waitFor(() =>
+      expect((global.fetch as jest.Mock).mock.calls[0][0]).toBe(
+        "/api/v1/users/alice-uuid",
+      ),
+    );
+  });
 });

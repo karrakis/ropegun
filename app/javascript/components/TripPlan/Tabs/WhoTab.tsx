@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { csrfToken } from "../../../utilities/csrfToken";
+import { UserProfileModal } from "../../Profile/UserProfileModal";
 
 interface WhoTabProps {
   trip: any;
@@ -146,6 +147,7 @@ export const WhoTab: React.FC<WhoTabProps> = ({
   const [leaving, setLeaving] = useState(false);
   const [canceling, setCanceling] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [viewingUuid, setViewingUuid] = useState<string | null>(null);
 
   const memberships: any[] = trip.trip_memberships ?? [];
   const guestList: any[] = trip.guest_list ?? [];
@@ -282,9 +284,16 @@ export const WhoTab: React.FC<WhoTabProps> = ({
             <span className="absolute -top-2.5 left-3 bg-cream text-ashgray text-xs px-1 uppercase tracking-widest">
               organizer
             </span>
-            <span className="text-night font-semibold text-sm">
+            <button
+              type="button"
+              className="text-night font-semibold text-sm underline decoration-dotted hover:decoration-solid"
+              onClick={() =>
+                ownerMembership.user?.uuid &&
+                setViewingUuid(ownerMembership.user.uuid)
+              }
+            >
               {ownerMembership.user?.name ?? "—"}
-            </span>
+            </button>
             <span className="text-ashgray text-xs ml-2">
               {ownerMembership.user?.email}
             </span>
@@ -298,9 +307,13 @@ export const WhoTab: React.FC<WhoTabProps> = ({
             className="flex items-center justify-between py-2 border-b border-ashgray border-opacity-20 last:border-0"
           >
             <div>
-              <span className="text-night text-sm font-medium">
+              <button
+                type="button"
+                className="text-night text-sm font-medium underline decoration-dotted hover:decoration-solid"
+                onClick={() => m.user?.uuid && setViewingUuid(m.user.uuid)}
+              >
                 {m.user?.name ?? "—"}
-              </span>
+              </button>
               <span className="text-ashgray text-xs ml-2">{m.user?.email}</span>
               {m.role === "invited" && !m.accepted && (
                 <span className="ml-2 text-xs text-auburn italic">invited</span>
@@ -398,6 +411,11 @@ export const WhoTab: React.FC<WhoTabProps> = ({
           </button>
         </div>
       )}
+
+      <UserProfileModal
+        uuid={viewingUuid}
+        onClose={() => setViewingUuid(null)}
+      />
     </div>
   );
 };
