@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { csrfToken } from "../../../utilities/csrfToken";
 import { UserProfileModal } from "../../Profile/UserProfileModal";
+import { GuestInfoModal } from "../../Profile/GuestInfoModal";
 
 interface WhoTabProps {
   trip: any;
@@ -148,6 +149,7 @@ export const WhoTab: React.FC<WhoTabProps> = ({
   const [canceling, setCanceling] = useState(false);
   const [actionError, setActionError] = useState<string | null>(null);
   const [viewingUuid, setViewingUuid] = useState<string | null>(null);
+  const [viewingGuest, setViewingGuest] = useState<any | null>(null);
 
   const memberships: any[] = trip.trip_memberships ?? [];
   const guestList: any[] = trip.guest_list ?? [];
@@ -353,7 +355,13 @@ export const WhoTab: React.FC<WhoTabProps> = ({
             key={`guest-${i}`}
             className="flex items-center justify-between py-2 border-b border-ashgray border-opacity-20 last:border-0"
           >
-            <span className="text-night text-sm">{g.name}</span>
+            <button
+              type="button"
+              className="text-night text-sm underline decoration-dotted hover:decoration-solid"
+              onClick={() => setViewingGuest(g)}
+            >
+              {g.name}
+            </button>
             {isOrganizer && (
               <button
                 className="text-auburn text-xs underline"
@@ -415,6 +423,10 @@ export const WhoTab: React.FC<WhoTabProps> = ({
       <UserProfileModal
         uuid={viewingUuid}
         onClose={() => setViewingUuid(null)}
+      />
+      <GuestInfoModal
+        guest={viewingGuest}
+        onClose={() => setViewingGuest(null)}
       />
     </div>
   );

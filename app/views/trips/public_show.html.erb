@@ -231,9 +231,12 @@
           <p class="text-ashgray text-xs mb-3">No account needed. Just add your name so the organizer knows you're interested.</p>
           <%= form_with url: "/trips/#{@trip.share_token}/guests", method: :post, local: true do |f| %>
             <%= f.hidden_field :authenticity_token, value: form_authenticity_token %>
-            <div class="flex gap-2">
-              <%= f.text_field :name, placeholder: "Your name", class: "flex-1 h-9 rounded bg-cream text-night px-3 text-sm", required: true %>
-              <%= f.submit "Add me", class: "bg-auburn text-cream text-sm px-4 rounded cursor-pointer" %>
+            <div class="flex flex-col gap-2">
+              <div class="flex gap-2">
+                <%= f.text_field :name, placeholder: "Your name", class: "flex-1 h-9 rounded bg-cream text-night px-3 text-sm", required: true %>
+                <%= f.submit "Add me", class: "bg-auburn text-cream text-sm px-4 rounded cursor-pointer" %>
+              </div>
+              <%= f.email_field :email, placeholder: "Your email (optional)", class: "h-9 rounded bg-cream text-night px-3 text-sm" %>
             </div>
           <% end %>
           <p class="text-ashgray text-xs mt-3">

@@ -234,4 +234,44 @@ describe("WhoTab", () => {
       ),
     );
   });
+
+  test("clicking a guest's name shows whatever info they provided, with no fetch involved", async () => {
+    global.fetch = jest.fn();
+    render(
+      <WhoTab
+        trip={baseTrip({
+          guest_list: [
+            { name: "Casey", email: "casey@example.com", added_at: "2026-01-01" },
+          ],
+        })}
+        localUser={localUser(1)}
+        isOrganizer={true}
+        onTripUpdated={jest.fn()}
+        onBack={jest.fn()}
+      />,
+    );
+
+    await userEvent.click(screen.getByText("Casey"));
+
+    expect(screen.getByText("casey@example.com")).toBeInTheDocument();
+    expect(global.fetch).not.toHaveBeenCalled();
+  });
+
+  test("a guest with no email shown doesn't render an empty email row", async () => {
+    global.fetch = jest.fn();
+    render(
+      <WhoTab
+        trip={baseTrip({ guest_list: [{ name: "Casey" }] })}
+        localUser={localUser(1)}
+        isOrganizer={true}
+        onTripUpdated={jest.fn()}
+        onBack={jest.fn()}
+      />,
+    );
+
+    await userEvent.click(screen.getByText("Casey"));
+
+    expect(screen.getByText("Guest — not a registered account.")).toBeInTheDocument();
+    expect(screen.queryByText("Email")).not.toBeInTheDocument();
+  });
 });

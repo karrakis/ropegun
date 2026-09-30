@@ -82,6 +82,20 @@ class TripsControllerTest < ActionController::TestCase
     assert @trip.guest_list.any? { |g| g["name"] == "Dana" }
   end
 
+  test "add_guest stores an email when the guest provides one" do
+    post :add_guest, params: { share_token: @trip.share_token, name: "Dana", email: "dana@example.com" }
+
+    guest = @trip.reload.guest_list.find { |g| g["name"] == "Dana" }
+    assert_equal "dana@example.com", guest["email"]
+  end
+
+  test "add_guest omits the email key entirely when none is given" do
+    post :add_guest, params: { share_token: @trip.share_token, name: "Dana" }
+
+    guest = @trip.reload.guest_list.find { |g| g["name"] == "Dana" }
+    refute guest.key?("email")
+  end
+
   test "add_guest does not broadcast for a duplicate guest name" do
     @trip.update!(guest_list: [{ "name" => "Dana", "added_at" => Time.current.iso8601 }])
 

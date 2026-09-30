@@ -52,15 +52,21 @@ class TripsController < ApplicationController
     redirect_to redirect_url, notice: "Availability saved."
   end
 
-  # Anonymous guest adds their name
+  # Anonymous guest adds their name (and optionally an email, so the
+  # organizer/other members can see it — see GuestInfoModal.tsx, which
+  # renders whatever the guest provided here directly out of guest_list,
+  # with no account/uuid to look anything else up by).
   def add_guest
     @trip = Trip.find_by!(share_token: params[:share_token])
     name = params[:name].to_s.strip
     return redirect_to "/trips/#{params[:share_token]}" if name.blank?
+    email = params[:email].to_s.strip
 
     guest_list = @trip.guest_list || []
     unless guest_list.any? { |g| g["name"]&.downcase == name.downcase }
-      guest_list << { "name" => name, "added_at" => Time.current.iso8601 }
+      guest = { "name" => name, "added_at" => Time.current.iso8601 }
+      guest["email"] = email if email.present?
+      guest_list << guest
       @trip.update!(guest_list: guest_list)
       @trip.broadcast_refresh!
     end
