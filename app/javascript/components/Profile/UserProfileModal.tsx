@@ -49,7 +49,10 @@ export const UserProfileModal: React.FC<UserProfileModalProps> = ({
 
   return (
     <Dialog open={!!uuid} onClose={onClose} className="relative z-50">
-      <div className="fixed inset-0 bg-night bg-opacity-60" aria-hidden="true" />
+      <div
+        className="fixed inset-0 bg-night bg-opacity-60"
+        aria-hidden="true"
+      />
       <div className="fixed inset-0 flex items-center justify-center p-4">
         <DialogPanel className="w-full max-w-sm bg-night text-cream rounded-lg p-6 flex flex-col gap-4">
           {loading && <p className="text-ashgray text-sm">Loading…</p>}

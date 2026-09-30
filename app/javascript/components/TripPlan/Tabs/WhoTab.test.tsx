@@ -241,7 +241,11 @@ describe("WhoTab", () => {
       <WhoTab
         trip={baseTrip({
           guest_list: [
-            { name: "Casey", email: "casey@example.com", added_at: "2026-01-01" },
+            {
+              name: "Casey",
+              email: "casey@example.com",
+              added_at: "2026-01-01",
+            },
           ],
         })}
         localUser={localUser(1)}
@@ -271,7 +275,9 @@ describe("WhoTab", () => {
 
     await userEvent.click(screen.getByText("Casey"));
 
-    expect(screen.getByText("Guest — not a registered account.")).toBeInTheDocument();
+    expect(
+      screen.getByText("Guest — not a registered account."),
+    ).toBeInTheDocument();
     expect(screen.queryByText("Email")).not.toBeInTheDocument();
   });
 });

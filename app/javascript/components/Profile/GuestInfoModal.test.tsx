@@ -26,9 +26,7 @@ describe("GuestInfoModal", () => {
 
   test("calls onClose when the Close button is clicked", () => {
     const onClose = jest.fn();
-    render(
-      <GuestInfoModal guest={{ name: "Casey" }} onClose={onClose} />,
-    );
+    render(<GuestInfoModal guest={{ name: "Casey" }} onClose={onClose} />);
     screen.getByText("Close").click();
     expect(onClose).toHaveBeenCalled();
   });

@@ -85,7 +85,6 @@ const InviteForm = ({
         >
           <div>
             <span className="text-night text-sm">{f.name}</span>
-            <span className="text-ashgray text-xs ml-2">{f.email}</span>
           </div>
           <button
             className="bg-auburn text-cream text-xs px-3 py-1 rounded disabled:opacity-50"

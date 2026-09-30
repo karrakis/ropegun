@@ -52,10 +52,16 @@ describe("WhenTab", () => {
     const today = new Date();
     const buttons = screen
       .getAllByRole("button")
-      .filter((b) => !b.hasAttribute("disabled") && /^\d+$/.test(b.textContent?.trim().split("\n")[0] ?? ""));
+      .filter(
+        (b) =>
+          !b.hasAttribute("disabled") &&
+          /^\d+$/.test(b.textContent?.trim().split("\n")[0] ?? ""),
+      );
     await userEvent.click(buttons[buttons.length - 1]);
 
-    await waitFor(() => expect(onTripUpdated).toHaveBeenCalledWith(updatedTrip));
+    await waitFor(() =>
+      expect(onTripUpdated).toHaveBeenCalledWith(updatedTrip),
+    );
     const [url, options] = (global.fetch as jest.Mock).mock.calls[0];
     expect(url).toBe("/api/v1/trips/1/availability");
     expect(options.method).toBe("PATCH");
