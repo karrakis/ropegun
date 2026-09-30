@@ -62,8 +62,12 @@ class Api::V1::UsersControllerTest < ActionController::TestCase
     assert_includes names, "Carol"
   end
 
+  test "new users are discoverable by default without having to opt in" do
+    assert @carol.discoverable_by_search
+  end
+
   test "search excludes non-discoverable users even with an exact name match" do
-    # @carol left at the default (discoverable_by_search: false)
+    @carol.update!(discoverable_by_search: false) # explicitly opted out
     sign_in_as(@alice)
     get :search, params: { q: "Carol" }
     names = JSON.parse(response.body).map { |u| u["name"] }

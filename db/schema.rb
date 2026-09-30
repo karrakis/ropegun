@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2026_09_28_130000) do
+ActiveRecord::Schema[7.0].define(version: 2026_09_30_140000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -189,7 +189,7 @@ ActiveRecord::Schema[7.0].define(version: 2026_09_28_130000) do
     t.string "home_address"
     t.uuid "uuid", default: -> { "gen_random_uuid()" }, null: false
     t.jsonb "profile_visibility", default: {}, null: false
-    t.boolean "discoverable_by_search", default: false, null: false
+    t.boolean "discoverable_by_search", default: true, null: false
     t.index ["uuid"], name: "index_users_on_uuid", unique: true
   end
 

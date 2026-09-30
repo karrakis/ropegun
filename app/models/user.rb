@@ -88,7 +88,7 @@ class User < ApplicationRecord
     FriendshipsChannel.broadcast_to(self, friendships_payload)
   end
 
-  # Users who've opted in (Phase 5), excluding this user and anyone already
+  # Users who haven't opted out, excluding this user and anyone already
   # connected (or pending) with them, matching name or email.
   def self.discoverable_search(query, excluding:)
     excluded_ids = Friendship.where(user_id: excluding.id).pluck(:friend_id) +
