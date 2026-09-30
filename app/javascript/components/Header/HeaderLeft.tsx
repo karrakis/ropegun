@@ -11,6 +11,10 @@ export const HeaderLeft = ({ page, setPage }) => {
     setMenuOpen(false);
     setFeedbackOpen(true);
   };
+  const goToPlanATrip = () => {
+    setMenuOpen(false);
+    setPage("/trip_plan");
+  };
 
   useEffect(() => {
     setMenuOpen(false);
@@ -21,17 +25,14 @@ export const HeaderLeft = ({ page, setPage }) => {
       id="header-left"
       className="justify-start flex w-full ml-2 cursor-pointer"
     >
-      <div onClick={() => setPage("/trip_plan")} className="flex">
+      <div onClick={goToPlanATrip} className="flex">
         <img
           className="h-12"
           // src={require("../../assets/mountains-transparency5.png")}
           src={require("../../assets/mountains-transparency5.png")}
         />
-        <span className="px-4 py-2 bg-auburn text-xl flex flex-row items-center hidden md:block">
-          <span>Approach</span>
-        </span>
       </div>
-      <div onClick={() => setPage("/trip_plan")} className="flex ml-2">
+      <div onClick={goToPlanATrip} className="flex ml-2">
         <span className="px-4 py-2 bg-auburn text-xl flex flex-row items-center hidden md:block">
           <span>Plan a Trip</span>
         </span>
@@ -58,12 +59,7 @@ export const HeaderLeft = ({ page, setPage }) => {
       {menuOpen && (
         <div className="flex flex-col bg-night text-cream absolute top-16 left-0 w-full items-center pb-8 md:hidden">
           <div className="flex flex-col w-1/2">
-            <div onClick={() => setPage("/trip_plan")} className="flex">
-              <span className="px-4 py-2 bg-auburn text-xl flex flex-row items-center w-full mt-4">
-                <span>Approach</span>
-              </span>
-            </div>
-            <div onClick={() => setPage("/trip_plan")} className="flex">
+            <div onClick={goToPlanATrip} className="flex">
               <span className="px-4 py-2 bg-auburn text-xl flex flex-row items-center w-full mt-4">
                 <span>Plan a Trip</span>
               </span>
