@@ -5,67 +5,26 @@ class FeedbacksControllerTest < ActionDispatch::IntegrationTest
     @feedback = feedbacks(:one)
   end
 
-  # index/show/edit/update/destroy are intentionally simplified to redirect
-  # into the SPA rather than rendering the generated scaffold views/acting
-  # on the record — only `new`/`create` are live (linked from the header's
-  # "Feedback" button, see HeaderLeft.tsx).
-  test "should get index" do
-    get feedbacks_url
-    assert_redirected_to root_path
-  end
-
-  test "should get new" do
-    get new_feedback_url
-    assert_response :success
-  end
-
-  test "should create feedback" do
+  # Feedback is submitted from a modal (see FeedbackModal.tsx) rather than a
+  # standalone page, so create is the only action left — it just needs to
+  # create the record and report back as JSON.
+  test "create saves feedback and responds with the created record" do
     assert_difference("Feedback.count") do
-      post feedbacks_url, params: { feedback: { body: @feedback.body, email: @feedback.email, title: @feedback.title } }
+      post feedbacks_path,
+        params: { feedback: { title: @feedback.title, body: @feedback.body, email: @feedback.email } },
+        as: :json
     end
 
-    assert_redirected_to root_path
+    assert_response :created
+    body = JSON.parse(@response.body)
+    assert_equal @feedback.title, body["title"]
+    assert_equal @feedback.body, body["body"]
   end
 
-  test "create redirects back to return_to when present" do
-    post feedbacks_url, params: {
-      feedback: { body: @feedback.body, email: @feedback.email, title: @feedback.title },
-      return_to: "/trip_plan",
-    }
-
-    assert_redirected_to "/trip_plan"
-  end
-
-  test "create ignores an absolute/external return_to to avoid an open redirect" do
-    post feedbacks_url, params: {
-      feedback: { body: @feedback.body, email: @feedback.email, title: @feedback.title },
-      return_to: "https://evil.example.com",
-    }
-
-    assert_redirected_to root_path
-  end
-
-  test "should show feedback" do
-    get feedback_url(@feedback)
-    assert_redirected_to root_path
-  end
-
-  test "should get edit" do
-    get edit_feedback_url(@feedback)
-    assert_redirected_to root_path
-  end
-
-  test "should update feedback" do
-    patch feedback_url(@feedback), params: { feedback: { body: @feedback.body, email: @feedback.email, title: @feedback.title } }
-    assert_redirected_to root_path
-  end
-
-  test "should destroy feedback" do
-    assert_no_difference("Feedback.count") do
-      delete feedback_url(@feedback)
+  test "create only accepts the permitted feedback fields" do
+    assert_raises(ActionController::ParameterMissing) do
+      post feedbacks_path, params: {}, as: :json
     end
-
-    assert_redirected_to root_path
   end
 end
 

@@ -1,7 +1,7 @@
 Rails.application.routes.draw do
   mount ActionCable.server => "/cable"
 
-  resources :feedbacks
+  post '/feedbacks' => 'feedbacks#create'
   root 'landing#index'
 
   get '/auth/auth0/callback' => 'auth0#callback'

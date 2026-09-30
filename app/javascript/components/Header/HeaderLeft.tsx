@@ -1,9 +1,15 @@
 import React, { useState, useEffect } from "react";
+import FeedbackModal from "../Feedback/FeedbackModal";
 
 export const HeaderLeft = ({ page, setPage }) => {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [feedbackOpen, setFeedbackOpen] = useState(false);
   const unfoldMenu = () => {
     setMenuOpen(!menuOpen);
+  };
+  const openFeedback = () => {
+    setMenuOpen(false);
+    setFeedbackOpen(true);
   };
 
   useEffect(() => {
@@ -30,14 +36,11 @@ export const HeaderLeft = ({ page, setPage }) => {
           <span>Plan a Trip</span>
         </span>
       </div>
-      <a
-        href={`/feedbacks/new?return_to=${encodeURIComponent(page)}`}
-        className="flex ml-2"
-      >
+      <div onClick={openFeedback} className="flex ml-2">
         <span className="px-4 py-2 bg-auburn text-xl flex flex-row items-center hidden md:block">
           <span>Feedback</span>
         </span>
-      </a>
+      </div>
       <div
         onClick={() => unfoldMenu()}
         className="flex ml-2 w-8 h-8 flex-none md:hidden"
@@ -65,17 +68,15 @@ export const HeaderLeft = ({ page, setPage }) => {
                 <span>Plan a Trip</span>
               </span>
             </div>
-            <a
-              href={`/feedbacks/new?return_to=${encodeURIComponent(page)}`}
-              className="flex"
-            >
+            <div onClick={openFeedback} className="flex">
               <span className="px-4 py-2 bg-auburn text-xl flex flex-row items-center w-full mt-4">
                 <span>Feedback</span>
               </span>
-            </a>
+            </div>
           </div>
         </div>
       )}
+      <FeedbackModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
     </div>
   );
 };
