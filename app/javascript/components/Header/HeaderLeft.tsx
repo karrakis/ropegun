@@ -30,11 +30,14 @@ export const HeaderLeft = ({ page, setPage }) => {
           <span>Plan a Trip</span>
         </span>
       </div>
-      <div onClick={() => setPage("/development")} className="flex ml-2">
+      <a
+        href={`/feedbacks/new?return_to=${encodeURIComponent(page)}`}
+        className="flex ml-2"
+      >
         <span className="px-4 py-2 bg-auburn text-xl flex flex-row items-center hidden md:block">
-          <span>App Roadmap</span>
+          <span>Feedback</span>
         </span>
-      </div>
+      </a>
       <div
         onClick={() => unfoldMenu()}
         className="flex ml-2 w-8 h-8 flex-none md:hidden"
@@ -62,11 +65,14 @@ export const HeaderLeft = ({ page, setPage }) => {
                 <span>Plan a Trip</span>
               </span>
             </div>
-            <div onClick={() => setPage("/development")} className="flex">
+            <a
+              href={`/feedbacks/new?return_to=${encodeURIComponent(page)}`}
+              className="flex"
+            >
               <span className="px-4 py-2 bg-auburn text-xl flex flex-row items-center w-full mt-4">
-                <span>App Roadmap</span>
+                <span>Feedback</span>
               </span>
-            </div>
+            </a>
           </div>
         </div>
       )}

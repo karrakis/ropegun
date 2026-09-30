@@ -18,7 +18,6 @@ Rails.application.routes.draw do
   get '/trip_plan/new'      => 'components#index'
   get '/trip_plan/new/setup' => 'components#index'
   get '/trip_plan/:id'      => 'components#index'
-  get '/development' => 'components#index'
   get '/dashboard' => 'components#index'
   
   patch '/users/:id' => 'users#update'

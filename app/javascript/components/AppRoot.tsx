@@ -4,7 +4,6 @@ import Home from "./Home/Home";
 import Dashboard from "./Dashboard/Dashboard";
 import TripPlan from "./TripPlan/TripPlan";
 import ComingSoon from "./Home/Landing";
-import DevBlog from "./Devblog/Devblog";
 import { getConsumer } from "../utilities/cable";
 
 import { Geyikbayiri } from "../../assets/images/Geyikbayiri.jpg";
@@ -77,8 +76,6 @@ export const AppRoot: React.FC<AppRootProps> = ({
         );
       case "/trip_plan":
         return <TripPlan localUser={localUser} />;
-      case "/development":
-        return <DevBlog />;
       default:
         if (currentPage.startsWith("/trip_plan/")) {
           return <TripPlan localUser={localUser} />;

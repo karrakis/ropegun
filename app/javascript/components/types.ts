@@ -45,10 +45,6 @@ export interface LocationsSelectorProps {
   updateTrip: (trip: Trip) => void;
 }
 
-export interface DevblogProps {
-  user: UserSessionObject;
-}
-
 export interface localUserType {
   id: number;
   name: string;
