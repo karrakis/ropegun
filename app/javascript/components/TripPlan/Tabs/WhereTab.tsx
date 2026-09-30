@@ -136,6 +136,7 @@ interface WhereTabProps {
   localUser: any;
   isOrganizer: boolean;
   onTripUpdated: (trip: any) => void;
+  onAddLocation: () => void;
 }
 
 // ─── Distances sub-tab ────────────────────────────────────────────────────────
@@ -329,6 +330,7 @@ export const WhereTab: React.FC<WhereTabProps> = ({
   localUser,
   isOrganizer,
   onTripUpdated,
+  onAddLocation,
 }) => {
   const [selectedLocation, setSelectedLocation] = useState<any>(
     trip.locations?.[0] ?? null,
@@ -382,6 +384,14 @@ export const WhereTab: React.FC<WhereTabProps> = ({
       {/* Sub-tab content */}
       {subTab === "locations" && (
         <div className="p-4 flex flex-col gap-3">
+          {isOrganizer && (
+            <button
+              className="self-start bg-auburn text-cream px-3 py-1.5 rounded text-sm font-semibold"
+              onClick={onAddLocation}
+            >
+              + Add location
+            </button>
+          )}
           {locations.length === 0 && (
             <p className="text-ashgray text-sm">No locations on this trip.</p>
           )}

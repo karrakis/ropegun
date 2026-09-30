@@ -100,11 +100,8 @@ export const DiscussTab: React.FC<DiscussTabProps> = ({
 
       {/* Sticky so the composer stays reachable no matter how long the
           thread gets — it shouldn't require scrolling past every comment
-          to post a new one. Extra bottom padding clears the fixed
-          "+ New trip" button (bottom-4 right-4) rendered on top of this
-          screen in TripPlan.tsx, which otherwise sits directly over the
-          Post button and swallows its clicks. */}
-      <div className="sticky bottom-0 bg-cream px-4 pt-2 pb-20 border-t border-ashgray border-opacity-20 flex flex-col gap-2">
+          to post a new one. */}
+      <div className="sticky bottom-0 bg-cream px-4 pt-2 pb-4 border-t border-ashgray border-opacity-20 flex flex-col gap-2">
         <textarea
           className="w-full rounded bg-night text-cream text-sm px-3 py-2 focus:outline-none focus:ring-2 focus:ring-auburn"
           rows={2}

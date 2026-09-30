@@ -14,6 +14,7 @@ interface TripSummaryProps {
   localUser: any;
   onTripUpdated: (trip: any) => void;
   onBack: () => void;
+  onAddLocation: () => void;
 }
 
 const TAB_LABELS: { id: Tab; label: string }[] = [
@@ -29,6 +30,7 @@ export const TripSummary: React.FC<TripSummaryProps> = ({
   localUser,
   onTripUpdated,
   onBack,
+  onAddLocation,
 }) => {
   const [activeTab, setActiveTab] = useState<Tab>("where");
 
@@ -91,6 +93,7 @@ export const TripSummary: React.FC<TripSummaryProps> = ({
             localUser={localUser}
             isOrganizer={isOrganizer}
             onTripUpdated={onTripUpdated}
+            onAddLocation={onAddLocation}
           />
         )}
         {activeTab === "when" && (
