@@ -10,9 +10,7 @@ describe("HeaderLeft", () => {
 
   test("clicking Feedback opens the feedback modal instead of navigating", () => {
     render(<HeaderLeft page="/dashboard" setPage={jest.fn()} />);
-    expect(
-      screen.queryByText("What's on your mind?"),
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText("What's on your mind?")).not.toBeInTheDocument();
 
     fireEvent.click(screen.getAllByText("Feedback")[0]);
 

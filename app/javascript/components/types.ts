@@ -55,6 +55,10 @@ export interface localUserType {
 export interface TripPlanProps {
   localUser: localUserType;
   tripLocations?: Location[];
+  // Lets TripPlan tell its host (AppRoot) that the current screen wants the
+  // full viewport instead of the normal max-w-md, chrome-wrapped layout —
+  // e.g. the trip editor and the full-page "add a location" map step.
+  onFullBleedChange?: (fullBleed: boolean) => void;
 }
 
 export interface TripEditProps {

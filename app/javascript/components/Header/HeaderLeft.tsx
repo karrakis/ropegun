@@ -72,7 +72,10 @@ export const HeaderLeft = ({ page, setPage }) => {
           </div>
         </div>
       )}
-      <FeedbackModal open={feedbackOpen} onClose={() => setFeedbackOpen(false)} />
+      <FeedbackModal
+        open={feedbackOpen}
+        onClose={() => setFeedbackOpen(false)}
+      />
     </div>
   );
 };

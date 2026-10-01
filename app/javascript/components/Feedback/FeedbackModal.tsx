@@ -70,7 +70,10 @@ export const FeedbackModal: React.FC<FeedbackModalProps> = ({
 
   return (
     <Dialog open={open} onClose={handleClose} className="relative z-50">
-      <div className="fixed inset-0 bg-night bg-opacity-60" aria-hidden="true" />
+      <div
+        className="fixed inset-0 bg-night bg-opacity-60"
+        aria-hidden="true"
+      />
       <div className="fixed inset-0 flex items-center justify-center p-4">
         <DialogPanel className="w-full max-w-md bg-night text-cream rounded-lg p-6 flex flex-col gap-4">
           <button

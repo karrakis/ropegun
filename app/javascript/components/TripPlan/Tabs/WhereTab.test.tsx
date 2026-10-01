@@ -69,3 +69,65 @@ describe("WhereTab — Add location", () => {
     expect(onAddLocation).toHaveBeenCalledTimes(1);
   });
 });
+
+describe("WhereTab — Overview packing list", () => {
+  const localUser = { id: 1, name: "Alice" };
+
+  const baseTrip = (overrides: Partial<any> = {}) => ({
+    id: 42,
+    locations: [],
+    route_mode: false,
+    ...overrides,
+  });
+
+  test("shows a placeholder when the local user has no gear commitments", () => {
+    render(
+      <WhereTab
+        trip={baseTrip({ trip_gear_items: [] })}
+        localUser={localUser}
+        isOrganizer={true}
+        onTripUpdated={jest.fn()}
+        onAddLocation={jest.fn()}
+      />,
+    );
+    expect(screen.getByText("Your packing list")).toBeInTheDocument();
+    expect(
+      screen.getByText("You haven't committed to bring any gear yet."),
+    ).toBeInTheDocument();
+  });
+
+  test("lists only gear items the local user has committed to bring, with quantity", () => {
+    const trip = baseTrip({
+      trip_gear_items: [
+        {
+          id: 1,
+          gear_item: { name: "Tent" },
+          commitments: [{ user_id: 1, user_name: "Alice", quantity: 2 }],
+        },
+        {
+          id: 2,
+          gear_item: { name: "Stove" },
+          commitments: [{ user_id: 2, user_name: "Bob", quantity: 1 }],
+        },
+        {
+          id: 3,
+          gear_item: { name: "Lantern" },
+          commitments: [{ user_id: 1, user_name: "Alice", quantity: 0 }],
+        },
+      ],
+    });
+    render(
+      <WhereTab
+        trip={trip}
+        localUser={localUser}
+        isOrganizer={true}
+        onTripUpdated={jest.fn()}
+        onAddLocation={jest.fn()}
+      />,
+    );
+    expect(screen.getByText("Tent")).toBeInTheDocument();
+    expect(screen.getByText("× 2")).toBeInTheDocument();
+    expect(screen.queryByText("Stove")).not.toBeInTheDocument();
+    expect(screen.queryByText("Lantern")).not.toBeInTheDocument();
+  });
+});

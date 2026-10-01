@@ -37,7 +37,10 @@ function parsePath(path: string): { screen: string; tripId: string | null } {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
-export const TripPlan = ({ localUser }: TripPlanProps) => {
+export const TripPlan = ({
+  localUser,
+  onFullBleedChange,
+}: TripPlanProps) => {
   const [path, setPath] = useState(currentPath());
   const [createdTrip, setCreatedTrip] = useState<any>(null);
   const [tripLoading, setTripLoading] = useState(false);
@@ -51,6 +54,17 @@ export const TripPlan = ({ localUser }: TripPlanProps) => {
   }, []);
 
   const { screen, tripId } = parsePath(path);
+
+  // Only the add-location map step needs the whole viewport (no Header, no
+  // max-w-md column) so the map has room to work on phones. The trip editor
+  // itself stays within the app's normal constrained column like every
+  // other screen. Tell AppRoot so it can render us outside its normal
+  // chrome instead of us faking it locally with position:fixed.
+  const isFullBleed = screen === "add_location";
+  useEffect(() => {
+    onFullBleedChange?.(isFullBleed);
+    return () => onFullBleedChange?.(false);
+  }, [isFullBleed]);
 
   // When URL says "created/:id" (or its "add_location" sub-screen) but we
   // don't have the trip in memory, fetch it.
@@ -122,6 +136,45 @@ export const TripPlan = ({ localUser }: TripPlanProps) => {
     }
   };
 
+  // ── Trip Summary (stays within the normal constrained column) ──
+  if (screen === "created") {
+    return (
+      <div className="w-full h-screen-minus-header bg-cream">
+        {tripLoading || !createdTrip ? (
+          <p className="text-ashgray text-sm p-8">Loading trip…</p>
+        ) : (
+          <TripSummary
+            trip={createdTrip}
+            localUser={localUser}
+            onTripUpdated={setCreatedTrip}
+            onBack={() => navigate("/trip_plan/trips")}
+            onAddLocation={() => navigate(`/trip_plan/${tripId}/add_location`)}
+          />
+        )}
+      </div>
+    );
+  }
+
+  // ── Add a location to an existing trip (full-bleed) ──
+  if (screen === "add_location" && tripId) {
+    return (
+      <div className="w-full h-full bg-cream flex flex-col">
+        <div className="w-full flex items-center gap-2 bg-auburn p-2 z-10">
+          <BackCaret onClick={() => navigate(`/trip_plan/${tripId}`)} />
+          <h1 className="text-cream text-2xl font-bold truncate">
+            Add a location
+          </h1>
+        </div>
+        {addLocationError && (
+          <div className="text-red-400 text-sm px-3 pt-2">
+            {addLocationError}
+          </div>
+        )}
+        <DestinationSelector onDestinationAdded={handleLocationAddedToTrip} />
+      </div>
+    );
+  }
+
   return (
     <div className="w-full flex flex-row justify-center h-full">
       <div className="flex flex-col justify-start h-fit w-full text-cream max-w-3xl h-screen-minus-header">
@@ -185,43 +238,6 @@ export const TripPlan = ({ localUser }: TripPlanProps) => {
           )}
         </div>
       </div>
-
-      {/* ── Trip Summary ── */}
-      {screen === "created" && (
-        <div className="fixed inset-0 z-50 bg-cream overflow-y-auto">
-          {tripLoading || !createdTrip ? (
-            <p className="text-ashgray text-sm p-8">Loading trip…</p>
-          ) : (
-            <TripSummary
-              trip={createdTrip}
-              localUser={localUser}
-              onTripUpdated={setCreatedTrip}
-              onBack={() => navigate("/trip_plan/trips")}
-              onAddLocation={() =>
-                navigate(`/trip_plan/${tripId}/add_location`)
-              }
-            />
-          )}
-        </div>
-      )}
-
-      {/* ── Add a location to an existing trip ── */}
-      {screen === "add_location" && tripId && (
-        <div className="fixed inset-0 z-50 bg-cream flex flex-col">
-          <div className="w-full flex items-center gap-2 bg-auburn p-2 z-10">
-            <BackCaret onClick={() => navigate(`/trip_plan/${tripId}`)} />
-            <h1 className="text-cream text-2xl font-bold truncate">
-              Add a location
-            </h1>
-          </div>
-          {addLocationError && (
-            <div className="text-red-400 text-sm px-3 pt-2">
-              {addLocationError}
-            </div>
-          )}
-          <DestinationSelector onDestinationAdded={handleLocationAddedToTrip} />
-        </div>
-      )}
     </div>
   );
 };

@@ -17,6 +17,12 @@ export const AppRoot: React.FC<AppRootProps> = ({
 }) => {
   const [currentPage, setCurrentPage] = useState(window.location.pathname);
   const [localUser, setLocalUser] = useState(initialLocalUser);
+  // Some pages (currently just TripPlan's trip editor and its full-page
+  // "add a location" map step) need the whole viewport instead of being
+  // squeezed into the normal max-w-md column below a sticky Header — they
+  // tell us via onFullBleedChange rather than each faking it locally with
+  // position:fixed (which fights any max-w we set here).
+  const [fullBleed, setFullBleed] = useState(false);
 
   // Friendship changes (a sent invite being accepted/declined, etc.) are
   // pushed here regardless of which page is currently showing, since this
@@ -61,7 +67,9 @@ export const AppRoot: React.FC<AppRootProps> = ({
     }
     switch (currentPage) {
       case "/":
-        return <TripPlan localUser={localUser} />;
+        return (
+          <TripPlan localUser={localUser} onFullBleedChange={setFullBleed} />
+        );
       case "/home":
         return <Home localUser={localUser} />;
       case "/dashboard":
@@ -75,10 +83,17 @@ export const AppRoot: React.FC<AppRootProps> = ({
           />
         );
       case "/trip_plan":
-        return <TripPlan localUser={localUser} />;
+        return (
+          <TripPlan localUser={localUser} onFullBleedChange={setFullBleed} />
+        );
       default:
         if (currentPage.startsWith("/trip_plan/")) {
-          return <TripPlan localUser={localUser} />;
+          return (
+            <TripPlan
+              localUser={localUser}
+              onFullBleedChange={setFullBleed}
+            />
+          );
         }
         return null;
     }
@@ -102,8 +117,16 @@ export const AppRoot: React.FC<AppRootProps> = ({
         />
       </a>
 
-      <Header user={user} csrf={csrf} page={currentPage} setPage={goToPage} />
-      {setDisplayPage()}
+      {!fullBleed && (
+        <Header user={user} csrf={csrf} page={currentPage} setPage={goToPage} />
+      )}
+      <div
+        className={
+          fullBleed ? "h-full w-full" : "flex max-w-md mx-auto"
+        }
+      >
+        {setDisplayPage()}
+      </div>
     </div>
   );
 };

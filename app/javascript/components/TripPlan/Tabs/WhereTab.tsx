@@ -448,6 +448,48 @@ export const WhereTab: React.FC<WhereTabProps> = ({
               </div>
             </div>
           ))}
+
+          {/* Packing list — gear this person has committed to bring */}
+          <div className="bg-night rounded p-3">
+            <h3 className="text-cream font-semibold text-sm mb-2">
+              Your packing list
+            </h3>
+            {(() => {
+              const myGear = (trip.trip_gear_items ?? []).filter(
+                (item: any) =>
+                  item.commitments?.some(
+                    (c: any) => c.user_id === localUser.id && c.quantity > 0,
+                  ),
+              );
+              if (myGear.length === 0) {
+                return (
+                  <p className="text-ashgray text-xs">
+                    You haven't committed to bring any gear yet.
+                  </p>
+                );
+              }
+              return (
+                <ul className="flex flex-col gap-1">
+                  {myGear.map((item: any) => {
+                    const mine = item.commitments.find(
+                      (c: any) => c.user_id === localUser.id,
+                    );
+                    return (
+                      <li
+                        key={item.id}
+                        className="flex justify-between text-sm"
+                      >
+                        <span className="text-cream">
+                          {item.gear_item?.name}
+                        </span>
+                        <span className="text-ashgray">× {mine.quantity}</span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              );
+            })()}
+          </div>
         </div>
       )}
 

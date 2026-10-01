@@ -1,0 +1,11 @@
+<div class="bg-auburn text-cream w-screen h-screen p-4">
+  <a href="<%= @return_to %>" class="inline-block mb-4 text-cream underline">&larr; Back</a>
+  <h1>What's on your mind?</h1>
+  <p>However harsh it sounds, it'll be nicer than whatever the next person to find the same problem <i>thinks</i>, so don't spare me, please.</p>
+  <p>This is a solo dev project and development will happen in fits and spurts, but I promise I do read all of these.</p>
+
+  <%= render "form", feedback: @feedback, return_to: @return_to %>
+
+  <br>
+</div>
+
