@@ -468,6 +468,16 @@ export const WhereTab: React.FC<WhereTabProps> = ({
                   </p>
                 );
               }
+              const togglePacked = async (tripGearId: number) => {
+                const res = await fetch(
+                  `/api/v1/trip_gear_items/${tripGearId}/toggle_packed`,
+                  {
+                    method: "PATCH",
+                    headers: { "X-CSRF-Token": csrfToken() },
+                  },
+                );
+                if (res.ok) onTripUpdated(await res.json());
+              };
               return (
                 <ul className="flex flex-col gap-1">
                   {myGear.map((item: any) => {
@@ -477,11 +487,25 @@ export const WhereTab: React.FC<WhereTabProps> = ({
                     return (
                       <li
                         key={item.id}
-                        className="flex justify-between text-sm"
+                        className="flex items-center justify-between text-sm"
                       >
-                        <span className="text-cream">
-                          {item.gear_item?.name}
-                        </span>
+                        <label className="flex items-center gap-2 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={!!mine.packed}
+                            onChange={() => togglePacked(item.id)}
+                            className="w-4 h-4"
+                          />
+                          <span
+                            className={
+                              mine.packed
+                                ? "text-ashgray line-through"
+                                : "text-cream"
+                            }
+                          >
+                            {item.gear_item?.name}
+                          </span>
+                        </label>
                         <span className="text-ashgray">× {mine.quantity}</span>
                       </li>
                     );

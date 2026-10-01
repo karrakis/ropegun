@@ -53,6 +53,60 @@ class Api::V1::TripGearItemsControllerTest < ActionController::TestCase
     assert_equal 1, @tgi.commitments.count { |c| c["user_id"] == @bob.id }
   end
 
+  test "commit preserves a previously-set packed flag across re-commits" do
+    sign_in_as(@bob)
+    patch :commit, params: { id: @tgi.id, user_id: @bob.id, quantity: "2" }
+    patch :toggle_packed, params: { id: @tgi.id }
+    patch :commit, params: { id: @tgi.id, user_id: @bob.id, quantity: "3" }
+    assert_response :success
+    @tgi.reload
+    commitment = @tgi.commitments.find { |c| c["user_id"] == @bob.id }
+    assert_equal true, commitment["packed"]
+    assert_equal 3, commitment["quantity"]
+  end
+
+  test "toggle_packed flips the signed-in user's own packed flag" do
+    sign_in_as(@bob)
+    patch :commit, params: { id: @tgi.id, user_id: @bob.id, quantity: "1" }
+    @tgi.reload
+    commitment = @tgi.commitments.find { |c| c["user_id"] == @bob.id }
+    assert_equal false, commitment["packed"]
+
+    patch :toggle_packed, params: { id: @tgi.id }
+    assert_response :success
+    @tgi.reload
+    commitment = @tgi.commitments.find { |c| c["user_id"] == @bob.id }
+    assert_equal true, commitment["packed"]
+
+    patch :toggle_packed, params: { id: @tgi.id }
+    assert_response :success
+    @tgi.reload
+    commitment = @tgi.commitments.find { |c| c["user_id"] == @bob.id }
+    assert_equal false, commitment["packed"]
+  end
+
+  test "toggle_packed only affects the signed-in user's own commitment" do
+    sign_in_as(@bob)
+    patch :commit, params: { id: @tgi.id, user_id: @bob.id, quantity: "1" }
+    sign_in_as(@alice)
+    patch :commit, params: { id: @tgi.id, user_id: @alice.id, quantity: "1" }
+
+    sign_in_as(@alice)
+    patch :toggle_packed, params: { id: @tgi.id }
+    assert_response :success
+    @tgi.reload
+    alice_commitment = @tgi.commitments.find { |c| c["user_id"] == @alice.id }
+    bob_commitment = @tgi.commitments.find { |c| c["user_id"] == @bob.id }
+    assert_equal true, alice_commitment["packed"]
+    assert_equal false, bob_commitment["packed"]
+  end
+
+  test "toggle_packed returns unprocessable_entity when the user has no commitment" do
+    sign_in_as(@bob)
+    patch :toggle_packed, params: { id: @tgi.id }
+    assert_response :unprocessable_entity
+  end
+
   test "update is scoped to the trip owner" do
     sign_in_as(@bob)
     patch :update, params: { id: @tgi.id, required_quantity: "5" }

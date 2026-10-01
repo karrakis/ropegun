@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { userEvent } from "@testing-library/user-event";
 import { WhereTab } from "./WhereTab";
 
@@ -129,5 +129,95 @@ describe("WhereTab — Overview packing list", () => {
     expect(screen.getByText("× 2")).toBeInTheDocument();
     expect(screen.queryByText("Stove")).not.toBeInTheDocument();
     expect(screen.queryByText("Lantern")).not.toBeInTheDocument();
+  });
+
+  test("renders a checkbox per packing-list item reflecting its persisted packed state", () => {
+    const trip = baseTrip({
+      trip_gear_items: [
+        {
+          id: 1,
+          gear_item: { name: "Tent" },
+          commitments: [
+            { user_id: 1, user_name: "Alice", quantity: 2, packed: true },
+          ],
+        },
+        {
+          id: 2,
+          gear_item: { name: "Stove" },
+          commitments: [
+            { user_id: 1, user_name: "Alice", quantity: 1, packed: false },
+          ],
+        },
+      ],
+    });
+    render(
+      <WhereTab
+        trip={trip}
+        localUser={localUser}
+        isOrganizer={true}
+        onTripUpdated={jest.fn()}
+        onAddLocation={jest.fn()}
+      />,
+    );
+    const tentCheckbox = screen.getByRole("checkbox", { name: /Tent/ });
+    const stoveCheckbox = screen.getByRole("checkbox", { name: /Stove/ });
+    expect(tentCheckbox).toBeChecked();
+    expect(stoveCheckbox).not.toBeChecked();
+  });
+
+  test("clicking a packing-list checkbox persists the toggle via the API and applies the response", async () => {
+    const trip = baseTrip({
+      trip_gear_items: [
+        {
+          id: 1,
+          gear_item: { name: "Tent" },
+          commitments: [
+            { user_id: 1, user_name: "Alice", quantity: 2, packed: false },
+          ],
+        },
+      ],
+    });
+    const updatedTrip = {
+      ...trip,
+      trip_gear_items: [
+        {
+          id: 1,
+          gear_item: { name: "Tent" },
+          commitments: [
+            { user_id: 1, user_name: "Alice", quantity: 2, packed: true },
+          ],
+        },
+      ],
+    };
+    global.fetch = jest.fn((url: string, opts?: any) => {
+      if (
+        url === "/api/v1/trip_gear_items/1/toggle_packed" &&
+        opts?.method === "PATCH"
+      ) {
+        return Promise.resolve({ ok: true, json: async () => updatedTrip });
+      }
+      return Promise.resolve({ ok: true, json: async () => ({}) });
+    }) as jest.Mock;
+    const onTripUpdated = jest.fn();
+
+    render(
+      <WhereTab
+        trip={trip}
+        localUser={localUser}
+        isOrganizer={true}
+        onTripUpdated={onTripUpdated}
+        onAddLocation={jest.fn()}
+      />,
+    );
+
+    await userEvent.click(screen.getByRole("checkbox", { name: /Tent/ }));
+
+    await waitFor(() =>
+      expect(global.fetch).toHaveBeenCalledWith(
+        "/api/v1/trip_gear_items/1/toggle_packed",
+        expect.objectContaining({ method: "PATCH" }),
+      ),
+    );
+    await waitFor(() => expect(onTripUpdated).toHaveBeenCalledWith(updatedTrip));
   });
 });

@@ -21,8 +21,16 @@ class Api::V1::TripGearItemsController < ApplicationController
     user = User.find(params[:user_id])
     quantity = params[:quantity].to_i
     commitments = tgi.extra_data&.fetch("commitments", []) || []
+    previous = commitments.find { |c| c["user_id"] == user.id }
     commitments = commitments.reject { |c| c["user_id"] == user.id }
-    commitments << { "user_id" => user.id, "user_name" => user.name, "quantity" => quantity } if quantity > 0
+    if quantity > 0
+      commitments << {
+        "user_id" => user.id,
+        "user_name" => user.name,
+        "quantity" => quantity,
+        "packed" => previous&.fetch("packed", false) || false
+      }
+    end
     committed_total = commitments.sum { |c| c["quantity"].to_i }
     tgi.update!(
       quantity: committed_total,
@@ -31,6 +39,22 @@ class Api::V1::TripGearItemsController < ApplicationController
         "committed_quantity" => committed_total
       )
     )
+    tgi.trip.broadcast_refresh!
+    render json: tgi.trip.reload.serialize_for
+  end
+
+  # Toggles the signed-in user's own "packed" flag for their commitment on
+  # this gear item. Scoped to the current user (never a user_id param) so
+  # nobody can mark someone else's packing list item as packed.
+  def toggle_packed
+    tgi = TripGearItem.find(params[:id])
+    commitments = tgi.extra_data&.fetch("commitments", []) || []
+    commitment = commitments.find { |c| c["user_id"] == current_local_user.id }
+    unless commitment
+      return render json: { error: "No commitment to pack" }, status: :unprocessable_entity
+    end
+    commitment["packed"] = !commitment["packed"]
+    tgi.update!(extra_data: (tgi.extra_data || {}).merge("commitments" => commitments))
     tgi.trip.broadcast_refresh!
     render json: tgi.trip.reload.serialize_for
   end
